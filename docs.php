@@ -25,7 +25,7 @@
 	// Get a list of google sites
 	$area2 .= '<div id="googleappslogin">';
   $area2 .= '<script type="text/javascript" src="/mod/googleappslogin/jquery.tablesorter.js"></script> ';
-  $area2 .= '<script>$(function(){$('#docs_table').tablesorter()});</script>';
+  $area2 .= '<script>$(function(){$("#docs_table").tablesorter()});</script>';
 	$area2 .= '<div class="contentWrapper singleview">';
 
 
