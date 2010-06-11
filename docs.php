@@ -24,6 +24,8 @@
 
 	// Get a list of google sites
 	$area2 .= '<div id="googleappslogin">';
+  $area2 .= '<script type="text/javascript" src="/mod/googleappslogin/jquery.tablesorter.js"></script> ';
+  $area2 .= '<script>$(function(){$('#docs_table').tablesorter()});</script>';
 	$area2 .= '<div class="contentWrapper singleview">';
 
 
@@ -37,7 +39,7 @@
                              </table>';
         
         $area2.='<div class="docs_table">            
-                                <table width="100%">';
+                                <table width="100%" id="docs_table">';
 
         $documents_collaborators=array();
 	foreach ($google_docs as $id => $doc) {
