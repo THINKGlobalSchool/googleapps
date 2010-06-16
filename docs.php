@@ -24,16 +24,16 @@
 
 	// Get a list of google sites
 	$area2 .= '<div id="googleappslogin">';
-  $area2 .= '<link rel="stylesheet" href="/mod/googleappslogin/css/style.css" type="text/css" /> ';
-  $area2 .= '<script type="text/javascript" src="/mod/googleappslogin/jquery.tablesorter.js"></script> ';
-  $area2 .= '<script>$(function(){$("#docs_table").tablesorter()});</script>';
+	$area2 .= '<link rel="stylesheet" href="/mod/googleappslogin/css/style.css" type="text/css" /> ';
+	$area2 .= '<script type="text/javascript" src="/mod/googleappslogin/jquery.tablesorter.js"></script> ';
+	$area2 .= '<script>function sort_number (n) { if (n < 10) return "00" + n; else if (n < 100) return "0" + n; else return n.toString(); }; $(function(){$("#docs_table").tablesorter({textExtraction:function (x) { var n = parseInt(x.firstChild.innerHTML, 10); return isNaN(n) ? x.innerHTML : sort_number(n); }})});</script>';
 	$area2 .= '<div class="contentWrapper singleview">';
 
 
         $area2 .='<form action="'.$GLOBALS['share_doc_url'].'" method="post">';
         $area2 .='<label>Comment to add</label><br /><textarea name="comment" class="docs_comment"></textarea><br /><br />';
         $area2.='<div class="docs_table">            
-          <table width="100%" id="docs_table">
+          <table width="100%" id="docs_table" class="tablesorter">
             <thead>
               <tr><th width="70"></th><th  width="200"><b>Name</b></th><th><b>Sharing</b></th><th><b>Modified</b></th></tr>
             </thead><tbody>';
