@@ -46,7 +46,7 @@ switch ($answer) {
     case 'Cancel':
         break;        
 }
-
+die('OK');
 forward($url_to_redirect);
 
 ?>

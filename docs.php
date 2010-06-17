@@ -17,12 +17,26 @@
 	$user = $_SESSION['user'];
 	$area2 = elgg_view_title(elgg_echo('googleappslogin:google_docs'));
 
+	$area2 .= '<form action="'.$GLOBALS['share_doc_url'].'" method="post" onsubmit="return ajax_submit(this)" >';
 	// Get a list of google sites
 	$area2 .= '<div id="googleappslogin">Loading...</div>';
 	$area2 .= '<script>
 	function load_docs() {
 		$("#googleappslogin").load("?action=documents");
 	};
+
+	function ajax_submit(x) {
+		var data = {};
+		$($(x).serializeArray()).each(function (i, e) {
+			data[e.name] = e.value;
+		});
+		console.log(x.action);
+		$.post(x.action.replace(/^http(s?):\/\/.*?\//, "/"), data, function (r) {
+			$("<div></div>").html(r).dialog();
+			load_docs();
+		});
+		return false;
+	}
 	$(load_docs);
 	</script>';
 
@@ -63,6 +77,7 @@
 
 		$area = '';
 		$area .= '<link rel="stylesheet" href="/mod/googleappslogin/css/style.css" type="text/css" /> ';
+		$area .= '<link rel="stylesheet" href="/mod/googleappslogin/css/jquery-ui-173/css/custom-theme/jquery-ui-1.7.3.custom.css" type="text/css" /> ';
 		$area .= '<script type="text/javascript" src="/mod/googleappslogin/jquery.tablesorter.js"></script> ';
 		$area .= '<script>
 			function sort_number (n) {
@@ -85,7 +100,6 @@
 		$area .= '<div class="contentWrapper singleview">';
 
 
-		$area .= '<form action="'.$GLOBALS['share_doc_url'].'" method="post">';
 		$area .= '<label>Comment to add</label><br /><textarea name="comment" class="docs_comment"></textarea><br /><br />';
 		$area .= '<div class="docs_table">            
 		  <table width="100%" id="docs_table" class="tablesorter">
@@ -110,6 +124,7 @@
 		    </tr>
 		    ';
 		}
+		$area .= '</tbody></table></div>';
 		echo $area;
 	exit;
 	}
