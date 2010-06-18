@@ -15,13 +15,13 @@ $to_share['group']=$group_id;
 $_SESSION['google_docs_to_share_data']=serialize( $to_share ); // remember data
 
 if ( is_null($doc_id) ) {
-	die('No doc id');
+    die('No doc id');
     system_message(elgg_echo("googleappslogin:doc:share:no_doc_id"));
     forward($url_to_redirect);
 }
 
 if( empty($comment)) {
-	die('No comment');
+    die('No comment');
     system_message(elgg_echo("googleappslogin:doc:share:no_comment"));
     forward($url_to_redirect);
 }
@@ -38,18 +38,20 @@ if ($activity_access == 'group') {
 
 if (! check_document_permission($doc_access, $activity_access, $members) ) {
 
-	$area2 .= '<div id="googleappslogin">';
+	$area2 .= '
+	<script>
+	function save_answer(el) {
+		el.form.answer.value = el.value;
+	}
+	</script>';
 	$area2 .= '<div class="contentWrapper singleview">';
-
-
-        $area2 .='<form action="'. $GLOBALS['change_doc_permissions_url'] .'" onsubmit="return ajax_submit(this);"  method="post">';
-        $area2 .='<h3>'.elgg_echo('googleappslogin:doc:share:wrong_permissions').'</h3>';
-        $area2 .='<input type="submit" value="Grant view permisson" name="answer">&nbsp;';
-        $area2 .='<input type="submit" value="Ignore and continue" name="answer">&nbsp;';
-        $area2 .='<input type="submit" value="Cancel" name="answer">&nbsp;';
-
-
-        $area2.='</div><div class="clearfloat"></div></div>';
+        $area2 .= '<form action="'. $GLOBALS['change_doc_permissions_url'] .'" onsubmit="return ajax_submit(this);"  method="post">';
+        $area2 .= '<h3>'.elgg_echo('googleappslogin:doc:share:wrong_permissions').'</h3>';
+        $area2 .= '<input type="hidden" value="" name="answer">&nbsp;';
+        $area2 .= '<input type="submit" value="Grant view permisson" onclick="save_answer(this)">&nbsp;';
+        $area2 .= '<input type="submit" value="Ignore and continue" onclick="save_answer(this)">&nbsp;';
+        $area2 .= '<input type="submit" value="Cancel" onclick="save_answer(this)">&nbsp;';
+        $area2 .= '</div><div class="clearfloat"></div>';
 	echo $area2;
  } else {
 

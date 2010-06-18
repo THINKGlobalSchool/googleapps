@@ -20,25 +20,7 @@
 	$area2 .= '<form action="'.$GLOBALS['share_doc_url'].'" method="post" onsubmit="return ajax_submit(this)" >';
 	// Get a list of google sites
 	$area2 .= '<div id="googleappslogin">Loading...</div>';
-	$area2 .= '<script>
-	function load_docs() {
-		$("#googleappslogin").load("?action=documents");
-	};
-
-	function ajax_submit(x) {
-		var data = {};
-		$($(x).serializeArray()).each(function (i, e) {
-			data[e.name] = e.value;
-		});
-		console.log(x.action);
-		$.post(x.action.replace(/^http(s?):\/\/.*?\//, "/"), data, function (r) {
-			$("<div></div>").html(r).dialog();
-			load_docs();
-		});
-		return false;
-	}
-	$(load_docs);
-	</script>';
+	$area2 .= '';
 
         $area2.='<br />View access level: <select name="access" id="access" onchange="showGroups()">';
         $area2.='<option value="public">Public</option>';
@@ -144,4 +126,24 @@ function showGroups(){
     }
 
 }
+function load_docs() {
+	$("#googleappslogin").load("?action=documents");
+}
+
+function ajax_submit(x) {
+	var data = {};
+	$($(x).serializeArray()).each(function (i, e) {
+		data[e.name] = e.value;
+	});
+	$.post(x.action.replace(/^http(s?):\/\/.*?\//, "/"), data, function (r) {
+		var $dlg = $("<div></div>").html(r).dialog().find('form').submit(function () {
+			$dlg.parents('.ui-dialog').remove();
+		});
+		if (r.toUpperCase() === 'OK') {
+			load_docs();
+		}
+	});
+	return false;
+}
+$(load_docs);
 </script>  
