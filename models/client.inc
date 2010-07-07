@@ -122,8 +122,8 @@ class OAuth_Client {
 	}
 
 	public function authorized() {
-        
-		if (!empty($_SESSION['access_token']) && !empty($_SESSION['access_secret'])) {                    
+
+		if (!empty($_SESSION['access_token']) && !empty($_SESSION['access_secret'])) {
 //empty($this->access_token) && empty($this->access_secret)) {
 			$this->access_token = $_SESSION['access_token'];
 			$this->access_secret = $_SESSION['access_secret'];
@@ -190,6 +190,32 @@ class OAuth_Client {
 				null, false);
 
 	}
+
+	public function execute_post($endpoint, $version = '2.0', $params = null, $method= 'GET', $data=null) {
+
+		if (empty($this->access_token) || empty($this->access_secret)) {
+			return false;
+		}
+
+		if (empty($params)) {
+			$params = array();
+		}
+		$access_token = new OAuthToken($this->access_token, $this->access_secret);                          
+		$echo_req = OAuthRequest::from_consumer_and_token($this->consumer, $access_token,
+				$method, $endpoint, $params);
+
+               
+		$echo_req->sign_request($this->signature_method, $this->consumer, $access_token);
+
+                
+
+		$content_type = 'Content-Type: application/atom+xml';
+		$gdataVersion = 'GData-Version: ' . $version;                
+
+		return $this->send_signed_request($method, $endpoint,
+				array($echo_req->to_header(), $content_type, $gdataVersion),
+				$data, false);
+	}        
 
 	public function fetch_sites($xml) {            
 
