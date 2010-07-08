@@ -29,20 +29,20 @@ function googleappslogin_init() {
 	$googleappsconnect_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/connect', FALSE);
 	$googleappsdisconnect_url = elgg_add_action_tokens_to_url('http://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/disconnect', FALSE);
 	$oauth_update_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/oauth_update', FALSE);
-        $share_doc_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/share_doc', FALSE);
-        $change_doc_permissions_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/change_doc_permissions', FALSE);
+	$share_doc_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/share_doc', FALSE);
+	$change_doc_permissions_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/change_doc_permissions', FALSE);
 
 	$GLOBALS['googleappslogin_url'] = $googleappslogin_url;
 	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;
 	$GLOBALS['googleappsdisconnect_url'] = $googleappsdisconnect_url;
 	$GLOBALS['oauth_update_url'] = $oauth_update_url;
-        $GLOBALS['share_doc_url'] = $share_doc_url;
-        $GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
+	$GLOBALS['share_doc_url'] = $share_doc_url;
+	$GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
 	$GLOBALS['oauth_update_interval'] = get_plugin_setting('oauth_update_interval', 'googleappslogin');
 
 	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleappslogin');
 	$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleappslogin');
-        $oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleappslogin');
+	$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleappslogin');
 
 	$domain = get_plugin_setting('googleapps_domain', 'googleappslogin');
 	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site" target="_blank';
@@ -75,7 +75,7 @@ function googleappslogin_init() {
 
 	// Register widgets
 	add_widget_type('google_docs', elgg_echo('googleappslogin:google_docs'),
-			elgg_echo('googleappslogin:google_docs:description'));
+	elgg_echo('googleappslogin:google_docs:description'));
 }
 
 function googleappslogin_pagesetup() {
@@ -84,7 +84,7 @@ function googleappslogin_pagesetup() {
 
 	if (get_context() == "settings") {
 		add_submenu_item(elgg_echo('googleappslogin:google_sites_settings'), $CONFIG->wwwroot . "mod/googleappslogin/");
-                add_submenu_item(elgg_echo('googleappslogin:google_sync_settings'), $CONFIG->wwwroot . "mod/googleappslogin/sync_settings.php");
+		add_submenu_item(elgg_echo('googleappslogin:google_sync_settings'), $CONFIG->wwwroot . "mod/googleappslogin/sync_settings.php");
 	}
 
 	if (get_context() == 'wikis') {

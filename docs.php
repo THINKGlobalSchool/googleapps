@@ -12,14 +12,14 @@
 
 	// Load Elgg engine
 	global $CONFIG;
-	require_once($CONFIG->path . "engine/start.php");
+	require_once($CONFIG->path . "engine/start.php");	
         
-	$user = $_SESSION['user'];
+	$user = $_SESSION['user'];	
 	$area2 = elgg_view_title(elgg_echo('googleappslogin:google_docs'));
 
 	$area2 .= '<form action="'.$GLOBALS['share_doc_url'].'" method="post" onsubmit="return ajax_submit(this)" >';
 	// Get a list of google sites
-	$area2 .= '<div id="googleappslogin"><img src="/mod/embed/images/loading.gif" /></div>';
+	$area2 .= '<div id="googleappslogin">Loading....<img src="/mod/embed/images/loading.gif" /></div>';
 	$area2 .= '';
 
         $area2.='<br />View access level: <select name="access" id="access" onchange="showGroups()">';
@@ -40,14 +40,12 @@
 
         $area2.=$group_list;
         $area2.='&nbsp;&nbsp;&nbsp;<input type="submit" value="Share doc"></form>';
-        $area2.='</div><div class="clearfloat"></div></div>';
-
-	$body = elgg_view_layout("two_column_left_sidebar", '', $area1 . $area2, $area3);
+        $area2.='</div><div class="clearfloat"></div></div>';	
 
 	switch (get_input('action')) {
 	default:
 		// Display them in the page
-		$body = elgg_view_layout("two_column_left_sidebar", '', $area1 . $area2, $area3);
+		$body = elgg_view_layout('one_column', $area1 . $area2, $area3);
 		// Display page
 		page_draw( elgg_echo('googleappslogin:google_docs'), $body);
 	break;
