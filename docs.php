@@ -27,7 +27,7 @@
 	$area2.='<br />View access level: <select name="access" id="access" onchange="showGroups()">';
 	$area2.='<option value="public">Public</option>';
 	$area2.='<option value="logged_in">Logged in users</option>';
-	if (is_array($groups)) {
+	if (is_array($groups) || is_array($shared_access)) {
 		$area2.='<option value="group">Group or Shared Access</option>';
 	}
 	$area2.='<option value="match">Match permissions of Google doc</option>';
