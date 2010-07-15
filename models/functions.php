@@ -992,8 +992,8 @@ function get_group_or_channel_members($group_channel) {
 	return get_members_mails($members);
  }
 
- function get_channel_members_mails($group_id) {
-    $members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $share_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
+ function get_channel_members_mails($channel_id) {
+    $members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $channel_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
 	return get_members_mails($members);
  }
 
