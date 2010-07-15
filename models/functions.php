@@ -976,13 +976,12 @@
     }
 
 function get_group_or_channel_members($group_channel) {
-	$share_type = substr($group_channel, 0, 2);		
-	if ($share_type == 'gr') {
-		$group_id = (int)$group_channel;
-		$members = get_group_members_mails($group_id);
+	$share_type = substr($group_channel, 0, 2);
+	$id = substr($group_channel, 2);	
+	if ($share_type == 'gr') {		
+		$members = get_group_members_mails($id);
 	} else {
-		$channel_id = (int)$group_channel;
-		$members = get_channel_members_mails($channel_id);
+		$members = get_channel_members_mails($id);
 	}
 	return $members;
 }
