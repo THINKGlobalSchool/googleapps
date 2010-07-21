@@ -93,7 +93,7 @@
 						<img border="0" src="/mod/googleappslogin/graphics/icon_site.jpg">
 					</div>
 				</div>
-				<div class="search_listing_info">
+				<div>
 					<div>
 						<p><b><a href="' . $site->url . '">' . $site->title . '</a></b></p>
 					</div>
@@ -118,14 +118,14 @@
 	//$area2 .= elgg_list_entities(array('type' => 'object', 'subtype' => 'site', 'limit' => 4, 'full_view' => FALSE));
 	$area2 .= '</div><div class="clearfloat"></div></div>';
 
-	$body = elgg_view_layout("two_column_left_sidebar", '', $area1 . $area2, $area3);
+	$body = elgg_view_layout("one_column", $area1 . $area2, $area3);
 
 	// Get categories, if they're installed
 	//global $CONFIG;
 	//$area3 = elgg_view('blog/categorylist',array('baseurl' => $CONFIG->wwwroot . 'search/?subtype=blog&owner_guid='.$page_owner->guid.'&tagtype=universal_categories&tag=','subtype' => 'blog', 'owner_guid' => $page_owner->guid));
 
 	// Display them in the page
-	$body = elgg_view_layout("two_column_left_sidebar", '', $area1 . $area2, $area3);
+	$body = elgg_view_layout("one_column_with_sidebar", $area1 . $area2, $area3);
 
 	// Display page
 	page_draw(elgg_echo('googleappslogin:sites') . ': ' . elgg_echo('googleappslogin:sites:' . $postfix), $body);
