@@ -1,5 +1,7 @@
-#googleappslogin-box {
+#googleappslogin-icon {
 	padding: 10px 10px 10px 10px;
+	display: block;
+	text-align: center;
 }
 
 .toolbarimages .user_mini_avatar {
@@ -12,6 +14,8 @@
 #custom-messages {
 	margin:0 auto;
 }
+
+
 #custom-messages .messages, #custom-messages .errors {
 	color:white;
 	font-weight: bold;
@@ -117,4 +121,4 @@
 
 .docs_tags {
     width: 90%;
-}
+} 

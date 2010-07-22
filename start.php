@@ -24,6 +24,8 @@ global $CONFIG;
 function googleappslogin_init() {
 
 	global $CONFIG;
+	
+	require_once 'models/functions.php';
 
 	$googleappslogin_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/login', FALSE);
 	$googleappsconnect_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/connect', FALSE);
@@ -49,17 +51,41 @@ function googleappslogin_init() {
 
 	//$body = elgg_view("blogs/list", array('googleappslogin_url' => $googleappslogin_url));
 	//elgg_extend_view("account/forms/login", $body);
-	elgg_extend_view('account/forms/login', 'googleappslogin/login');
-	elgg_extend_view('account/forms/login_dropdown', 'googleappslogin/login_dropdown');
+	elgg_extend_view('login/extend', 'googleappslogin/login_dropdown');
 	elgg_extend_view('messages/list', 'googleappslogin/scripts');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleappslogin/css');
 	elgg_extend_view('elgg_topbar/extend','googleappslogin/new_mail');
+	
+	
 	//register_plugin_hook('usersettings:save','user','googleappslogin_user_settings_save');
 	register_entity_type('object','site_activity', 'Site activity');
         register_entity_type('object','doc_activity', 'Doc activity');
 	$user = $_SESSION['user'];
+
+	register_elgg_event_handler('pagesetup','system','googleappslogin_pagesetup');
+	//register_elgg_event_handler('logout', 'user', 'googleappslogin_logout');
+	register_elgg_event_handler('login', 'user', 'googleappslogin_login');
+
+	// TODO: remove this permissions hook if it turns out not to be necessary
+	register_plugin_hook('permissions_check','user','googleappslogin_can_edit');
+	register_plugin_hook('entity:icon:url','user','googleappslogin_icon_url');
+
+	// Register actions
+	register_action('googleappslogin/oauth_update', true, $CONFIG->pluginspath . 'googleappslogin/actions/oauth_update.php');
+	register_action('googleappslogin/login', true, $CONFIG->pluginspath . 'googleappslogin/actions/login.php');
+	register_action('googleappslogin/connect', true, $CONFIG->pluginspath . 'googleappslogin/actions/connect.php');
+	register_action('googleappslogin/disconnect', true, $CONFIG->pluginspath . 'googleappslogin/actions/disconnect.php');
+	register_action('googleappslogin/return', true, $CONFIG->pluginspath . 'googleappslogin/actions/return.php');
+	register_action('googleappslogin/return_with_connect', true, $CONFIG->pluginspath . 'googleappslogin/actions/return_with_connect.php');
+	register_action('googleappslogin/save', false, $CONFIG->pluginspath . 'googleappslogin/actions/save.php');
+	register_action('googleappslogin/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleappslogin/actions/save_user_sync.php');
+
+	register_action('googleappslogin/share_doc', false, $CONFIG->pluginspath . 'googleappslogin/actions/share_doc.php');
+	register_action('googleappslogin/change_doc_permissions', false, $CONFIG->pluginspath . 'googleappslogin/actions/change_doc_permissions.php');
+
+	register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
 
         
 	if (!empty($user) && $user->google &&$oauth_sync_sites != 'no') {
@@ -325,34 +351,8 @@ function googleappslogin_user_settings_save() {
 	}
 }
 
-
-require_once 'models/functions.php';
-
 register_elgg_event_handler('init','system','googleappslogin_init');
-register_elgg_event_handler('pagesetup','system','googleappslogin_pagesetup');
-//register_elgg_event_handler('logout', 'user', 'googleappslogin_logout');
-register_elgg_event_handler('login', 'user', 'googleappslogin_login');
 
-// TODO: remove this permissions hook if it turns out not to be necessary
-
-register_plugin_hook('permissions_check','user','googleappslogin_can_edit');
-register_plugin_hook('entity:icon:url','user','googleappslogin_icon_url');
-
-// Register actions
-
-register_action('googleappslogin/oauth_update', true, $CONFIG->pluginspath . 'googleappslogin/actions/oauth_update.php');
-register_action('googleappslogin/login', true, $CONFIG->pluginspath . 'googleappslogin/actions/login.php');
-register_action('googleappslogin/connect', true, $CONFIG->pluginspath . 'googleappslogin/actions/connect.php');
-register_action('googleappslogin/disconnect', true, $CONFIG->pluginspath . 'googleappslogin/actions/disconnect.php');
-register_action('googleappslogin/return', true, $CONFIG->pluginspath . 'googleappslogin/actions/return.php');
-register_action('googleappslogin/return_with_connect', true, $CONFIG->pluginspath . 'googleappslogin/actions/return_with_connect.php');
-register_action('googleappslogin/save', false, $CONFIG->pluginspath . 'googleappslogin/actions/save.php');
-register_action('googleappslogin/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleappslogin/actions/save_user_sync.php');
-
-register_action('googleappslogin/share_doc', false, $CONFIG->pluginspath . 'googleappslogin/actions/share_doc.php');
-register_action('googleappslogin/change_doc_permissions', false, $CONFIG->pluginspath . 'googleappslogin/actions/change_doc_permissions.php');
-
-register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
 
 
 
