@@ -89,6 +89,7 @@ function googleappslogin_init() {
 
         
 	if (!empty($user) && $user->google &&$oauth_sync_sites != 'no') {
+								//var_dump($oauth_sync_sites); die;
                 if  ($oauth_sync_sites != 'no') {
                     add_menu(elgg_echo('googleappslogin:sites'), $CONFIG->wwwroot . 'pg/wikis/' . $_SESSION['user']->username);
                     register_page_handler('wikis','googleappslogin_page_handler');
