@@ -90,7 +90,7 @@
 			<div class="search_listing">
 				<div class="search_listing_icon">
 					<div class="icon">
-						<img border="0" src="/mod/googleappslogin/graphics/icon_site.jpg">
+						<img border="0" src="' . $CONFIG->wwwroot . 'mod/googleappslogin/graphics/icon_site.jpg">
 					</div>
 				</div>
 				<div>

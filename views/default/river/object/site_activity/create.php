@@ -6,7 +6,7 @@
 	$date = $time ? date('d M Y', $time) : '';
 	
 	$string = !empty($object->text) ? preg_replace("/\<div([^>]+)\>(.*?)\<\/div\>/", "$2", $object->text) : $object->text;
-	
+	$string .= " <span class='entity_subtext'>" . friendly_time($object->time_created) . "</span>";
 ?>
 
 <?php echo $string; ?>

@@ -25,14 +25,16 @@ function googleappslogin_init() {
 
 	global $CONFIG;
 	
-	require_once 'models/functions.php';
+	require_once 'models/functions.php';	
+	
+	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
 
-	$googleappslogin_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/login', FALSE);
-	$googleappsconnect_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/connect', FALSE);
-	$googleappsdisconnect_url = elgg_add_action_tokens_to_url('http://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/disconnect', FALSE);
-	$oauth_update_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/oauth_update', FALSE);
-	$share_doc_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/share_doc', FALSE);
-	$change_doc_permissions_url = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleappslogin/change_doc_permissions', FALSE);
+	$googleappslogin_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/login', FALSE);
+	$googleappsconnect_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/connect', FALSE);
+	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/disconnect', FALSE);
+	$oauth_update_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/oauth_update', FALSE);
+	$share_doc_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/share_doc', FALSE);
+	$change_doc_permissions_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/change_doc_permissions', FALSE);
 
 	$GLOBALS['googleappslogin_url'] = $googleappslogin_url;
 	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;
@@ -61,7 +63,7 @@ function googleappslogin_init() {
 	
 	//register_plugin_hook('usersettings:save','user','googleappslogin_user_settings_save');
 	register_entity_type('object','site_activity', 'Site activity');
-        register_entity_type('object','doc_activity', 'Doc activity');
+  register_entity_type('object','doc_activity', 'Doc activity');
 	$user = $_SESSION['user'];
 
 	register_elgg_event_handler('pagesetup','system','googleappslogin_pagesetup');
@@ -81,13 +83,12 @@ function googleappslogin_init() {
 	register_action('googleappslogin/return_with_connect', true, $CONFIG->pluginspath . 'googleappslogin/actions/return_with_connect.php');
 	register_action('googleappslogin/save', false, $CONFIG->pluginspath . 'googleappslogin/actions/save.php');
 	register_action('googleappslogin/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleappslogin/actions/save_user_sync.php');
-
 	register_action('googleappslogin/share_doc', false, $CONFIG->pluginspath . 'googleappslogin/actions/share_doc.php');
 	register_action('googleappslogin/change_doc_permissions', false, $CONFIG->pluginspath . 'googleappslogin/actions/change_doc_permissions.php');
 
+	//register CRON hook to poll for Google Site activity
 	register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
 
-        
 	if (!empty($user) && $user->google &&$oauth_sync_sites != 'no') {
 								//var_dump($oauth_sync_sites); die;
                 if  ($oauth_sync_sites != 'no') {

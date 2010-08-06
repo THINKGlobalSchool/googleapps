@@ -45,8 +45,8 @@
 
 	function googleapps_cron_fetch_data() {
 
-        $context = get_context();
-	set_context('googleappslogin_cron_job');
+        	$context = get_context();
+					set_context('googleappslogin_cron_job');
 
 
             /* need to sync sites ? */
@@ -65,11 +65,9 @@
             foreach ($result as $gapps_user) {
                     $user = get_user($gapps_user->owner_guid);
                     if (empty($user->access_token) || empty($user->token_secret)) {
-                            echo '<p>No access token for ' . $user->username . '.</p>';
+                            echo 'No access token for ' . $user->username . '\n';
                             continue;
                     }
-
-                    
 
                     $_SESSION['user'] = $user;
                     $client = get_client($user);
@@ -87,17 +85,7 @@
                     $all_site_entities_count =count($res['all_site_entities']); // sites objects
                     $all_site_entities =$res['all_site_entities'];
 
-
-
-
-                    echo "User = ".$user->name.', all site_entities = '.$all_site_entities_count;
-                    if (get_input('debug')) {
-                        echo "<pre>";
-                        print_r($all_site_entities);
-                        echo "</pre>";
-                    } else {
-                        echo "no debug";
-                    }
+                    echo "========== Processing user ".$user->name." ==========";
 
                         $max_time = null;
                         $times = array();
@@ -140,8 +128,8 @@
 
 
                                 // Parse entries for each google site
-                                echo "<br />site entity id=".$site_entity->guid." <b>site ".$site_entity->title."</b>( ".$site_entity->site_id." )<br />";
-                                if ($site_entity->site_access_id == ACCESS_PRIVATE) { echo "site access is private<br />"; }
+                                echo "site entity id=".$site_entity->guid." site title= ".$site_entity->title." ( ".$site_entity->site_id." )\n";
+                                if ($site_entity->site_access_id == ACCESS_PRIVATE) { echo "site access is private\n"; }
 
                                 foreach ($rss->entry as $item) {
                                         // Get entry data
@@ -178,15 +166,15 @@
 
                                                         // Now save the object
                                                         if (!$site_activity->save()) {
-                                                                register_error('Site activity has not saves.');
+                                                                register_error('Site activity has not saved.');
                                                                 //forward($_SERVER['HTTP_REFERER']);
                                                         }
 
                                                         if (add_to_river('river/object/site_activity/create', 'create', $user->guid, $site_activity->guid, "", strtotime($date))) {
                                                             $is_new_activity = true;
-                                                            echo "<br /><b>Published activity for this site</b>. Site is access is ".$access;
+                                                            echo "\nPublished activity for this site</b>. Site is access is ".$access."\n";
                                                         } else {
-                                                            echo "error with add to river";
+                                                            echo "error adding activity to river\n";
                                                         }
 
                                                 } // need to add activite
@@ -198,7 +186,7 @@
                                 if( $last_time_site_updated > $site_entity->modified ) {
                                     $site_entity->modified = $last_time_site_updated;
                                     $site_entity->save();
-                                    echo "<br /><b>updated time site.</b>";
+                                    echo "\nupdated last updated time.\n";
                                 };
                         } // all sites
 
@@ -214,18 +202,18 @@
                         }
 
                         if ($is_new_activity) {
-                                echo '<p>New activity added for ' . $user->username . '.</p>';
+                                echo 'New activity added for ' . $user->username . '\n';
                         } else {
-                                echo '<p>No new activity for ' . $user->username . '.</p>';
+                                echo 'No new activity for ' . $user->username . '\n';
                         }
 
-                echo "<hr />";
+                echo "\n\n";
             } // each user
 
 
-                echo "<br /><br /><b>All finished</b>";
+                echo "\n\nAll finished\n";
                 $b_time=time();
-                echo "<br>".($b_time-$a_time)." sec";
+                echo "\n".($b_time-$a_time)." sec";
                 flush();
 
                 set_context($context);
