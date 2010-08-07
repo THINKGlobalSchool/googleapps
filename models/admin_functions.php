@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Functions for use by admin pages
  *
@@ -12,12 +12,12 @@
 function list_googlesite_entities() {
 	$output = "";
 
-	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999));
+	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>999));
 	$site_count = count($site_entities);
 	
 	$output .= "<p>Site entities found: {$site_count}</p>";
 	foreach($site_entities as $site_entity) {
-		$output .= elgg_view('googleappslogin/admin/site_entity',array('site'=>$site_entity));
+		$output .= elgg_view('googleappslogin/admin/site_entity',array('site_entity'=>$site_entity));
 		$output .= "<br/>";
 	}
 	
