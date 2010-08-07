@@ -82,6 +82,7 @@
 
                     $response_list = $res['response_list']; //sites xml list
                     $site_entities =$res['site_entities']; // sites objects
+										var_dump($site_entities); die;
                     $all_site_entities_count =count($res['all_site_entities']); // sites objects
                     $all_site_entities =$res['all_site_entities'];
 
@@ -115,7 +116,7 @@
                                 $feed = $site['feed'];
                                 $site_exist = null;
 
-                                // update access setings for site in user site list
+                                // update access settings for site in user site list
                                 save_site_to_user_list($site_entity, $site, $site_list);
 
                                 // Get google sites activity stream
@@ -374,7 +375,7 @@
 		$result = $client->execute('https://sites.google.com/feeds/site/' . $client->key . '/', '1.1');
 		$response_list = $client->fetch_sites($result); // Site list
 
-                $all_site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999)); // Get all site entities
+    $all_site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999)); // Get all site entities
 
 
 		// 2. Get local site list
@@ -439,8 +440,8 @@
                         // search for site in elgg entities
 			foreach ($all_site_entities as $site_entity) {
 				if ($site['site_id'] == $site_entity->site_id) {
-                                        $users_site_entities[]=$site_entity;
-                                        save_site_to_user_list($site_entity, $site, $merged);
+          $users_site_entities[]=$site_entity;
+          save_site_to_user_list($site_entity, $site, $merged);
 					$found = true;
 					break;
 				}
@@ -456,15 +457,15 @@
 				$new_site->subtype = "site";
 				$new_site->url = $site['url'];
 				$new_site->modified = $site['modified'];
-                                $new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
+        $new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
 				$new_site->site_access_id = ACCESS_PRIVATE ; // for site
 				$new_site->save();
-                                $users_site_entities[]=$new_site;
-                                save_site_to_user_list($new_site, $site, $merged);
+        $users_site_entities[]=$new_site;
+        save_site_to_user_list($new_site, $site, $merged);
 			}
 		}
 
-                  // 4. Update user
+    // 4. Update user
 		$user->site_list = serialize($merged);
 		$user->save();
 

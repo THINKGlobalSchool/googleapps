@@ -25,7 +25,8 @@ function googleappslogin_init() {
 
 	global $CONFIG;
 	
-	require_once 'models/functions.php';	
+	require_once 'models/functions.php';
+	require_once 'models/admin_functions.php';
 	
 	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
 
@@ -101,6 +102,11 @@ function googleappslogin_init() {
                     add_menu(elgg_echo('googleappslogin:google_docs'), $CONFIG->wwwroot . 'pg/docs/my');
                 }
 	}
+
+	//admin page stuff
+	//TODO: figure out how to order the submenu so that it appears at the bottom
+	register_page_handler('googleapidebug','admin_google_debug');
+	elgg_add_submenu_item(array('text'=>elgg_echo('googleappslogin:admindebugtitle'),'href'=>"{$CONFIG->url}pg/googleapidebug",'id'=>'googleapidebug'),'admin');
 
 	// Register widgets
 	add_widget_type('google_docs', elgg_echo('googleappslogin:google_docs'),
@@ -352,6 +358,21 @@ function googleappslogin_user_settings_save() {
 		}
 	}
 }
+
+function admin_google_debug($page) {
+	global $CONFIG;
+
+	admin_gatekeeper();
+	elgg_admin_add_plugin_settings_sidemenu();
+	set_context('admin');
+	
+	$content = list_googlesite_entities();
+	
+	$body = elgg_view_layout('administration', $content);
+	page_draw($title, $body, 'page_shells/admin');
+}
+
+
 
 register_elgg_event_handler('init','system','googleappslogin_init');
 

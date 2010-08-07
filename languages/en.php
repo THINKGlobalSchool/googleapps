@@ -54,7 +54,8 @@ $english = array(
                  "googleappslogin:doc:share:ok" => "Document shared",
                 "googleappslogin:doc:share:no_doc_id" => "You should select a document",
                 "googleappslogin:doc:share:no_comment" => "You should add comment",
-                "googleappslogin:doc:share:wrong_permissions" => "Please, give document permissions"
+                "googleappslogin:doc:share:wrong_permissions" => "Please, give document permissions",
+		'googleappslogin:admindebugtitle' => "Google API Debug"
 
 );
 
