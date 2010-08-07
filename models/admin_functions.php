@@ -23,5 +23,4 @@ function list_googlesite_entities() {
 }
 
 
-?>
 
