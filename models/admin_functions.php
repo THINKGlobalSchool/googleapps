@@ -31,8 +31,9 @@ function list_googlesite_entities_byuser() {
 	foreach($googleusers as $googleuser) {
 		$user = get_user($googleuser->owner_guid);
 		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
+		$site_count = count($site_list);
 		
-		$output .= "<p>Sites found for <strong>{$user->name}</strong>:";
+		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
 		foreach($site_list as $key => $site) {
 			$site_entity = get_entity($site['entity_id']);
 			$output .= elgg_view('googleappslogin/admin/site_entity',array('site_entity'=>$site_entity));
