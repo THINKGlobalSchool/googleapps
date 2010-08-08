@@ -8,5 +8,5 @@
 	<li>Owner: <?= $owner_user->username." (". $owner_user->guid . ")"; ?></li>
 	<li>URL: <?= "<a href='{$site->url}'>{$site->url}</a>"; ?></li>
 	<li>Access Level: <?= $site->site_access_id; ?></li>
-	<li>Last modified: <?= $site->last_modified; ?>
+	<li>Last modified: <?= date(DATE_ATOM,$site->modified); ?>
 </ul>

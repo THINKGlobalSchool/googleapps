@@ -366,7 +366,16 @@ function admin_google_debug($page) {
 	elgg_admin_add_plugin_settings_sidemenu();
 	set_context('admin');
 	
-	$content = list_googlesite_entities();
+//	if (isset($page[0])) {
+		switch ($page[0]) {
+			case "byuser" :
+				$content = list_googlesite_entities_byuser();
+				break;
+				
+			default:
+				$content = list_googlesite_entities();
+		}
+//	}
 	
 	$body = elgg_view_layout('administration', $content);
 	page_draw($title, $body, 'page_shells/admin');
