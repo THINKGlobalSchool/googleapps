@@ -86,6 +86,7 @@ function googleappslogin_init() {
 	register_action('googleappslogin/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleappslogin/actions/save_user_sync.php');
 	register_action('googleappslogin/share_doc', false, $CONFIG->pluginspath . 'googleappslogin/actions/share_doc.php');
 	register_action('googleappslogin/change_doc_permissions', false, $CONFIG->pluginspath . 'googleappslogin/actions/change_doc_permissions.php');
+	register_action('googleappslogin/sites_reset',false, $CONFIG->pluginspath . 'googleappslogin/actions/sites_reset.php');
 
 	//register CRON hook to poll for Google Site activity
 	register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
@@ -105,8 +106,9 @@ function googleappslogin_init() {
 
 	//admin page stuff
 	//TODO: figure out how to order the submenu so that it appears at the bottom
-	register_page_handler('googleapidebug','admin_google_debug');
-	elgg_add_submenu_item(array('text'=>elgg_echo('googleappslogin:admindebugtitle'),'href'=>"{$CONFIG->url}pg/googleapidebug",'id'=>'googleapidebug'),'admin');
+	register_page_handler('googlesitesdebug','admin_googlesites_debug');
+	elgg_add_submenu_item(array('text'=>elgg_echo('googleappslogin:admindebugtitle'),'href'=>"{$CONFIG->url}pg/googlesitesdebug",'id'=>'googlesitesdebug'),'admin');
+	
 
 	// Register widgets
 	add_widget_type('google_docs', elgg_echo('googleappslogin:google_docs'),
@@ -359,23 +361,28 @@ function googleappslogin_user_settings_save() {
 	}
 }
 
-function admin_google_debug($page) {
+function admin_googlesites_debug($page) {
 	global $CONFIG;
 
 	admin_gatekeeper();
 	elgg_admin_add_plugin_settings_sidemenu();
 	set_context('admin');
 	
-//	if (isset($page[0])) {
-		switch ($page[0]) {
-			case "byuser" :
-				$content = list_googlesite_entities_byuser();
-				break;
-				
-			default:
-				$content = list_googlesite_entities();
-		}
-//	}
+	$content = elgg_view_title(elgg_echo("googleappslogin:admindebugtitle"));
+	$content .= elgg_view('googleappslogin/admin/sitesdebug_nav',array('page'=>$page));
+		
+	switch ($page[0]) {
+		case "byuser" :
+			$content .= list_googlesite_entities_byuser();
+			break;
+		
+		case "reset":
+			$content .= elgg_view('googleappslogin/admin/reset');
+			break;
+		
+		default:
+			$content .= list_googlesite_entities();
+	}
 	
 	$body = elgg_view_layout('administration', $content);
 	page_draw($title, $body, 'page_shells/admin');

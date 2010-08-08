@@ -42,3 +42,25 @@ function list_googlesite_entities_byuser() {
 	}
 	return $output;
 }
+
+function delete_all_site_entities() {
+	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>99999));
+	foreach($site_entities as $site_entity) {
+		$site_entity->delete();
+	}
+	return;
+}
+
+function reset_user_sitelists() {
+	$googleusers =find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	foreach($googleusers as $googleuser) {
+		$user = get_user($googleuser->owner_guid);
+		$user->site_list = NULL;
+	}
+	return;
+}
+
+function reset_googlesites() {
+	delete_all_site_entities();
+	reset_user_sitelists();
+}

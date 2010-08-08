@@ -82,7 +82,6 @@
 
                     $response_list = $res['response_list']; //sites xml list
                     $site_entities =$res['site_entities']; // sites objects
-										var_dump($site_entities); die;
                     $all_site_entities_count =count($res['all_site_entities']); // sites objects
                     $all_site_entities =$res['all_site_entities'];
 

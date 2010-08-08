@@ -55,8 +55,8 @@ $english = array(
                 "googleappslogin:doc:share:no_doc_id" => "You should select a document",
                 "googleappslogin:doc:share:no_comment" => "You should add comment",
                 "googleappslogin:doc:share:wrong_permissions" => "Please, give document permissions",
-		'googleappslogin:admindebugtitle' => "Google API Debug"
-
+		'googleappslogin:admindebugtitle' => "Google Sites Debug",
+		'googleappslogin:googlesitesreset' => "Google Sites have been successfully reset"
 );
 
 add_translation("en",$english);
