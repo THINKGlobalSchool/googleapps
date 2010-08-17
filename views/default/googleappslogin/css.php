@@ -132,7 +132,7 @@ a.emailnotifier {
 }
 a.emailnotifier:hover {
 	text-decoration: none;
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left -16px;
+	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 }
 a.emailnotifier.new {
 	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
@@ -142,7 +142,7 @@ a.emailnotifier.new {
 }
 a.emailnotifier.new:hover {
 	text-decoration: none;
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left -16px;
+	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 }
 a.emailnotifier.new span {
 	background-color: red;
