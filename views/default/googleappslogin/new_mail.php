@@ -15,7 +15,7 @@ if (isset($_SESSION['new_google_mess']) && !empty($user) && ($oauth_sync_email !
 	}
 
 	?>
-	<a id="unreadmessagescountlink" class='emailnotifier new' href="https://mail.google.com/a/<?= $domain ?>" class="usersettings" target="_blank" title="<?= $title ?>">
+	<a id="unreadmessagescountlink" class='<?php echo $class; ?>' href="https://mail.google.com/a/<?= $domain ?>" class="usersettings" target="_blank" title="<?= $title ?>">
 	<span>
 	<?php 
 		if ($count > 0) {
