@@ -12,13 +12,14 @@ if (isset($_SESSION['new_google_mess']) && !empty($user) && ($oauth_sync_email !
 		$title = "You don't have unread messages";
 	}
 	?>
-	<a id="unreadmessagescountlink" href="https://mail.google.com/a/<?= $domain ?>" class="usersettings" target="_blank" title="<?= $title ?>">
-	<img src="<? echo $CONFIG->wwwroot; ?>mod/googleappslogin/graphics/gmail.gif" align="left" alt="<?= $title ?>" />
+	<a id="unreadmessagescountlink" class='emailnotifier new' href="https://mail.google.com/a/<?= $domain ?>" class="usersettings" target="_blank" title="<?= $title ?>">
+	<span>
 	<?php 
-	if ($count > 0) {
-		echo $count;
-	}
+		if ($count > 0) {
+			echo $count;
+		}
 	?>
+	</span>
 	</a>
 <?php
 }
