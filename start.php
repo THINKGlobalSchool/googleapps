@@ -30,12 +30,12 @@ function googleappslogin_init() {
 	
 	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
 
-	$googleappslogin_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/login', FALSE);
-	$googleappsconnect_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/connect', FALSE);
-	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/disconnect', FALSE);
-	$oauth_update_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/oauth_update', FALSE);
-	$share_doc_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/share_doc', FALSE);
-	$change_doc_permissions_url = elgg_add_action_tokens_to_url($sslroot . 'action/googleappslogin/change_doc_permissions', FALSE);
+	$googleappslogin_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/login', FALSE);
+	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/connect', FALSE);
+	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/disconnect', FALSE);
+	$oauth_update_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/oauth_update', FALSE);
+	$share_doc_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/share_doc', FALSE);
+	$change_doc_permissions_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/change_doc_permissions', FALSE);
 
 	$GLOBALS['googleappslogin_url'] = $googleappslogin_url;
 	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;

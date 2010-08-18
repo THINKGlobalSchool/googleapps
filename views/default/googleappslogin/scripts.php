@@ -18,20 +18,21 @@
 				var is_new_doc = false;
 				
 				function oauth_update() {
+					//alert("<?= $url ?>".replace(/http(s?):\/\/.*?\//, '/'));
 					$.getJSON("<?= $url ?>".replace(/http(s?):\/\/.*?\//, '/'), function (data) {
 					<?php
 					if ($oauth_sync_email != 'no') {
 					?>
-						
+						//alert("Mail count: "+data.mail_count);
 						if (data.mail_count == 0) {
 							data.mail_count = '&nbsp;';
-							$('#unreadmessagescountlink').addClass('nodecor');
+							$('#unreadmessagescountlink').removeClass('new');
 						} else {
-							$('#unreadmessagescountlink').removeClass('nodecor');
+							$('#unreadmessagescountlink').addClass('new');
 						}
-						var mail_text = 'You' + (!data.mail_count ? ' dosn`t' : '') + ' have ' + data.mail_count + ' unread messages';
+						var mail_text = 'You have ' + (data.mail_count ? data.mail_count : 'no') + ' unread messages';
 						$('#unreadmessagescountlink').attr('title', mail_text);
-						$('#unreadmessagescountlink').html('<img src="/mod/googleappslogin/graphics/gmail.gif" align="left" alt="' + mail_text + '" />' + data.mail_count);
+						$('#unreadmessagescountlink').html('<span>' + data.mail_count + '</span>');
 					<?php
 					}
 					
@@ -50,7 +51,6 @@
 				}
 				
 				oauth_update();
-				
 				setInterval(oauth_update, (<?= $interval ?> * 60 * 1000));
 				
 			});
