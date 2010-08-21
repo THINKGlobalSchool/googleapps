@@ -135,6 +135,7 @@ function googleappslogin_pagesetup() {
 
 function googleappslogin_settings_page_handler($page) {
 	gatekeeper();
+	global $SESSION;
 	
 	if (!isset($page[0])) return false;
 	

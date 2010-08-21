@@ -14,7 +14,7 @@ function update_acitivities_access($site_name, $access) {
 }
 
 
-function update_site_entity_acces($entity_id, $access) {
+function update_site_entity_access($entity_id, $access) {
     $context = get_context();
     set_context('googleappslogin_cron_job');
 
@@ -68,9 +68,9 @@ if ($user->google == 1) {
 			$site_list = unserialize($user->site_list);
 			foreach ($googleapps_sites_settings as $site_id=> $access) {
 				$site_list[$site_id]['access'] = $access;
-                                $entity_id=$site_list[$site_id]['entity_id'];
+        $entity_id=$site_list[$site_id]['entity_id'];
 				//update_acitivities_access($title, $access);
-                                update_site_entity_acces($entity_id, $access);
+        update_site_entity_access($entity_id, $access);
 			}
 			$user->site_list = serialize($site_list);
 			$user->save();

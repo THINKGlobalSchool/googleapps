@@ -35,28 +35,34 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 
 		if ($user->google == 1 || $subtype == 'googleapps') {
 			$site_list = unserialize($user->site_list);
-
+			//var_dump($site_list); die;
+			
 			if (!empty($site_list)) {
 				
 				echo '<p>'.elgg_echo('googleappslogin:google_sites_settings_description').'</p>';
 				
-				$body = '';
+				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleappslogin:site').'</th><th>'.elgg_echo('googleappslogin:access_level').'</th></tr>';
 				foreach ($site_list as $site_id => $site_obj) {
 
-                                    $title=$site_obj['title'];
-                                     $access=$site_obj['access'];
+          $title=$site_obj['title'];
+          $access=$site_obj['access'];
 
 					if (!empty($title)) {
-						if (is_null($access) || $access != 0 && $access != 22) {
+						if (is_null($access)) {
 							$access = 1;
 						}
 
-						$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('internalname' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
+						//$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('internalname' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
+						$access_input = elgg_view('input/access', array(
+							'internalname' => 'googleapps_sites_settings['.$site_id.']',
+							'value' => $access
+						));
+						$body .= '<tr><td>'.$title.'</td><td class="access_col">'.$access_input.'</td></tr>';
+						
 					}
 				}
-
-				$body .= '<div class="clearfloat"></div><div class="friendspicker_savebuttons">	<input type="submit" value="' . elgg_echo('save') . '" /><br /></div>	';
-
+				$body .= '<tr class="submit_row"><td colspan=2 class="submit_cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
+				$body .= '</table>';
 				echo elgg_view('input/form',array(
 				'body' => $body,
 				'method' => 'post',

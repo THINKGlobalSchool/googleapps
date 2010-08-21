@@ -43,6 +43,7 @@ $english = array(
 		'googleappslogin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 
 		'googleappslogin:sites' => 'Wikis',
+		'googleappslogin:site' => 'Wiki',
 		'googleappslogin:sites:your' => 'Your Wikis',
 		'googleappslogin:sites:everyone' => 'All Wikis',
 		'googleappslogin:sites:all' => 'All Wikis',
@@ -55,8 +56,9 @@ $english = array(
     'googleappslogin:doc:share:no_comment' => 'You should add comment',
     'googleappslogin:doc:share:wrong_permissions' => 'Please, give document permissions',
 		'googleappslogin:admindebugtitle' => 'Google Sites Debug',
-		'googleappslogin:googlesitesreset' => 'Google Sites have been successfully reset'
-);
+		'googleappslogin:googlesitesreset' => 'Google Sites have been successfully reset',
+		'googleappslogin:access_level' => 'Access Level'
+  );
 
 add_translation('en',$english);
 

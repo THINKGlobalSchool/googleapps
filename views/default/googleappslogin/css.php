@@ -147,7 +147,7 @@ a.emailnotifier.new:hover {
 a.emailnotifier.new span {
 	background-color: red;
 	-webkit-border-radius: 10px; 
-	-moz-border-radius: 10px;
+	-moz-border-radius: 10px; 
 	-webkit-box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.50); /* safari v3+ */
 	-moz-box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.50); /* FF v3.5+ */
 	color:white;
@@ -163,3 +163,41 @@ a.emailnotifier.new span {
 	font-size:10px;
 	font-weight:bold;
 }
+
+
+table.wiki_activity_settings {
+	width: 500px;
+	margin: 10px auto;
+}
+
+table.wiki_activity_settings th {
+	border: 0;
+	border-bottom: 1px solid #888888;
+	font-weight: bold;
+	text-align: left;
+}
+
+table.wiki_activity_settings tr {
+	border-bottom: 1px solid #888888;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+table.wiki_activity_settings td {
+	vertical-align: middle;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+table.wiki_activity_settings td.access_col {
+ text-align: right;
+}
+
+table.wiki_activity_settings tr.submit_row {
+	border:0;
+}
+
+table.wiki_activity_settings td.submit_cell {
+	text-align:right;
+}
+
