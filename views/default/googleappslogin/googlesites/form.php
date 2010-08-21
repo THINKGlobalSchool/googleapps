@@ -4,10 +4,10 @@
 // Echo title
 echo elgg_view_title(elgg_echo('googleappslogin:google_sites_settings'));
 
-
+/* not used anywhere?
 $options = array(elgg_echo('googleappslogin:settings:yes')=>'yes',
 		elgg_echo('googleappslogin:settings:no')=>'no'
-);
+);  */
 
 $access_types = array(
 		'private' => '0',
@@ -33,17 +33,13 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 	<div class="notification_methods">
 		<?php
 
-
-
 		if ($user->google == 1 || $subtype == 'googleapps') {
 			$site_list = unserialize($user->site_list);
 
 			if (!empty($site_list)) {
-				?>
-		<h3><?php echo elgg_echo('googleappslogin:google_sites_settings'); ?></h3>
-
-		<p><?php echo elgg_echo('googleappslogin:google_sites_settings_description'); ?></p>
-				<?php
+				
+				echo '<p>'.elgg_echo('googleappslogin:google_sites_settings_description').'</p>';
+				
 				$body = '';
 				foreach ($site_list as $site_id => $site_obj) {
 

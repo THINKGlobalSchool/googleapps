@@ -6,7 +6,7 @@
  * @package GoogleAppsLogin
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
- * @copyright FlatSourcing 2010
+ * @copyright THINK Global School 2010
  * @link http://elgg.org/
  */
 
@@ -103,6 +103,8 @@ function googleappslogin_init() {
                     add_menu(elgg_echo('googleappslogin:google_docs'), $CONFIG->wwwroot . 'pg/docs/my');
                 }
 	}
+	register_page_handler('googleappsettings','googleappslogin_settings_page_handler');
+
 
 	//admin page stuff
 	//TODO: figure out how to order the submenu so that it appears at the bottom
@@ -118,10 +120,9 @@ function googleappslogin_init() {
 function googleappslogin_pagesetup() {
 
 	global $CONFIG;
-
 	if (get_context() == "settings") {
-		add_submenu_item(elgg_echo('googleappslogin:google_sites_settings'), $CONFIG->wwwroot . "mod/googleappslogin/");
-		add_submenu_item(elgg_echo('googleappslogin:google_sync_settings'), $CONFIG->wwwroot . "mod/googleappslogin/sync_settings.php");
+		add_submenu_item(elgg_echo('googleappslogin:google_sites_settings'), $CONFIG->wwwroot . "pg/googleappsettings/wikiactivity");
+		add_submenu_item(elgg_echo('googleappslogin:google_sync_settings'), $CONFIG->wwwroot . "pg/googleappsettings/account");
 	}
 
 	if (get_context() == 'wikis') {
@@ -129,8 +130,34 @@ function googleappslogin_pagesetup() {
 		add_submenu_item(elgg_echo('googleappslogin:sites:everyone'), $CONFIG->wwwroot . 'pg/wikis/all');
 		add_submenu_item(elgg_echo('googleappslogin:site:add'), $GLOBALS['link_to_add_site']);
 	}
+}
 
-	//extend_elgg_settings_page('googleappslogin/settings/usersettings', 'usersettings/user');
+
+function googleappslogin_settings_page_handler($page) {
+	gatekeeper();
+	
+	if (!isset($page[0])) return false;
+	
+	set_context('settings');
+	
+	switch($page[0]) {
+		case 'wikiactivity':
+		
+			$form = elgg_view('googleappslogin/googlesites/form');
+			$body = elgg_view_layout('one_column_with_sidebar', $form);
+			page_draw(elgg_echo('googleappslogin:google_sites_settings'),$body);
+			
+		break;
+		case 'account':
+			
+			$body = elgg_view('googleappslogin/sync_form');
+			$body = elgg_view_layout('one_column_with_sidebar', $body);
+			page_draw(elgg_echo('googleappslogin:google_sync_settings'),$body);
+			
+		break;
+	}
+	
+	
 }
 
 

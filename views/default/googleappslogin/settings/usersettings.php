@@ -1,5 +1,6 @@
 <?php
 	/**
+	 * NOTE - It looks like this file is not called anywhere
 	 * User settings for googleappslogin.
 	 * 
 	 * @package googleappslogin

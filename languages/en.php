@@ -35,7 +35,7 @@ $english = array(
 		'googleappslogin:google_docs:description' => '',
 
 		'googleappslogin:google_sites_settings' => 'Wiki Activity Settings',
-		'googleappslogin:google_sites_settings_description' => 'Set the visibility of activity within Wikis you are a member of.',
+		'googleappslogin:google_sites_settings_description' => 'Set who gets to see wiki activity for the wikis you are in.',
 
 		'googleappslogin:google_sync_settings' => 'Google Apps Settings',
 		'googleappslogin:google_sync_settings_description' => 'Manage your connection to Google Apps',
