@@ -24,18 +24,18 @@ $english = array(
 		'googleappslogin:googleapps_user_settings_title' => 'googleapps profile',
 		'googleappslogin:googleapps_user_settings_sync_email' => 'Synchronize with google mail.',
 		'googleappslogin:googleapps_user_settings_sync_sites' => 'Synchronize with google sites.',
-                'googleappslogin:googleapps_user_settings_sync_docs' => 'Synchronize with google docs.',
+    'googleappslogin:googleapps_user_settings_sync_docs' => 'Synchronize with google docs.',
 
 		'googleappslogin:googleapps_user_settings:save:ok' => 'Your googleapps profile preference has been saved.',
 		'googleappslogin:googleapps_login_settings:save:ok' => 'Your googleapps screen name has been saved.',
 		'googleappslogin:googleapps_login_title' => 'Googleapps login',
-		'googleappslogin:googleapps_login_description' => 'If you want to login to Elgg using googleapps, click \'Connect with Google OpenID account\'',
+		'googleappslogin:googleapps_login_description' => 'Connect your Spot user account with your Google Apps account.',
 
 		'googleappslogin:google_docs' => 'Share Google docs',
 		'googleappslogin:google_docs:description' => '',
 
 		'googleappslogin:google_sites_settings' => 'Wiki Activity Settings',
-		'googleappslogin:google_sites_settings_description' => 'Set who gets to see wiki activity for the wikis you are in.',
+		'googleappslogin:google_sites_settings_description' => 'Set who gets to see wiki activity for the wikis you are in.  NOTE: These settings control the publish activity for everyone. Take care when making changes here.',
 
 		'googleappslogin:google_sync_settings' => 'Google Apps Settings',
 		'googleappslogin:google_sync_settings_description' => 'Manage your connection to Google Apps',

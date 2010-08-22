@@ -31,7 +31,7 @@ foreach ($user_sync_settings as $setting => $v) {
 					<?php
 					$body = "<p>" . elgg_view('input/checkboxes', array('internalname' => "sync_settings", 'value' =>$enabled,  'options' => array('Syncing name upon login'=>'sync_name')) );
 					$body .= '</p>';
-					$body .= '<div class="clearfloat"></div><div class="friendspicker_savebuttons">	<input type="submit" value="' . elgg_echo('save') . '" /><br /></div>	';
+					$body .= elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button'));
 
 					echo elgg_view('input/form',array(
 						'body' => $body,

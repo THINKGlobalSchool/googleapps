@@ -1,1 +1,2 @@
-<div id="googleappslogin-box" style="margin-left: 10px;"><input type="button" value="Disconnect from Google OpenID account" onclick="location.href='<?php echo $GLOBALS['googleappsdisconnect_url'];?>'" class="cancel_button" /></div>
+<hr/>
+<div id="googleappslogin-box" style="text-align:center;"><input type="button" value="Disconnect from Google OpenID account" onclick="location.href='<?php echo $GLOBALS['googleappsdisconnect_url'];?>'" class="cancel_button" /></div>
