@@ -6,12 +6,8 @@ require_once (dirname(dirname(__FILE__)) . '/models/Google_OpenID.php');
 require_once (dirname(dirname(__FILE__)) . '/models/OAuth.php');
 require_once (dirname(dirname(__FILE__)) . '/models/client.inc');
 
-global $CONFIG;
-if (empty($CONFIG->input['openid_ns'])){
-	$CONFIG->input = array_merge($CONFIG->input, $_REQUEST);
-}
 //print_r($GLOBALS);
-$user = $_SESSION['user'];
+$user = get_loggedin_user();
 
 $CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleappslogin');
 $CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleappslogin');
@@ -19,7 +15,7 @@ $CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleappslogin');
 $oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleappslogin');
 $oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleappslogin');
 
-$oauth_verifier = $CONFIG->input['oauth_verifier'];
+$oauth_verifier = get_input('oauth_verifier');
 
 $client = new OAuth_Client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 
@@ -51,7 +47,7 @@ if (!empty($_SESSION['oauth_connect'])) {
 	forward('mod/googleappslogin/sync_settings.php');
 }
 
-$google = Google_OpenID::create_from_response($CONFIG->input);
+$google = Google_OpenID::create_from_response($_REQUEST);
 
 $google->set_home_url($googleapps_domain);
 $response = $google->get_response();

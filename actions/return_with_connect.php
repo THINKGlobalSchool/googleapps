@@ -10,15 +10,12 @@ require_once (dirname(dirname(__FILE__)) . "/models/OAuth.php");
 require_once (dirname(dirname(__FILE__)) . "/models/Google_OpenID.php");
 
 global $CONFIG;
-if (empty($CONFIG->input['openid_ns'])){
-	$CONFIG->input = array_merge($CONFIG->input, $_REQUEST);
-}
 
-$google = Google_OpenID::create_from_response($CONFIG->input);
+$google = Google_OpenID::create_from_response($_REQUEST);
 $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'No authorised'));
+	register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Not authorized'));
 	forward('mod/googleappslogin/sync_settings.php');
 } else {
 	
@@ -33,7 +30,7 @@ if (!$google->is_authorized()) {
 	$entities = get_user_by_email($email);
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Sorry, but email ' . $email . ' is already exists and used by other user.'));
+		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Sorry, but email ' . $email . ' already exists and in use by other user.'));
 		forward('mod/googleappslogin/sync_settings.php');
 	}
 	$is_sync = $user->sync == '1';
