@@ -8,9 +8,9 @@
 	width:16px;
 	height:16px;
 }
-.hidden {
+/*.hidden {
 	display: none;
-}
+}*/
 #custom-messages {
 	margin:0 auto;
 }

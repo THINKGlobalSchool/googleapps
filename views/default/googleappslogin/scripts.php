@@ -10,7 +10,6 @@
 	if ($url && $user && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no' || $oauth_sync_docs != 'no')) {
 		
 		?>
-		<!--<script type="text/javascript" src="/mod/googleappslogin/views/default/googleappslogin/system_messages.js"></script>-->
 		<script type="text/javascript">
 			
 			jQuery(function($) {
