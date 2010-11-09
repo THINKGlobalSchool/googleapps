@@ -22,16 +22,21 @@
 					<?php
 					if ($oauth_sync_email != 'no') {
 					?>
-						//alert("Mail count: "+data.mail_count);
-						if (data.mail_count == 0) {
-							data.mail_count = '&nbsp;';
-							$('#unreadmessagescountlink').removeClass('new');
-						} else {
-							$('#unreadmessagescountlink').addClass('new');
+						// Eventually we're going to get an error that the page has expired
+						// For now, until the ajax action system is more stable, check for an 
+						// error and don't bother updating the mail display with garbage
+						if (data && data.status != -1) {
+							//alert("Mail count: "+data.mail_count);
+							if (data.mail_count == 0) {
+								data.mail_count = '&nbsp;';
+								$('#unreadmessagescountlink').removeClass('new');
+							} else {
+								$('#unreadmessagescountlink').addClass('new');
+							}
+							var mail_text = 'You have ' + (data.mail_count ? data.mail_count : 'no') + ' unread messages';
+							$('#unreadmessagescountlink').attr('title', mail_text);
+							$('#unreadmessagescountlink').html('<span>' + data.mail_count + '</span>');
 						}
-						var mail_text = 'You have ' + (data.mail_count ? data.mail_count : 'no') + ' unread messages';
-						$('#unreadmessagescountlink').attr('title', mail_text);
-						$('#unreadmessagescountlink').html('<span>' + data.mail_count + '</span>');
 					<?php
 					}
 					
