@@ -46,7 +46,7 @@
     font-size:90%;
 }
 .document-icon {
-    background: url("/mod/googleappslogin/views/default/widgets/google_docs/images/mimetypes.gif") no-repeat 0 0;
+    background: url("<?php echo elgg_get_site_url(); ?>mod/googleappslogin/views/default/widgets/google_docs/images/mimetypes.gif") no-repeat 0 0;
     width:10px;
     height:10px;
     display:block;
@@ -125,24 +125,24 @@
 
 /* messages/new messages icon & counter in elgg_topbar */
 a.emailnotifier {
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
+	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 	padding-left:16px;
 	margin:2px 15px 0 5px;
 	cursor:pointer;
 }
 a.emailnotifier:hover {
 	text-decoration: none;
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
+	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 }
 a.emailnotifier.new {
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
+	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 	padding-left:18px;
 	margin:2px 15px 0 5px;
 	color:white;
 }
 a.emailnotifier.new:hover {
 	text-decoration: none;
-	background:transparent url(<?php echo $vars['url']; ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
+	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleappslogin/graphics/gmail.gif) no-repeat left 2px;
 }
 a.emailnotifier.new span {
 	background-color: red;

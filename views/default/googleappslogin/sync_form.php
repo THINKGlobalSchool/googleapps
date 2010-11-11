@@ -36,7 +36,7 @@ foreach ($user_sync_settings as $setting => $v) {
 					echo elgg_view('input/form',array(
 						'body' => $body,
 						'method' => 'post',
-						'action' => $vars['url'] . 'action/googleappslogin/save_user_sync_settings',
+						'action' => elgg_get_site_url() . 'action/googleappslogin/save_user_sync_settings',
 					));
 
 					echo elgg_view('googleappslogin/disconnect');

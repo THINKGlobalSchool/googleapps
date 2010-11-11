@@ -1,1 +1,1 @@
-<span id="googleappslogin-icon"><a href="<?php echo $GLOBALS['googleappslogin_url'];?>"><img src="<?php echo $vars['url']; ?>mod/googleappslogin/graphics/login_with_google_apps.gif" alt="googleapps" /></a></span>
+<span id="googleappslogin-icon"><a href="<?php echo $GLOBALS['googleappslogin_url'];?>"><img src="<?php echo elgg_get_site_url(); ?>mod/googleappslogin/graphics/login_with_google_apps.gif" alt="googleapps" /></a></span>
