@@ -1,9 +1,9 @@
 <?php
 
 	/**
-	 * Elgg googleappslogin index page
+	 * Elgg googleapps index page
 	 *
-	 * @package GoogleAppsLogin
+	 * @package googleapps
 	 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
 	 * @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
 	 * @copyright FlatSourcing 2010
@@ -18,10 +18,10 @@
 	$groups = elgg_get_entities_from_relationship(array('relationship' => 'member', 'relationship_guid' => get_loggedin_userid(), 'types' => 'group', 'limit' => 9999));
 	$shared_access = elgg_get_entities_from_relationship(array(	'relationship' => 'shared_access_member', 'relationship_guid' => get_loggedin_userid(), 'limit' => 999));
 
-	$area2 = elgg_view_title(elgg_echo('googleappslogin:google_docs'));
+	$area2 = elgg_view_title(elgg_echo('googleapps:google_docs'));
 	$area2 .= '<form action="'.$GLOBALS['share_doc_url'].'" method="post" onsubmit="return ajax_submit(this)" >';
 	// Get a list of google sites
-	$area2 .= '<div id="googleappslogin">Loading....</div>';
+	$area2 .= '<div id="googleapps">Loading....</div>';
 	$area2 .= '';
 
 	$area2.='<br />View access level: <select name="access" id="access" onchange="showGroups()">';
@@ -55,7 +55,7 @@
 		// Display them in the page
 		$body = elgg_view_layout('one_column', $area2);
 		// Display page
-		page_draw( elgg_echo('googleappslogin:google_docs'), $body);
+		page_draw( elgg_echo('googleapps:google_docs'), $body);
 	break;
 	case 'documents':
 		$client = authorized_client(true);
@@ -64,9 +64,9 @@
 
 
 		$area = '';
-		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleappslogin/css/style.css" type="text/css" /> ';
-		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleappslogin/css/jquery-ui-173/css/custom-theme/jquery-ui-1.7.3.custom.css" type="text/css" /> ';
-		$area .= '<script type="text/javascript" src="' . elgg_get_site_url() . 'mod/googleappslogin/jquery.tablesorter.js"></script> ';
+		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleapps/css/style.css" type="text/css" /> ';
+		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleapps/css/jquery-ui-173/css/custom-theme/jquery-ui-1.7.3.custom.css" type="text/css" /> ';
+		$area .= '<script type="text/javascript" src="' . elgg_get_site_url() . 'mod/googleapps/jquery.tablesorter.js"></script> ';
 		$area .= '<script>
 			function sort_number (n) {
 				if (n < 10) {
@@ -134,7 +134,7 @@ function showGroups(){
 
 }
 function load_docs() {
-	$("#googleappslogin").load("?action=documents");
+	$("#googleapps").load("?action=documents");
 }
 
 function ajax_submit(x) {

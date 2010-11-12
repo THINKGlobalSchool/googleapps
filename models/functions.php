@@ -2,7 +2,7 @@
 /**
  * Functions for use OAuth
  *
- * @package GoogleAppsLogin
+ * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
  * @copyright FlatSourcing 2010
@@ -26,8 +26,8 @@
 		require_once 'OAuth.php';
 		require_once 'client.inc';
 
-		$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleappslogin');
-		$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleappslogin');
+		$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+		$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
 
 		$client = new OAuth_Client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 		$client->access_token = $user->access_token;
@@ -46,11 +46,11 @@
 	function googleapps_cron_fetch_data() {
 
         	$context = get_context();
-					set_context('googleappslogin_cron_job');
+					set_context('googleapps_cron_job');
 
 
             /* need to sync sites ? */
-            $oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleappslogin');
+            $oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
             if ($oauth_sync_sites == 'no') return;
 
             set_time_limit(0);
@@ -230,8 +230,8 @@
 		require_once 'OAuth.php';
 		require_once 'client.inc';
 
-		$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleappslogin');
-		$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleappslogin');
+		$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+		$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
 
 		$user = $_SESSION['user'];
 		if (!empty($user->access_token)) {
@@ -270,7 +270,7 @@
      * @param bool $ajax
      * @return object
      */
-	function googleappslogin_get_oauth_data($ajax = false) {
+	function googleapps_get_oauth_data($ajax = false) {
 		$client = authorized_client($ajax);
 		if ($client) {
 			$x = googleapps_fetch_oauth_data($client, $ajax);
@@ -302,9 +302,9 @@
 			$all = false;
 		}
 
-		$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleappslogin');
-		$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleappslogin');
-		$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleappslogin');
+		$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
+		$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
+		$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleapps');
 
 		$count = 0;
 		$is_new_docs = false;
@@ -356,7 +356,7 @@
 	
 	function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 		// 0. Check settings
-		if (get_plugin_setting('oauth_sync_sites', 'googleappslogin') == 'no') {
+		if (get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
 			return false;
 		}
 
@@ -540,7 +540,7 @@
                                           <gAcl:role value='reader'/> ";
 
                    if ($access_type=="domain") {
-                       $domain = get_plugin_setting('googleapps_domain', 'googleappslogin');
+                       $domain = get_plugin_setting('googleapps_domain', 'googleapps');
                        $data.="<gAcl:scope type=\"domain\" value=\"".$domain."\" />";
                    } else {
                        $data.="<gAcl:scope type=\"default\"/>";
@@ -919,7 +919,7 @@
                 add_to_river('river/object/doc_activity/create', 'create doc', $user->guid, $doc_activity->guid, "", strtotime($date));
             }
 
-//            system_message(elgg_echo("googleappslogin:doc:share:ok"));
+//            system_message(elgg_echo("googleapps:doc:share:ok"));
      }
 
 

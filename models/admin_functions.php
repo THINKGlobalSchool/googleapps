@@ -2,7 +2,7 @@
 /**
  * Functions for use by admin pages
  *
- * @package GoogleAppsLogin
+ * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Mike Hourahine
  * @copyright THINK Global School 2010
@@ -11,13 +11,13 @@
 
 function list_googlesite_entities() {
 	$output = "";
-
+	
 	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>999));
 	$site_count = count($site_entities);
 	
 	$output .= "<p>Site entities found: {$site_count}</p>";
 	foreach($site_entities as $site_entity) {
-		$output .= elgg_view('googleappslogin/admin/site_entity',array('site_entity'=>$site_entity));
+		$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
 		$output .= "<br/>";
 	}
 	
@@ -36,7 +36,7 @@ function list_googlesite_entities_byuser() {
 		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
 		foreach($site_list as $key => $site) {
 			$site_entity = get_entity($site['entity_id']);
-			$output .= elgg_view('googleappslogin/admin/site_entity',array('site_entity'=>$site_entity));
+			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
 		}
 		$output .= "<hr />";	 
 	}

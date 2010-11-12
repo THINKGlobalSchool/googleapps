@@ -25,7 +25,7 @@ $subtype = $user->getSubtype();
 if ($user->google) {
 	
 	if (empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Please provide your password before you disconnect profile from googleapps.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Please provide your password before you disconnect profile from googleapps.'));
 		forward($_SERVER['HTTP_REFERER']);
 	}
 	
@@ -46,7 +46,7 @@ if ($user->google) {
 	system_message('Your profile has been successfully disconnected from googleapps.');
 }
 
-forward('mod/googleappslogin/sync_settings.php');
+forward('mod/googleapps/sync_settings.php');
 
 exit;
 

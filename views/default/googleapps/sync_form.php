@@ -2,7 +2,7 @@
 
 
 // Echo title
-echo elgg_view_title(elgg_echo('googleappslogin:google_sync_settings'));
+echo elgg_view_title(elgg_echo('googleapps:google_sync_settings'));
 
 
 $user = $_SESSION['user'];
@@ -27,7 +27,7 @@ foreach ($user_sync_settings as $setting => $v) {
 
 	<?php if ($user->google == 1 || $subtype == 'googleapps') { ?>
 			
-			<p><?php echo elgg_echo('googleappslogin:google_sync_settings_description'); ?></p>
+			<p><?php echo elgg_echo('googleapps:google_sync_settings_description'); ?></p>
 					<?php
 					$body = "<p>" . elgg_view('input/checkboxes', array('internalname' => "sync_settings", 'value' =>$enabled,  'options' => array('Syncing name upon login'=>'sync_name')) );
 					$body .= '</p>';
@@ -36,18 +36,18 @@ foreach ($user_sync_settings as $setting => $v) {
 					echo elgg_view('input/form',array(
 						'body' => $body,
 						'method' => 'post',
-						'action' => elgg_get_site_url() . 'action/googleappslogin/save_user_sync_settings',
+						'action' => elgg_get_site_url() . 'action/googleapps/save_user_sync_settings',
 					));
 
-					echo elgg_view('googleappslogin/disconnect');
+					echo elgg_view('googleapps/disconnect');
 
 	} else {
 		$googleapps_screen_name = $user->googleapps_screen_name;
 	?>
-			<h3><?php echo elgg_echo('googleappslogin:googleapps_login_title'); ?></h3>
-			<p><?php echo elgg_echo('googleappslogin:googleapps_login_description'); ?></p>
+			<h3><?php echo elgg_echo('googleapps:googleapps_login_title'); ?></h3>
+			<p><?php echo elgg_echo('googleapps:googleapps_login_description'); ?></p>
 	<?php
-		echo elgg_view('googleappslogin/connect');
+		echo elgg_view('googleapps/connect');
 	}
 	?>
 			

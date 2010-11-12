@@ -16,7 +16,7 @@ $home_url = $CONFIG->wwwroot;
 $google = new Google_OpenID();
 $google->use_oauth();
 $google->set_home_url($home_url);
-$google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/googleappslogin/return', FALSE));
+$google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/googleapps/return', FALSE));
 
 if ($googleapps_domain) {
     $google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
@@ -28,7 +28,7 @@ try {
     $url = $google->get_authorization_url();
     forward($url);
 } catch(Exception $e) {
-    register_error(sprintf(elgg_echo("googleappslogin:wrongdomain"), $username));
+    register_error(sprintf(elgg_echo("googleapps:wrongdomain"), $username));
     forward();
 }
 

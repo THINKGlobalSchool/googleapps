@@ -6,4 +6,6 @@
         <field key="website" value="http://thinkglobalschool.org/" />
         <field key="copyright" value="(C) THINK Global School 2010" />
         <field key="licence" value="GNU Public License version 2" />
+		<field key="admin_interface" value="simple" />
+		<field key="elgg_install_state" value="enabled" />
 </plugin_manifest>

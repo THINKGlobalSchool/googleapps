@@ -9,11 +9,11 @@ require_once (dirname(dirname(__FILE__)) . '/models/client.inc');
 //print_r($GLOBALS);
 $user = get_loggedin_user();
 
-$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleappslogin');
-$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleappslogin');
+$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
 
-$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleappslogin');
-$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleappslogin');
+$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
+$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
 
 $oauth_verifier = get_input('oauth_verifier');
 
@@ -44,7 +44,7 @@ if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oa
 
 if (!empty($_SESSION['oauth_connect'])) {
 	unset($_SESSION['oauth_connect']);
-	forward('mod/googleappslogin/sync_settings.php');
+	forward('mod/googleapps/sync_settings.php');
 }
 
 $google = Google_OpenID::create_from_response($_REQUEST);
@@ -55,12 +55,12 @@ $response = $google->get_response();
 if (!empty($response)) {
 	$request_token = !empty($response['openid_ext2_request_token']) ? $response['openid_ext2_request_token'] : '';
 } else {
-	//register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Bad response'));
+	//register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Bad response'));
 	forward();
 }
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'No authorized'));
+	register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No authorized'));
 	forward();
 } else {
 	
@@ -74,7 +74,7 @@ if (!$google->is_authorized()) {
 	$duplicate_account = false;
 	
 	if (empty($email)) {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'No email'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No email'));
 		forward();
 	}
 	
@@ -93,7 +93,7 @@ if (!$google->is_authorized()) {
 
 		if(get_user_by_username($username)) {
 			$duplicate_account = true;
-			register_error(sprintf(elgg_echo("googleappslogin:account_duplicate"), $username));
+			register_error(sprintf(elgg_echo("googleapps:account_duplicate"), $username));
 		}
 		
 		if (!$duplicate_account) {
@@ -120,12 +120,12 @@ if (!$google->is_authorized()) {
 				$subtype = 'googleapps';
 				$user->google = 1;
 			} else {
-				register_error(elgg_echo("googleappslogin:account_create"));
+				register_error(elgg_echo("googleapps:account_create"));
 			}
 		}
 	} elseif ($entities[0]->active == 'no') {
 		// this is an inactive account		
-		register_error(elgg_echo("googleappslogin:inactive"));
+		register_error(elgg_echo("googleapps:inactive"));
 	} else {
 		$user = $entities[0];
 		
@@ -134,13 +134,13 @@ if (!$google->is_authorized()) {
 //		if ($user->google == 1 || $subtype == 'googleapps' or true) {
 			// account is active, check to see if this user has been banned
 			if (isset($user->banned) && $user->banned == 'yes') { // this needs to change.
-				register_error(elgg_echo("googleappslogin:banned"));
+				register_error(elgg_echo("googleapps:banned"));
 			} else {
 				$do_login = true;
 				$new_account = false;
 			}
 //		} else {
-//			register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Sorry, but username ' . $user->username . ' already exists.'));
+//			register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Sorry, but username ' . $user->username . ' already exists.'));
 //		}
 		
     }

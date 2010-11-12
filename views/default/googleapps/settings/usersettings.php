@@ -1,17 +1,17 @@
 <?php
 	/**
 	 * NOTE - It looks like this file is not called anywhere
-	 * User settings for googleappslogin.
+	 * User settings for googleapps.
 	 * 
-	 * @package googleappslogin
+	 * @package googleapps
 	 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
 	 * @author Alexander Ulitin
 	 * @copyright Flatsourcing 2010
 	 * @link http://elgg.org/
 	 */
 	
-	$options = array(elgg_echo('googleappslogin:settings:yes')=>'yes',
-		elgg_echo('googleappslogin:settings:no')=>'no'
+	$options = array(elgg_echo('googleapps:settings:yes')=>'yes',
+		elgg_echo('googleapps:settings:no')=>'no'
 	);
 	
 	$access_types = array(
@@ -31,20 +31,20 @@
 	
 	googleapps_sync_sites();
 ?>
-<div class="user_settings googleappslogin">
+<div class="user_settings googleapps">
 <?
 	
 	if ($user->google == 1 || $subtype == 'googleapps') {
 		
-		//echo elgg_echo('googleappslogin:googleapps_controlled_profile') . "<br />";
+		//echo elgg_echo('googleapps:googleapps_controlled_profile') . "<br />";
 		//echo elgg_view('input/radio', array('internalname' => 'googleapps_controlled_profile', 'options' => $options, 'value' => $googleapps_controlled_profile));
 		
 		$site_list = unserialize($user->site_list);
 		if (!empty($site_list)) {
 			?>
-			<h3><?php echo elgg_echo('googleappslogin:google_sites_settings'); ?></h3>
+			<h3><?php echo elgg_echo('googleapps:google_sites_settings'); ?></h3>
 			
-			<p><?php echo elgg_echo('googleappslogin:google_sites_settings_description'); ?></p>
+			<p><?php echo elgg_echo('googleapps:google_sites_settings_description'); ?></p>
 			<?php
 			foreach ($site_list as $site) {
                             $tite=$site['title'];
@@ -59,16 +59,16 @@
 				}
 			}
 		}		
-		echo elgg_view('googleappslogin/disconnect');
+		echo elgg_view('googleapps/disconnect');
 	} else {
 		$googleapps_screen_name = $user->googleapps_screen_name;
 		?>
-			<h3><?php echo elgg_echo('googleappslogin:googleapps_login_title'); ?></h3>
+			<h3><?php echo elgg_echo('googleapps:googleapps_login_title'); ?></h3>
 			
-			<p><?php echo elgg_echo('googleappslogin:googleapps_login_description'); ?></p>
+			<p><?php echo elgg_echo('googleapps:googleapps_login_description'); ?></p>
 			
 		<?php
-		echo elgg_view('googleappslogin/connect');
+		echo elgg_view('googleapps/connect');
 	}
 ?>
 </div>

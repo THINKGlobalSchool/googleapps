@@ -15,12 +15,12 @@ $to_share['tags']=$tags;
 $_SESSION['google_docs_to_share_data']=serialize($to_share); // remember data
 
 if ( is_null($doc_id) ) {
-    echo elgg_echo("googleappslogin:doc:share:no_doc_id");
+    echo elgg_echo("googleapps:doc:share:no_doc_id");
     exit;
 }
 
 if( empty($comment)) {
-    echo elgg_echo("googleappslogin:doc:share:no_comment");
+    echo elgg_echo("googleapps:doc:share:no_comment");
     exit;
 }
 
@@ -46,7 +46,7 @@ if (! check_document_permission($doc_access, $activity_access, $members) ) {
 	</script>';
 	$area2 .= '<div class="contentWrapper singleview">';
 	$area2 .= '<form action="'. $GLOBALS['change_doc_permissions_url'] .'" onsubmit="return ajax_submit(this);"  method="post">';
-	$area2 .= '<h3>'.elgg_echo('googleappslogin:doc:share:wrong_permissions').'</h3>';
+	$area2 .= '<h3>'.elgg_echo('googleapps:doc:share:wrong_permissions').'</h3>';
 	$area2 .= '<input type="hidden" value="" name="answer">&nbsp;';
 	$area2 .= '<input type="submit" value="Grant view permisson" onclick="save_answer(this)">&nbsp;';
 	$area2 .= '<input type="submit" value="Ignore and continue" onclick="save_answer(this)">&nbsp;';
@@ -61,7 +61,7 @@ if (! check_document_permission($doc_access, $activity_access, $members) ) {
     }
 
      share_document($doc, $user, $comment, $tags, $activity_access, $doc_access); // Share and public document activity
-     echo elgg_echo("googleappslogin:doc:share:ok");
+     echo elgg_echo("googleapps:doc:share:ok");
      exit;
  }
 

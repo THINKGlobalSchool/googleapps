@@ -2,11 +2,11 @@
 
 
 // Echo title
-echo elgg_view_title(elgg_echo('googleappslogin:google_sites_settings'));
+echo elgg_view_title(elgg_echo('googleapps:google_sites_settings'));
 
 /* not used anywhere?
-$options = array(elgg_echo('googleappslogin:settings:yes')=>'yes',
-		elgg_echo('googleappslogin:settings:no')=>'no'
+$options = array(elgg_echo('googleapps:settings:yes')=>'yes',
+		elgg_echo('googleapps:settings:no')=>'no'
 );  */
 
 $access_types = array(
@@ -39,9 +39,9 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 			
 			if (!empty($site_list)) {
 				
-				echo '<p>'.elgg_echo('googleappslogin:google_sites_settings_description').'</p>';
+				echo '<p>'.elgg_echo('googleapps:google_sites_settings_description').'</p>';
 				
-				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleappslogin:site').'</th><th>'.elgg_echo('googleappslogin:access_level').'</th></tr>';
+				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:site').'</th><th>'.elgg_echo('googleapps:access_level').'</th></tr>';
 				foreach ($site_list as $site_id => $site_obj) {
 
           $title=$site_obj['title'];
@@ -66,7 +66,7 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 				echo elgg_view('input/form',array(
 				'body' => $body,
 				'method' => 'post',
-				'action' => $vars['url'] . 'action/googleappslogin/save',
+				'action' => $vars['url'] . 'action/googleapps/save',
 				));
 			}
 		}

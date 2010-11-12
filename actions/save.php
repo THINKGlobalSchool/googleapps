@@ -16,7 +16,7 @@ function update_acitivities_access($site_name, $access) {
 
 function update_site_entity_access($entity_id, $access) {
     $context = get_context();
-    set_context('googleappslogin_cron_job');
+    set_context('googleapps_cron_job');
 
     $user_site_entities=unserialize($_SESSION['user_site_entities']);
 
@@ -48,7 +48,7 @@ $subtype = $user->getSubtype();
 if ($user->google == 1) {
 
 	if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Please provide your password before you stop synchronizing with googleapps.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Please provide your password before you stop synchronizing with googleapps.'));
 		forward($_SERVER['HTTP_REFERER']);
 	}
 

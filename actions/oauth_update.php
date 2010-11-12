@@ -7,7 +7,7 @@ ini_set('pcre.backtrack_limit', 10000000);
 
 require_once (dirname(dirname(__FILE__)) . '/models/functions.php');
 global $CONFIG;
-$result = googleappslogin_get_oauth_data(true);
+$result = googleapps_get_oauth_data(true);
 echo $result;
 exit;
 ?>

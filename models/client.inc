@@ -3,7 +3,7 @@
 /**
  * Class for use OAuth
  *
- * @package GoogleAppsLogin
+ * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
  * @copyright FlatSourcing 2010

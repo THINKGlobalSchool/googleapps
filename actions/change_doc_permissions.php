@@ -38,7 +38,7 @@ switch (get_input('answer')) {
 
 }
 
-     die ( elgg_echo("googleappslogin:doc:share:ok") );
+     die ( elgg_echo("googleapps:doc:share:ok") );
      exit;
 
 ?>

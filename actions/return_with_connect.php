@@ -15,8 +15,8 @@ $google = Google_OpenID::create_from_response($_REQUEST);
 $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Not authorized'));
-	forward('mod/googleappslogin/sync_settings.php');
+	register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Not authorized'));
+	forward('mod/googleapps/sync_settings.php');
 } else {
 	
 	if (!$user) {
@@ -30,14 +30,14 @@ if (!$google->is_authorized()) {
 	$entities = get_user_by_email($email);
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'Sorry, but email ' . $email . ' already exists and in use by other user.'));
-		forward('mod/googleappslogin/sync_settings.php');
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Sorry, but email ' . $email . ' already exists and in use by other user.'));
+		forward('mod/googleapps/sync_settings.php');
 	}
 	$is_sync = $user->sync == '1';
 	if ($is_sync) {
 		
 		if (empty($email)) {
-			register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'No data'));
+			register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No data'));
 			forward();
 		}
 		
@@ -52,16 +52,16 @@ if (!$google->is_authorized()) {
 		$user->save();
 		
 		$_SESSION['oauth_connect'] = 1;
-		$googleappslogin_return = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleappslogin/return', FALSE);
-		forward($googleappslogin_return);
+		$googleapps_return = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/return', FALSE);
+		forward($googleapps_return);
 		
 	} else {
-		register_error(sprintf(elgg_echo('googleappslogin:googleappserror'), 'This user is not ready for synchronization.'));
-		forward('mod/googleappslogin/sync_settings.php');
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'This user is not ready for synchronization.'));
+		forward('mod/googleapps/sync_settings.php');
 	}
 	
 }
 
-forward('mod/googleappslogin/sync_settings.php');
+forward('mod/googleapps/sync_settings.php');
 exit;
 ?>
