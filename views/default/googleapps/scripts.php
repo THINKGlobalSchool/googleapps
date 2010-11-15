@@ -10,7 +10,7 @@
 	if ($url && $user && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no' || $oauth_sync_docs != 'no')) {
 		
 		?>
-		<script type="text/javascript">
+		<script title='Googleapps Plugin OAUTH Update' type="text/javascript">
 			
 			jQuery(function($) {
 				
@@ -59,26 +59,7 @@
 				
 			});
 			
-		</script>
-		
-		<div id="custom-messages" class="hidden">
-			
-			<div class="messages radius8">
-				<p></p>
-			</div>
-			
-			<div class="errors radius8">
-				<p></p>
-			</div>
-			
-		</div>
-		
-		<style>
-		.nodecor:hover {
-			text-decoration: none !important;
-		}
-		</style>
-		
-		<?
+		</script>		
+		<?php
 	}
 ?>

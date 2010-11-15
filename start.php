@@ -60,8 +60,8 @@ function googleapps_init() {
 	// Extend login view google login button
 	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
 	
-	// @TODO: Do this somewhere else... (include oauth update scripts)
-	elgg_extend_view('messages/list', 'googleapps/scripts');
+	// Include oauth update scripts
+	elgg_extend_view('metatags', 'googleapps/scripts');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
