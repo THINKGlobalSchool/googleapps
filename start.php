@@ -161,6 +161,7 @@ function googleapps_pagesetup() {
  * @return true|false Depending on success
  */
 function googleapps_page_handler($page) {
+	gatekeeper();
 	if (isset($page[0])) {
 		switch ($page[0]) {
 			case 'settings':
@@ -169,8 +170,8 @@ function googleapps_page_handler($page) {
 				switch ($page[1]) {
 					case 'wikiactivity':
 						$form = elgg_view('googleapps/forms/wiki_settings');
-						$body = elgg_view_layout('one_column_with_sidebar', $form);
-						page_draw(elgg_echo('googleapps:google_sites_settings'),$body);
+						$body = elgg_view_layout('one_column_with_sidebar', array('content' => $form));
+						echo elgg_view_page(elgg_echo('googleapps:google_sites_settings'),$body);
 					break;
 					case 'debug':
 						admin_gatekeeper();
@@ -192,13 +193,13 @@ function googleapps_page_handler($page) {
 						}
 
 						$body = elgg_view_layout('administration', array('content' => $content));
-						page_draw($title, $body, 'page_shells/admin');
+						echo elgg_view_page($title, $body, 'page_shells/admin');
 					break;
 					default:
 					case 'account':
 						$body = elgg_view('googleapps/forms/sync_form');
-						$body = elgg_view_layout('one_column_with_sidebar', $body);
-						page_draw(elgg_echo('googleapps:google_sync_settings'),$body);
+						$body = elgg_view_layout('one_column_with_sidebar', array('content' => $body));
+						echo elgg_view_page(elgg_echo('googleapps:google_sync_settings'),$body);
 					break;
 				}
 			break;
@@ -206,13 +207,13 @@ function googleapps_page_handler($page) {
 				set_context('docs');
 				// Google Docs pages
 				switch ($page[1]) {
-			        case 'permissions':
-			        	include(dirname(__FILE__) . '/docs_permissions.php');
-			           	return true; 
-			    	break;
 					default:
-				       	include(dirname(__FILE__) . '/docs.php');
-			        	return true;
+						$title = elgg_echo('googleapps:google_docs');
+						$body = elgg_view_layout('one_column', array('content' => elgg_view_title($title) . elgg_view('googleapps/docs_container')));
+						echo elgg_view_page($title, $body);
+					break;
+					case 'list_form':
+						echo elgg_view('googleapps/forms/docs_list_form');
 					break;
 				}
 			break;
@@ -230,7 +231,6 @@ function googleapps_page_handler($page) {
 		include(dirname(__FILE__) . '/wikis.php');
 		return true;
 	}
-
 	return false;
 }
 
