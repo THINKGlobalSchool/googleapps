@@ -224,7 +224,7 @@ table.tablesorter .odd {
 	background-color: #6E6E6E;
 }
 table.tablesorter .header {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>bg.png);
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>bg.png);
 	background-repeat: no-repeat;
 	border-left: 1px solid #FFF;
 	border-right: 1px solid #000;
@@ -234,11 +234,11 @@ table.tablesorter .header {
 	height: auto;
 }
 table.tablesorter .headerSortUp {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>asc.png);
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>asc.png);
 	background-repeat: no-repeat;
 }
 table.tablesorter .headerSortDown {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>desc.png);
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>desc.png);
 	background-repeat: no-repeat;
 }
 
