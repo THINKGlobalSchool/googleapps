@@ -16,7 +16,7 @@ $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
 	register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Not authorized'));
-	forward('mod/googleapps/sync_settings.php');
+	forward('pg/googleapps/settings/account');
 } else {
 	
 	if (!$user) {
@@ -31,7 +31,7 @@ if (!$google->is_authorized()) {
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
 		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Sorry, but email ' . $email . ' already exists and in use by other user.'));
-		forward('mod/googleapps/sync_settings.php');
+		forward('pg/googleapps/settings/account');
 	}
 	$is_sync = $user->sync == '1';
 	if ($is_sync) {
@@ -57,11 +57,11 @@ if (!$google->is_authorized()) {
 		
 	} else {
 		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'This user is not ready for synchronization.'));
-		forward('mod/googleapps/sync_settings.php');
+		forward('pg/googleapps/settings/account');
 	}
 	
 }
 
-forward('mod/googleapps/sync_settings.php');
+forward('pg/googleapps/settings/account');
 exit;
 ?>

@@ -62,16 +62,12 @@ function googleapps_init() {
 	
 	// @TODO: Do this somewhere else... (include oauth update scripts)
 	elgg_extend_view('messages/list', 'googleapps/scripts');
-	
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
 	
 	// Extend topbar view to add new mail icon
 	elgg_extend_view('elgg_topbar/extend','googleapps/new_mail');
-	
-	// @TODO: What does this do.. its commented out (see function)
-	//register_plugin_hook('usersettings:save','user','googleapps_user_settings_save');
 	
 	// Register subtypes
 	register_entity_type('object','site_activity', 'Site activity');
@@ -310,126 +306,6 @@ function googleapps_icon_url($hook_name,$entity_type, $return_value, $parameters
 			return $entity->googleapps_icon_url_mini;
 		} else {
 			return $entity->googleapps_icon_url_normal;
-		}
-	}
-}
-
-// @TODO: What does this do? Its not being called..
-function googleapps_user_settings_save() {
-	gatekeeper();
-	function update_acitivities_access($site_name, $access) {
-		$entities = get_entities_from_metadata('site_name', $site_name, 'object');
-		foreach ($entities as $entity) {
-			$entity->access_id = $access == 2 ? 1 : ($access == 22 ? 2 : $access);
-			$entity->save();
-		}
-	}
-
-	// temporary!
-	/*
-		$entities = get_entities('user');
-		foreach ($entities as $user) {
-			$site_list = unserialize($user->site_list);
-			foreach ($site_list as $title => $access) {
-				$site_list[$title] = $access == 2 ? 1 : $access;
-				update_acitivities_access($title, $access);
-			}
-			$user->site_list = serialize($site_list);
-			$user->save();
-		}
-	*/
-	// end temporary
-
-
-	$googleapps_controlled_profile = strip_tags(get_input('googleapps_controlled_profile'));
-	//$googleapps_sync_email = strip_tags(get_input('googleapps_sync_email'));
-	//$googleapps_sync_sites = strip_tags(get_input('googleapps_sync_sites'));
-	$googleapps_sites_settings = $_POST['googleapps_sites_settings'];
-
-	$user_id = get_input('guid');
-	$user = "";
-	$error = false;
-	$synchronize = false;
-
-	if (!$user_id) {
-		$user = $_SESSION['user'];
-	} else {
-		$user = get_entity($user_id);
-	}
-	$subtype = $user->getSubtype();
-
-	if ($user->google == 1) {
-
-		if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
-			register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Please provide your password before you stop synchronizing with googleapps.'));
-			forward($_SERVER['HTTP_REFERER']);
-		}
-
-		if (elgg_strlen($googleapps_controlled_profile) > 50) {
-			register_error(elgg_echo('admin:configuration:fail'));
-			forward($_SERVER['HTTP_REFERER']);
-		}
-
-		if (($user) && ($user->canEdit())) {
-			if ($googleapps_controlled_profile != $user->googleapps_controlled_profile) {
-				//$user->googleapps_controlled_profile = $googleapps_controlled_profile;
-				if (!$user->save()) {
-					$error = true;
-				}
-			}
-
-			if (!empty($googleapps_sites_settings)) {
-				$site_list = unserialize($user->site_list);
-				foreach ($googleapps_sites_settings as $title => $access) {
-					$site_list[$title] = $access;
-					update_acitivities_access($title, $access);
-				}
-				$user->site_list = serialize($site_list);
-				$user->save();
-			}
-
-			/*
-				if ($googleapps_sync_email != $user->googleapps_sync_email) {
-					$user->googleapps_sync_email = $googleapps_sync_email;
-					if (!$user->save()) {
-						$error = true;
-					} else {
-						
-						if ($user->googleapps_sync_email == 'yes') {
-							$synchronize = true;
-						}
-						
-					}
-				}
-				
-				if ($googleapps_sync_sites != $user->googleapps_sync_sites) {
-					$user->googleapps_sync_sites = $googleapps_sync_sites;
-					if (!$user->save()) {
-						$error = true;
-					} else {
-						
-						if ($user->googleapps_sync_sites == 'yes') {
-							$synchronize = true;
-						}
-						
-					}
-				}
-				
-				if ($synchronize) {
-					$_SESSION['oauth_connect'] = 1;
-					$googleapps_return = elgg_add_action_tokens_to_url('https://' . $_SERVER['HTTP_HOST'] . '/action/googleapps/return');
-					forward($googleapps_return);
-				}
-			*/
-
-		} else {
-			$error = true;
-		}
-
-		if (!$error) {
-			system_message(elgg_echo('admin:configuration:success'));
-		} else {
-			register_error(elgg_echo('admin:configuration:fail'));
 		}
 	}
 }

@@ -46,7 +46,7 @@ if ($user->google) {
 	system_message('Your profile has been successfully disconnected from googleapps.');
 }
 
-forward('mod/googleapps/sync_settings.php');
+forward('pg/googleapps/settings/account');
 
 exit;
 
