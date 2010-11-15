@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-require_once (dirname(dirname(__FILE__)) . '/models/Http.php');
-require_once (dirname(dirname(__FILE__)) . '/models/Google_OpenID.php');
-require_once (dirname(dirname(__FILE__)) . '/models/OAuth.php');
-require_once (dirname(dirname(__FILE__)) . '/models/client.inc');
+require_once (dirname(dirname(__FILE__)) . '/lib/Http.php');
+require_once (dirname(dirname(__FILE__)) . '/lib/Google_OpenID.php');
+require_once (dirname(dirname(__FILE__)) . '/lib/OAuth.php');
+require_once (dirname(dirname(__FILE__)) . '/lib/client.inc');
 
 //print_r($GLOBALS);
 $user = get_loggedin_user();

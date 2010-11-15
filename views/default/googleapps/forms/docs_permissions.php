@@ -10,7 +10,7 @@
 	 */
 
 	$script = '
-	<script>
+	<script type="text/javascript">
 	function save_answer(el) {
 		el.form.answer.value = el.value;
 	}

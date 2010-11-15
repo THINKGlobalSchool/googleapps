@@ -25,8 +25,8 @@ function googleapps_init() {
 	global $CONFIG;
 	
 	// Includes
-	require_once 'models/functions.php';
-	require_once 'models/admin_functions.php';
+	require_once 'lib/functions.php';
+	require_once 'lib/admin_functions.php';
 	
 	// Need to use SSL for google urls
 	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
