@@ -31,7 +31,7 @@ $english = array(
 		'googleapps:googleapps_login_title' => 'Googleapps login',
 		'googleapps:googleapps_login_description' => 'Connect your Spot user account with your Google Apps account.',
 
-		'googleapps:google_docs' => 'Share Google docs',
+		'googleapps:google_docs' => 'Share Google Docs',
 		'googleapps:google_docs:description' => '',
 
 		'googleapps:google_sites_settings' => 'Wiki Activity Settings',

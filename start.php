@@ -62,6 +62,7 @@ function googleapps_init() {
 	
 	// @TODO: Do this somewhere else... (include oauth update scripts)
 	elgg_extend_view('messages/list', 'googleapps/scripts');
+	
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
@@ -86,30 +87,24 @@ function googleapps_init() {
 	register_plugin_hook('permissions_check','user','googleapps_can_edit');
 	register_plugin_hook('entity:icon:url','user','googleapps_icon_url');
 
-
 	//register CRON hook to poll for Google Site activity
 	register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
+
+	// Setup main page handler
+	register_page_handler('googleapps','googleapps_page_handler');
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = get_loggedin_user();
 	if (!empty($user) && $user->google) {
 		if ($oauth_sync_sites != 'no') {
 			// Sync wikis enabled
-			add_menu(elgg_echo('googleapps:sites'), $CONFIG->wwwroot . 'pg/wikis/' . $user->username);
-			register_page_handler('wikis','googleapps_page_handler');
+			add_menu(elgg_echo('googleapps:sites'), $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $user->username);	
 		}
 		if ($oauth_sync_docs != 'no') {
 			// Share docs enabled
-			register_page_handler('docs','googleapps_docs_page_handler');
-			add_menu(elgg_echo('googleapps:google_docs'), $CONFIG->wwwroot . 'pg/docs/my');
+			add_menu(elgg_echo('googleapps:google_docs'), $CONFIG->wwwroot . 'pg/googleapps/docs/');
 		}
 	}
-	
-	// Set up page handler
-	register_page_handler('googleappsettings','googleapps_settings_page_handler');
-	
-	// Set up admin page handler
-	register_page_handler('googlesitesdebug','admin_googlesites_debug_page_handler');
 	
 	// Register widgets
 	add_widget_type('google_docs', elgg_echo('googleapps:google_docs'), elgg_echo('googleapps:google_docs:description'));
@@ -136,24 +131,24 @@ function googleapps_pagesetup() {
 
 	// Settings items
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:google_sites_settings'), 
-								'href' => $CONFIG->wwwroot . "pg/googleappsettings/wikiactivity"), 'settings', 'z');
+								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/wikiactivity"), 'settings', 'z');
 
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:google_sync_settings'), 
-								'href' => $CONFIG->wwwroot . "pg/googleappsettings/account"), 'settings', 'z');	
+								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/account"), 'settings', 'z');	
 
 	// Wikis
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:sites:your'), 
-								'href' => $CONFIG->wwwroot . 'pg/wikis/' . $page_owner->username), 'wikis');
+								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $page_owner->username), 'wikis');
 
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:sites:everyone'), 
-								'href' => $CONFIG->wwwroot . 'pg/wikis/all'), 'wikis');
+								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis'), 'wikis');
 														
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:site:add'), 
 								'href' => $GLOBALS['link_to_add_site']), 'wikis');
 	
 	// Admin
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admindebugtitle'),
-								'href'=> $CONFIG->url . "pg/googlesitesdebug",
+								'href'=> $CONFIG->url . "pg/googleapps/settings/debug",
 								'id'=>'googlesitesdebug'),'admin', 'zzz'); // zzz puts the debug at the bottom (alphabetically)
 }
 
@@ -185,29 +180,6 @@ function googleapps_settings_page_handler($page) {
 	}
 }
 
-
-/**
- * googleapps docs page handler
- *
- * @param array $page From the page_handler function
- * @return true|false Depending on success
- */
-function googleapps_docs_page_handler($page) {
-	if (isset($page[0])) {
-		switch ($page[0]) {
-       		case 'my':
-	        	include(dirname(__FILE__) . '/docs.php');
-	            return true;
-			break;
-            case 'permissions':
-            	include(dirname(__FILE__) . '/docs_permissions.php');
-                return true; 
-    		break;
-		}
-	}
-	return true;
-}
-
 /**
  * googleapps page handler
  *
@@ -217,14 +189,67 @@ function googleapps_docs_page_handler($page) {
 function googleapps_page_handler($page) {
 	if (isset($page[0])) {
 		switch ($page[0]) {
-			case "all" :
-				$all = true;
-				include(dirname(__FILE__) . '/wikis.php');
-				return true;
+			case 'settings':
+				set_context('settings');
+				// Google apps settings pages
+				switch ($page[1]) {
+					case 'wikiactivity':
+						$form = elgg_view('googleapps/googlesites/form');
+						$body = elgg_view_layout('one_column_with_sidebar', $form);
+						page_draw(elgg_echo('googleapps:google_sites_settings'),$body);
+					break;
+					case 'debug':
+						admin_gatekeeper();
+						elgg_admin_add_plugin_settings_sidemenu();
+						set_context('admin');
+						$content = elgg_view_title(elgg_echo("googleapps:admindebugtitle"));
+						$content .= elgg_view('googleapps/admin/sitesdebug_nav',array('page'=>$page));
+
+						switch ($page[2]) {
+							case "byuser" :
+								$content .= list_googlesite_entities_byuser();
+							break;
+							case "reset":
+								$content .= elgg_view('googleapps/admin/reset');
+							break;
+							default:
+								$content .= list_googlesite_entities();
+							break;
+						}
+
+						$body = elgg_view_layout('administration', array('content' => $content));
+						page_draw($title, $body, 'page_shells/admin');
+					break;
+					default:
+					case 'account':
+						$body = elgg_view('googleapps/sync_form');
+						$body = elgg_view_layout('one_column_with_sidebar', $body);
+						page_draw(elgg_echo('googleapps:google_sync_settings'),$body);
+					break;
+				}
 			break;
-			default:
+			case 'docs':
+				set_context('docs');
+				// Google Docs pages
+				switch ($page[1]) {
+			        case 'permissions':
+			        	include(dirname(__FILE__) . '/docs_permissions.php');
+			           	return true; 
+			    	break;
+					default:
+				       	include(dirname(__FILE__) . '/docs.php');
+			        	return true;
+					break;
+				}
+			break;
+			case 'wikis':
+				set_context('wikis');
+				$all = true;
+				if ($page['1']) {
+					$all = false;
+				}
+				// Google sites pages
 				include(dirname(__FILE__) . '/wikis.php');
-				return true;
 			break;
 		}
 	} else {
@@ -235,35 +260,6 @@ function googleapps_page_handler($page) {
 	return false;
 }
 
-/**
- * Admin page handler
- * @TODO: Not sure why need to many page handlers..
- */
-function admin_googlesites_debug_page_handler($page) {
-	global $CONFIG;
-
-	admin_gatekeeper();
-	elgg_admin_add_plugin_settings_sidemenu();
-	set_context('admin');
-	
-	$content = elgg_view_title(elgg_echo("googleapps:admindebugtitle"));
-	$content .= elgg_view('googleapps/admin/sitesdebug_nav',array('page'=>$page));
-		
-	switch ($page[0]) {
-		case "byuser" :
-			$content .= list_googlesite_entities_byuser();
-		break;
-		case "reset":
-			$content .= elgg_view('googleapps/admin/reset');
-		break;
-		default:
-			$content .= list_googlesite_entities();
-		break;
-	}
-	
-	$body = elgg_view_layout('administration', array('content' => $content));
-	page_draw($title, $body, 'page_shells/admin');
-}
 
 /** 
  * googleapps login event handler, triggered on login
