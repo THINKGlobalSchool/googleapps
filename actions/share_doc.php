@@ -37,22 +37,7 @@ if ($activity_access == 'group') {
 }
 
 if (! check_document_permission($doc_access, $activity_access, $members) ) {
-
-	$area2 .= '
-	<script>
-	function save_answer(el) {
-		el.form.answer.value = el.value;
-	}
-	</script>';
-	$area2 .= '<div class="contentWrapper singleview">';
-	$area2 .= '<form action="'. $GLOBALS['change_doc_permissions_url'] .'" onsubmit="return ajax_submit(this);"  method="post">';
-	$area2 .= '<h3>'.elgg_echo('googleapps:doc:share:wrong_permissions').'</h3>';
-	$area2 .= '<input type="hidden" value="" name="answer">&nbsp;';
-	$area2 .= '<input type="submit" value="Grant view permisson" onclick="save_answer(this)">&nbsp;';
-	$area2 .= '<input type="submit" value="Ignore and continue" onclick="save_answer(this)">&nbsp;';
-	$area2 .= '<input type="submit" value="Cancel" onclick="save_answer(this)">&nbsp;';
-	$area2 .= '</div><div class="clearfloat"></div>';
-	echo $area2;
+	echo elgg_view('googleapps/forms/docs_permissions');
 	exit;
  } else {
 

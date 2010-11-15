@@ -61,7 +61,7 @@ function googleapps_init() {
 	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
 	
 	// Include oauth update scripts
-	elgg_extend_view('metatags', 'googleapps/scripts');
+	elgg_extend_view('metatags', 'googleapps/oauth_scripts');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
@@ -146,35 +146,7 @@ function googleapps_pagesetup() {
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admindebugtitle'),
 								'href'=> $CONFIG->url . "pg/googleapps/settings/debug",
 								'id'=>'googlesitesdebug'),'admin', 'zzz'); // zzz puts the debug at the bottom (alphabetically)
-}
-
-/**
- * googleapps settings page handler
- *
- * @param array $page From the page_handler function
- * @return true|false Depending on success
- */
-function googleapps_settings_page_handler($page) {
-	gatekeeper();
-	global $SESSION;
-	
-	if (!isset($page[0])) return false;
-	
-	set_context('settings');
-	
-	switch($page[0]) {
-		case 'wikiactivity':
-			$form = elgg_view('googleapps/googlesites/form');
-			$body = elgg_view_layout('one_column_with_sidebar', $form);
-			page_draw(elgg_echo('googleapps:google_sites_settings'),$body);
-		break;
-		case 'account':
-			$body = elgg_view('googleapps/sync_form');
-			$body = elgg_view_layout('one_column_with_sidebar', $body);
-			page_draw(elgg_echo('googleapps:google_sync_settings'),$body);
-		break;
-	}
-}
+}	
 
 /**
  * googleapps page handler
@@ -190,7 +162,7 @@ function googleapps_page_handler($page) {
 				// Google apps settings pages
 				switch ($page[1]) {
 					case 'wikiactivity':
-						$form = elgg_view('googleapps/googlesites/form');
+						$form = elgg_view('googleapps/forms/wiki_settings');
 						$body = elgg_view_layout('one_column_with_sidebar', $form);
 						page_draw(elgg_echo('googleapps:google_sites_settings'),$body);
 					break;
@@ -218,7 +190,7 @@ function googleapps_page_handler($page) {
 					break;
 					default:
 					case 'account':
-						$body = elgg_view('googleapps/sync_form');
+						$body = elgg_view('googleapps/forms/sync_form');
 						$body = elgg_view_layout('one_column_with_sidebar', $body);
 						page_draw(elgg_echo('googleapps:google_sync_settings'),$body);
 					break;
