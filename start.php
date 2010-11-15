@@ -66,6 +66,12 @@ function googleapps_init() {
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
 	
+	// Include custom ui CSS
+	elgg_register_css(elgg_get_site_url() . "mod/googleapps/vendors/jquery-ui-173/css/custom-theme/jquery-ui-1.7.3.custom.css", 'jquery.ui.custom');
+	
+	// Include tablesorter
+	elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
+	
 	// Extend topbar view to add new mail icon
 	elgg_extend_view('elgg_topbar/extend','googleapps/new_mail');
 	

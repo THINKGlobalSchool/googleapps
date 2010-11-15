@@ -201,3 +201,45 @@ table.wiki_activity_settings td.submit_cell {
 	text-align:right;
 }
 
+/* TABLESORTER */
+table.tablesorter {
+	font-size: 12px;
+	background-color: #FFF;
+	border: 1px solid #000;
+}
+table.tablesorter th {
+	text-align: left;
+	padding: 5px;
+	background-color: #6E6E6E;
+	border-bottom: 1px solid #000;
+}
+table.tablesorter td {
+	color: #000;
+	padding: 5px;
+}
+table.tablesorter .even {
+	background-color: #3D3D3D;
+}
+table.tablesorter .odd {
+	background-color: #6E6E6E;
+}
+table.tablesorter .header {
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>bg.png);
+	background-repeat: no-repeat;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #000;
+	border-top: 1px solid #FFF;
+	padding-left: 30px;
+	padding-top: 8px;
+	height: auto;
+}
+table.tablesorter .headerSortUp {
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>asc.png);
+	background-repeat: no-repeat;
+}
+table.tablesorter .headerSortDown {
+	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/images/"; ?>desc.png);
+	background-repeat: no-repeat;
+}
+
+

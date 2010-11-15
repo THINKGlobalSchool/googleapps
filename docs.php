@@ -64,9 +64,6 @@
 
 
 		$area = '';
-		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleapps/css/style.css" type="text/css" /> ';
-		$area .= '<link rel="stylesheet" href="' . elgg_get_site_url() . 'mod/googleapps/css/jquery-ui-173/css/custom-theme/jquery-ui-1.7.3.custom.css" type="text/css" /> ';
-		$area .= '<script type="text/javascript" src="' . elgg_get_site_url() . 'mod/googleapps/jquery.tablesorter.js"></script> ';
 		$area .= '<script>
 			function sort_number (n) {
 				if (n < 10) {
