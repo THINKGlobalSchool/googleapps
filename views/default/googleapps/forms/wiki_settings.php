@@ -1,9 +1,5 @@
 <?php
 
-
-// Echo title
-echo elgg_view_title(elgg_echo('googleapps:google_sites_settings'));
-
 /* not used anywhere?
 $options = array(elgg_echo('googleapps:settings:yes')=>'yes',
 		elgg_echo('googleapps:settings:no')=>'no'
@@ -23,8 +19,8 @@ if ($user->connect == 1) {
 	$user->google = 1;
 }
 
-$response=googleapps_sync_sites();
-$user_site_entities=$response['site_entities'];
+$response = googleapps_sync_sites();
+$user_site_entities = $response['site_entities'];
 
 $_SESSION['user_site_entities']=serialize($user_site_entities);
 
@@ -44,8 +40,8 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:site').'</th><th>'.elgg_echo('googleapps:access_level').'</th></tr>';
 				foreach ($site_list as $site_id => $site_obj) {
 
-          $title=$site_obj['title'];
-          $access=$site_obj['access'];
+          			$title = $site_obj['title'];
+          			$access = $site_obj['access'];
 
 					if (!empty($title)) {
 						if (is_null($access)) {

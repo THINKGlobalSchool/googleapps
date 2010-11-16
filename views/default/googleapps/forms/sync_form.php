@@ -1,10 +1,5 @@
 <?php
 
-
-// Echo title
-echo elgg_view_title(elgg_echo('googleapps:google_sync_settings'));
-
-
 $user = $_SESSION['user'];
 $user_sync_settings = unserialize( $user->sync_settings );
 

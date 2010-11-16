@@ -21,12 +21,12 @@
  * @param unknown_type $object
  */
 function googleapps_init() {
-
 	global $CONFIG;
 	
 	// Includes
 	require_once 'lib/functions.php';
 	require_once 'lib/admin_functions.php';
+	require_once 'lib/googleapps_lib.php';
 	
 	// Need to use SSL for google urls
 	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
@@ -126,7 +126,6 @@ function googleapps_init() {
 }
 
 function googleapps_pagesetup() {
-
 	global $CONFIG;
 	
 	$page_owner = elgg_get_page_owner();
@@ -156,7 +155,9 @@ function googleapps_pagesetup() {
 
 /**
  * googleapps page handler
- * @TODO Streamline even further
+ * 
+ * - Now with 100% more awesome
+ * 
  * @param array $page From the page_handler function
  * @return true|false Depending on success
  */
@@ -169,37 +170,17 @@ function googleapps_page_handler($page) {
 				// Google apps settings pages
 				switch ($page[1]) {
 					case 'wikiactivity':
-						$form = elgg_view('googleapps/forms/wiki_settings');
-						$body = elgg_view_layout('one_column_with_sidebar', array('content' => $form));
-						echo elgg_view_page(elgg_echo('googleapps:google_sites_settings'),$body);
+						$content_info = googleapps_get_page_content_settings_wikiactivity();
 					break;
 					case 'debug':
 						admin_gatekeeper();
 						elgg_admin_add_plugin_settings_sidemenu();
 						set_context('admin');
-						$content = elgg_view_title(elgg_echo("googleapps:admindebugtitle"));
-						$content .= elgg_view('googleapps/admin/sitesdebug_nav',array('page'=>$page));
-
-						switch ($page[2]) {
-							case "byuser" :
-								$content .= list_googlesite_entities_byuser();
-							break;
-							case "reset":
-								$content .= elgg_view('googleapps/admin/reset');
-							break;
-							default:
-								$content .= list_googlesite_entities();
-							break;
-						}
-
-						$body = elgg_view_layout('administration', array('content' => $content));
-						echo elgg_view_page($title, $body, 'page_shells/admin');
+						$content_info = googleapps_get_page_content_settings_debug($page[2]);
 					break;
 					default:
 					case 'account':
-						$body = elgg_view('googleapps/forms/sync_form');
-						$body = elgg_view_layout('one_column_with_sidebar', array('content' => $body));
-						echo elgg_view_page(elgg_echo('googleapps:google_sync_settings'),$body);
+						$content_info = googleapps_get_page_content_settings_account();
 					break;
 				}
 			break;
@@ -208,40 +189,34 @@ function googleapps_page_handler($page) {
 				// Google Docs pages
 				switch ($page[1]) {
 					default:
-						$title = elgg_echo('googleapps:google_docs');
-						$body = elgg_view_layout('one_column', array('content' => elgg_view_title($title) . elgg_view('googleapps/docs_container')));
-						echo elgg_view_page($title, $body);
+						$content_info = googleapps_get_page_content_docs();
 					break;
 					case 'list_form':
 						echo elgg_view('googleapps/forms/docs_list_form');
+						// Need to break out of the page handler for this one
+						return true;
 					break;
 				}
 			break;
 			case 'wikis':
 				set_context('wikis');
-				// Google sites pages
-				if (!$page['1']) {
-					// Check if we were supplied a username
-					$all = true;
-				}
-				$postfix = $all ? 'everyone' : 'your';
-				if ($all) {
-					// list of all sites
-					$sites = elgg_get_entities(array('type' => 'object', 'subtype' => 'site'));
-				} else {
-					// get list of logged in user
-			        $res = googleapps_sync_sites(true, $user);
-					$sites = $res['site_entities'];
-				}
-				$title = elgg_echo('googleapps:sites:' . $postfix);
-				$body = elgg_view_layout('one_column', array('content' => elgg_view_title($title) . elgg_view('googleapps/wiki_list', array('wikis' => $sites))));
-				echo elgg_view_page($title, $body);
+				$content_info = googleapps_get_page_content_wikis($page[1]);
 			break;
 		}
 	} else {
-		// @TODO Wikis.. need a function
+		set_context('wikis');
+		$content_info = googleapps_get_page_content_wikis($page[1]);
 	}
-	return false;
+	
+	$sidebar = isset($content_info['sidebar']) ? $content_info['sidebar'] : '';
+
+	$params = array(
+		'content' => $content_info['content'],
+		'sidebar' => $sidebar,
+	);
+	$body = elgg_view_layout($content_info['layout'], $params);
+
+	echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'page_shells/admin' : 'page_shells/default');
 }
 
 
@@ -268,7 +243,6 @@ function googleapps_login() {
  * @TODO: Might be a better way to allow access to googleapps data  
  */
 function googleapps_can_edit($hook_name, $entity_type, $return_value, $parameters) {
-
 	$entity = $parameters['entity'];
 	$context = get_context();
 	if ($context == 'googleapps' && $entity->google == 1) {
@@ -287,7 +261,6 @@ function googleapps_can_edit($hook_name, $entity_type, $return_value, $parameter
  * Icon plugin hook? 
  */
 function googleapps_icon_url($hook_name,$entity_type, $return_value, $parameters) {
-
 	$entity = $parameters['entity'];
 	if (($entity->google == 1)) {
 		if (($parameters['size'] == 'tiny') || ($parameters['size'] == 'topbar')) {
