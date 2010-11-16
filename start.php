@@ -156,7 +156,7 @@ function googleapps_pagesetup() {
 
 /**
  * googleapps page handler
- *
+ * @TODO Streamline even further
  * @param array $page From the page_handler function
  * @return true|false Depending on success
  */
@@ -219,17 +219,27 @@ function googleapps_page_handler($page) {
 			break;
 			case 'wikis':
 				set_context('wikis');
-				$all = true;
-				if ($page['1']) {
-					$all = false;
-				}
 				// Google sites pages
-				include(dirname(__FILE__) . '/wikis.php');
+				if (!$page['1']) {
+					// Check if we were supplied a username
+					$all = true;
+				}
+				$postfix = $all ? 'everyone' : 'your';
+				if ($all) {
+					// list of all sites
+					$sites = elgg_get_entities(array('type' => 'object', 'subtype' => 'site'));
+				} else {
+					// get list of logged in user
+			        $res = googleapps_sync_sites(true, $user);
+					$sites = $res['site_entities'];
+				}
+				$title = elgg_echo('googleapps:sites:' . $postfix);
+				$body = elgg_view_layout('one_column', array('content' => elgg_view_title($title) . elgg_view('googleapps/wiki_list', array('wikis' => $sites))));
+				echo elgg_view_page($title, $body);
 			break;
 		}
 	} else {
-		include(dirname(__FILE__) . '/wikis.php');
-		return true;
+		// @TODO Wikis.. need a function
 	}
 	return false;
 }
