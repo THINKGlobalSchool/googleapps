@@ -117,8 +117,8 @@ function googleapps_init() {
 	register_action('googleapps/disconnect', true, $CONFIG->pluginspath . 'googleapps/actions/disconnect.php');
 	register_action('googleapps/return', true, $CONFIG->pluginspath . 'googleapps/actions/return.php');
 	register_action('googleapps/return_with_connect', true, $CONFIG->pluginspath . 'googleapps/actions/return_with_connect.php');
-	register_action('googleapps/save', false, $CONFIG->pluginspath . 'googleapps/actions/save.php');
-	register_action('googleapps/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_user_sync.php');
+	register_action('googleapps/save_wiki_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_wiki_settings.php');
+	register_action('googleapps/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
 	register_action('googleapps/share_doc', false, $CONFIG->pluginspath . 'googleapps/actions/share_doc.php');
 	register_action('googleapps/change_doc_permissions', false, $CONFIG->pluginspath . 'googleapps/actions/change_doc_permissions.php');
 	register_action('googleapps/sites_reset',false, $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
