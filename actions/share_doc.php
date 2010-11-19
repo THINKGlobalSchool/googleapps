@@ -1,4 +1,12 @@
 <?php
+/**
+ * Googleapps share doc action
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
 
 $doc_id = get_input('doc_id');
 $comment = get_input('comment', '');

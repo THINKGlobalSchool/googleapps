@@ -1,4 +1,13 @@
 <?php
+/**
+ * Googleapps return action
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
+
 session_start();
 
 require_once (dirname(dirname(__FILE__)) . '/lib/Http.php');

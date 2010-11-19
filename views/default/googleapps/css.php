@@ -1,3 +1,14 @@
+<?php
+/**
+ * Googleapps main CSS
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
+?>
+
 #googleapps-icon {
 	padding: 10px 10px 10px 10px;
 	display: block;

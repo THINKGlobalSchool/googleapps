@@ -1,4 +1,13 @@
-<?
+<?php
+/**
+ * Googleapps docs widget edit view
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
+
 if (empty($vars['entity']->max_entry)) {
 	$vars['entity']->max_entry = 20;
 }

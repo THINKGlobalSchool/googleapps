@@ -5,9 +5,8 @@
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
  * @copyright THINK Global School 2010
- * @link http://elgg.org/
+ * @link http://www.thinkglobalschool.org
  */
 
 

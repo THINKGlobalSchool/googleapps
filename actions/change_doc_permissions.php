@@ -1,4 +1,13 @@
 <?php
+/**
+ * Update/Change google doc permissions action
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
+
 $data = unserialize($_SESSION['google_docs_to_share_data']);
 $comment = $data['comment'];
 $tags = $data['tags'];
