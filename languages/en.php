@@ -56,7 +56,7 @@ $english = array(
 		'googleapps:emailexists' => 'Sorry, but email %s already exists and in use by other user.',
 		
 		// Success messages
-		'googleapps:success:disconnect' = 'Your profile has been successfully disconnected from googleapps.', 
+		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 		
 		// General labels
 		'googleapps:google_docs' => 'Share Google Docs',
