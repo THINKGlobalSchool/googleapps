@@ -34,7 +34,7 @@ $subtype = $user->getSubtype();
 if ($user->google) {
 	
 	if (empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Please provide your password before you disconnect profile from googleapps.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:passwordrequired:disconnect')));
 		forward($_SERVER['HTTP_REFERER']);
 	}
 	
@@ -52,7 +52,7 @@ if ($user->google) {
 	unset($_SESSION['logged_with_openid']);
 	unset($_SESSION['oauth_connect']);
 	
-	system_message('Your profile has been successfully disconnected from googleapps.');
+	system_message(elgg_echo('googleapps:success:disconnect'));
 }
 
 forward('pg/googleapps/settings/account');

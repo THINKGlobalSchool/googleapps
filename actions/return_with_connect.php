@@ -23,7 +23,7 @@ $google = Google_OpenID::create_from_response($_REQUEST);
 $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Not authorized'));
+	register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:notauthorized')));
 	forward('pg/googleapps/settings/account');
 } else {
 	
@@ -38,14 +38,16 @@ if (!$google->is_authorized()) {
 	$entities = get_user_by_email($email);
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Sorry, but email ' . $email . ' already exists and in use by other user.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), sprintf(elgg_echo('googleapps:emailexists'), $email)));
 		forward('pg/googleapps/settings/account');
 	}
+	
 	$is_sync = $user->sync == '1';
+	
 	if ($is_sync) {
 		
 		if (empty($email)) {
-			register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No data'));
+			register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:nodata')));
 			forward();
 		}
 		
@@ -64,10 +66,9 @@ if (!$google->is_authorized()) {
 		forward($googleapps_return);
 		
 	} else {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'This user is not ready for synchronization.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:usernotready')));
 		forward('pg/googleapps/settings/account');
 	}
-	
 }
 
 forward('pg/googleapps/settings/account');

@@ -69,10 +69,9 @@ if (!empty($response)) {
 }
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No authorized'));
+	register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:notauthorized')));
 	forward();
 } else {
-	
 	$email = $google->get_email();
 	$firstname = $google->get_firstname();
 	$lastname = $google->get_lastname();
@@ -83,7 +82,7 @@ if (!$google->is_authorized()) {
 	$duplicate_account = false;
 	
 	if (empty($email)) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'No email'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:noemail')));
 		forward();
 	}
 	
@@ -96,11 +95,11 @@ if (!$google->is_authorized()) {
 		$username = $email;
 		$username = preg_replace("/\@[a-zA-Z\.0-9\-]+$/", "", $username);
 
-		if(get_user_by_username($username)) {
+		if (get_user_by_username($username)) {
 			$username = preg_replace("/\@([a-zA-Z\.0-9\-]+)/", ".$1", $email);
 		}
 
-		if(get_user_by_username($username)) {
+		if (get_user_by_username($username)) {
 			$duplicate_account = true;
 			register_error(sprintf(elgg_echo("googleapps:account_duplicate"), $username));
 		}

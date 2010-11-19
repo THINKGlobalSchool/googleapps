@@ -25,38 +25,34 @@ if (!$user_id) {
 } else {
 	$user = get_entity($user_id);
 }
+
 $subtype = $user->getSubtype();
 
 if ($user->google == 1) {
-
 	if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), 'Please provide your password before you stop synchronizing with googleapps.'));
+		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:passwordrequired')));
 		forward($_SERVER['HTTP_REFERER']);
 	}
-
 	if (elgg_strlen($googleapps_controlled_profile) > 50) {
 		register_error(elgg_echo('admin:configuration:fail'));
 		forward($_SERVER['HTTP_REFERER']);
 	}
-
 	if (($user) && ($user->canEdit())) {
 		if ($googleapps_controlled_profile != $user->googleapps_controlled_profile) {
 			if (!$user->save()) {
 				$error = true;
 			}
 		}	
-
 		if (!empty($googleapps_sites_settings)) {
 			$site_list = unserialize($user->site_list);
-			foreach ($googleapps_sites_settings as $site_id=> $access) {
+			foreach ($googleapps_sites_settings as $site_id => $access) {
 				$site_list[$site_id]['access'] = $access;
-        		$entity_id=$site_list[$site_id]['entity_id'];
+        		$entity_id = $site_list[$site_id]['entity_id'];
         		update_site_entity_access($entity_id, $access);
 			}
 			$user->site_list = serialize($site_list);
 			$user->save();
 		}
-
 	} else {
 		$error = true;
 	}

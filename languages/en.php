@@ -47,6 +47,16 @@ $english = array(
 		'googleapps:googleappserror' => 'Error: googleapps returned the following error message: %s',
 		'googleapps:account_duplicate' => 'Error: a non-googleapps account with the same username (%s) already exists on this site.',
 		'googleapps:wrongdomain' => 'Error: cannot resolve OpenID entrypoint for your GoogleApps (hosted) domain or domain is not google-hosted.',
+		'googleapps:passwordrequired' => 'Please provide your password before you stop synchronizing with googleapps.',
+		'googleapps:passwordrequired:disconnect' => 'Please provide your password before you disconnect profile from googleapps.',
+		'googleapps:notauthorized' => 'Not authorized',
+		'googleapps:nodata' => 'No data',
+		'googleapss:usernotready' => 'This user is not ready for synchronization.',
+		'googleapps:noemail' => 'No email', 
+		'googleapps:emailexists' => 'Sorry, but email %s already exists and in use by other user.',
+		
+		// Success messages
+		'googleapps:success:disconnect' = 'Your profile has been successfully disconnected from googleapps.', 
 		
 		// General labels
 		'googleapps:google_docs' => 'Share Google Docs',
