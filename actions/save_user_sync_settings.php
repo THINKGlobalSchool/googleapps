@@ -26,8 +26,6 @@ foreach($user_sync_settings as $user_setting => $v) {
     }
 }
 
-
-
 $user->sync_settings = serialize($user_sync_settings);
 $user->save();
 system_message(elgg_echo('admin:configuration:success'));
