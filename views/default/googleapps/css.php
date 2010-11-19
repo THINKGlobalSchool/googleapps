@@ -57,7 +57,7 @@
     font-size:90%;
 }
 .document-icon {
-    background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/views/default/widgets/google_docs/images/mimetypes.gif") no-repeat 0 0;
+    background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/mimetypes.gif") no-repeat 0 0;
     width:10px;
     height:10px;
     display:block;
