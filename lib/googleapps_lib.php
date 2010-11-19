@@ -79,4 +79,20 @@
 		return $content_info;
 		
 	}
+	
+	function update_site_entity_access($entity_id, $access) {
+	    $context = get_context();
+	    set_context('googleapps_cron_job');
+
+	    $user_site_entities = unserialize($_SESSION['user_site_entities']);
+
+	    foreach ($user_site_entities as $entity) {
+	        if ($entity->guid == $entity_id ) {
+	            $entity->site_access_id = $access;
+	            $entity->save();
+	        }
+	    }
+
+	    set_context($context); 
+	}
 ?>

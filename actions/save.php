@@ -12,32 +12,6 @@ gatekeeper();
 
 global $SESSION;
 
-// todo: depricated ?
-function update_acitivities_access($site_name, $access) {
-	$entities = get_entities_from_metadata('site_name', $site_name, 'object');
-	foreach ($entities as $entity) {
-		$entity->access_id = $access == 2 ? 1 : ($access == 22 ? 2 : $access);
-		$entity->save();
-	}
-}
-
-
-function update_site_entity_access($entity_id, $access) {
-    $context = get_context();
-    set_context('googleapps_cron_job');
-
-    $user_site_entities=unserialize($_SESSION['user_site_entities']);
-
-    foreach ($user_site_entities as $entity) {
-        if ( $entity->guid == $entity_id ) {
-            $entity->site_access_id = $access;
-            $entity->save();
-        }
-    }
-
-    set_context($context); 
-}
-
 $googleapps_controlled_profile = strip_tags(get_input('googleapps_controlled_profile'));
 $googleapps_sites_settings = $_POST['googleapps_sites_settings'];
 
@@ -77,7 +51,6 @@ if ($user->google == 1) {
 			foreach ($googleapps_sites_settings as $site_id=> $access) {
 				$site_list[$site_id]['access'] = $access;
         $entity_id=$site_list[$site_id]['entity_id'];
-				//update_acitivities_access($title, $access);
         update_site_entity_access($entity_id, $access);
 			}
 			$user->site_list = serialize($site_list);
