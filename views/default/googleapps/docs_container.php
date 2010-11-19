@@ -11,7 +11,12 @@
 	 */
 			
 	// Form Container
-	$content .= '<div id="googleapps">Loading....</div>';
+	$content .= '<div id="googleapps">
+					<div id="google_docs_loading">
+						<img src="' . elgg_get_site_url() . '_graphics/ajax_loader_bw.gif" />
+						<p>' . elgg_echo('googleapps:docsloading') . '</p>
+					</div>
+				</div>';
 
 	$form_url = elgg_get_site_url() . 'pg/googleapps/docs/list_form';
 	
