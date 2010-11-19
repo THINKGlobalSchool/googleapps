@@ -1,9 +1,12 @@
 <?php
-
-/* not used anywhere?
-$options = array(elgg_echo('googleapps:settings:yes')=>'yes',
-		elgg_echo('googleapps:settings:no')=>'no'
-);  */
+/**
+ * Googleapps wiki settings form
+ *
+ * @package googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @copyright FlatSourcing 2010
+ * @link http://www.thinkglobalschool.org
+ */
 
 $access_types = array(
 		'private' => '0',
