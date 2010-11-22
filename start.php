@@ -9,7 +9,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-
 /**
  * googleapps initialisation
  *
@@ -79,17 +78,17 @@ function googleapps_init() {
   	register_entity_type('object','doc_activity', 'Doc activity');
 
 	// Pagesetup event handler
-	register_elgg_event_handler('pagesetup','system','googleapps_pagesetup');
+	elgg_register_event_handler('pagesetup','system','googleapps_pagesetup');
 	
 	// Login handler
-	register_elgg_event_handler('login', 'user', 'googleapps_login');
+	elgg_register_event_handler('login', 'user', 'googleapps_login');
 
-	// TODO: remove this permissions hook if it turns out not to be necessary
-	register_plugin_hook('permissions_check','user','googleapps_can_edit');
-	register_plugin_hook('entity:icon:url','user','googleapps_icon_url');
+	elgg_register_plugin_hook_handler('permissions_check','user','googleapps_can_edit');
+	
+	elgg_register_plugin_hook_handler('entity:icon:url','user','googleapps_icon_url');
 
 	//register CRON hook to poll for Google Site activity
-	register_plugin_hook('cron', 'fiveminute', 'googleapps_cron_fetch_data');
+	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
 
 	// Setup main page handler
 	register_page_handler('googleapps','googleapps_page_handler');
@@ -239,7 +238,6 @@ function googleapps_login() {
 
 /** 
  * Canedit plugin hook 
- * @TODO: Might be a better way to allow access to googleapps data  
  */
 function googleapps_can_edit($hook_name, $entity_type, $return_value, $parameters) {
 	$entity = $parameters['entity'];
@@ -257,9 +255,11 @@ function googleapps_can_edit($hook_name, $entity_type, $return_value, $parameter
 }
 
 /** 
- * Icon plugin hook? 
+ * Icon plugin hook
+ * Probably meant to override users profile pic if one was supplied by google apps
+ * Currently not implemented.. but its a cool idea.
  */
-function googleapps_icon_url($hook_name,$entity_type, $return_value, $parameters) {
+function googleapps_icon_url($hook_name, $entity_type, $return_value, $parameters) {
 	$entity = $parameters['entity'];
 	if (($entity->google == 1)) {
 		if (($parameters['size'] == 'tiny') || ($parameters['size'] == 'topbar')) {
