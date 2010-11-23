@@ -845,115 +845,111 @@
 
 
         
-        function get_permission_str($collaborators) {
-            if(is_array($collaborators)) $collaborators=count($collaborators);
-            $str='';
-            switch ($collaborators) {
-                case 'everyone_in_domain' :
-                                $str='Everyone in domain';
-                                break;
+	function get_permission_str($collaborators) {
+	    if(is_array($collaborators)) $collaborators=count($collaborators);
+	    $str='';
+	    switch ($collaborators) {
+	        case 'everyone_in_domain' :
+	                        $str='Everyone in domain';
+	                        break;
 
-                case 'public':
-                                $str='Public';
-                                break;
+	        case 'public':
+	                        $str='Public';
+	                        break;
 
-                default:
-                                if($collaborators > 1) $str=($collaborators-1).' collaborators'; // minus owner
-                                else $str='me';
-                                break;
-            }
+	        default:
+	                        if($collaborators > 1) $str=($collaborators-1).' collaborators'; // minus owner
+	                        else $str='me';
+	                        break;
+	    }
 
-            return $str;
-        }
+	    return $str;
+	}
 
 
-        function access_translate($access) {
-                switch ($access) {
-                    case 'logged_in': return ACCESS_LOGGED_IN; break; // logged_in
-                    case 'public': return ACCESS_PUBLIC; break; // public
-                    default: return ACCESS_DEFAULT;
-                }
-        }
+	function access_translate($access) {
+	        switch ($access) {
+	            case 'logged_in': return ACCESS_LOGGED_IN; break; // logged_in
+	            case 'public': return ACCESS_PUBLIC; break; // public
+	            default: return ACCESS_DEFAULT;
+	        }
+	}
 
         
     function share_document($doc, $user, $message, $tags, $access, $collaborators = null) {
-            $doc_activity = new ElggObject();
-            $doc_activity->subtype = "doc_activity";
-            $doc_activity->owner_guid = $user->guid;
-            $doc_activity->container_guid = $user->guid;
+            $shared_doc = new ElggObject();
+            $shared_doc->subtype = "shared_doc";
+            $shared_doc->owner_guid = $user->guid;
+            $shared_doc->container_guid = $user->guid;
 
             $tag_array = string_to_tag_array($tags);
 
             // Now let's add tags.
             if (is_array($tag_array)) {
-                    $doc_activity->tags = $tag_array;
+                    $shared_doc->tags = $tag_array;
             }
 
             if ($access == 'match') { /* Match permissions of Google doc */
-                $doc_activity->access_id = ACCESS_LOGGED_IN;
-                $doc_activity->shared_acces = true;
-                $doc_activity->show_only_for = serialize($collaborators);
+                $shared_doc->access_id = ACCESS_LOGGED_IN;
+                $shared_doc->shared_acces = true;
+                $shared_doc->show_only_for = serialize($collaborators);
             } elseif  ($access == 'group') {      // Group
-                $doc_activity->access_id = ACCESS_LOGGED_IN;
-                $doc_activity->shared_acces = true;
-                $doc_activity->show_only_for = serialize($collaborators);
+                $shared_doc->access_id = ACCESS_LOGGED_IN;
+                $shared_doc->shared_acces = true;
+                $shared_doc->show_only_for = serialize($collaborators);
             } else {
-                $doc_activity->access_id = access_translate($access);
+                $shared_doc->access_id = access_translate($access);
             }
 
 
-            $doc_activity->title = $doc['title'];
-            $doc_activity->text = $message.' <a href="' . $doc["href"] . '">Open document</a> ';
-            $doc_activity->res_id=  $doc['id'];
+            $shared_doc->title = $doc['title'];
+            $shared_doc->text = $message.' <a href="' . $doc["href"] . '">Open document</a> ';
+            $shared_doc->res_id=  $doc['id'];
 
-            $doc_activity->updated = $doc['updated'];
+            $shared_doc->updated = $doc['updated'];
 
             // Now save the object
-            if (!$doc_activity->save()) {
+            if (!$shared_doc->save()) {
                     register_error('Doc activity has not saves.');
                     exit;
             }
 
             // if doc is public add to river
-            if ($doc_activity->access_id!=0) {
-                add_to_river('river/object/doc_activity/create', 'create doc', $user->guid, $doc_activity->guid, "", strtotime($date));
+            if ($shared_doc->access_id!=0) {
+                add_to_river('river/object/shared_doc/create', 'create', $user->guid, $shared_doc->guid, "", strtotime($date));
             }
-
-//            system_message(elgg_echo("googleapps:doc:share:ok"));
      }
 
 
-//         Document permissions:
-//             everyone_in_domain
-//             public
-//             collaborators
-//         Acces level
-//             public
-//             logged_in
-//             private
-//             match
-//             group
-
-        function check_document_permission($document_access, $need_access, $group_members = null) {
-            if ( $document_access == 'public')  return true;
-            if ( $document_access == 'everyone_in_domain' and ($need_access == 'logged_in' or $need_access == 'group'))  return true;
-            if ( $need_access == 'match')  return true; // Match permissions of Google doc
-            
-            // Check that all group members has access to this doc
-            if ( $need_access === 'group')  {
-                $document_access=array_flip($document_access);
-                $permission=true;
-                foreach ($group_members as $member) {
-                    if (is_null($document_access[$member])) {
-						$permission=false;
-						break;
-					}
-                }
-                return $permission;
-            }
-                        
-            return false;
-        }
+	//         Document permissions:
+	//             everyone_in_domain
+	//             public
+	//             collaborators
+	//         Acces level
+	//             public
+	//             logged_in
+	//             private
+	//             match
+	//             group
+	function check_document_permission($document_access, $need_access, $group_members = null) {
+		if ( $document_access == 'public')  return true;
+		if ( $document_access == 'everyone_in_domain' and ($need_access == 'logged_in' or $need_access == 'group'))  return true;
+		if ( $need_access == 'match')  return true; // Match permissions of Google doc
+      
+	    // Check that all group members has access to this doc
+		if ( $need_access === 'group')  {
+	    	$document_access=array_flip($document_access);
+	       	$permission=true;
+			foreach ($group_members as $member) {
+	        	if (is_null($document_access[$member])) {
+					$permission=false;
+					break;
+				}
+	    	}
+	        	return $permission;
+		}  
+		return false;
+	}
 
 
     function save_site_to_user_list($site_entity, $site_xml, &$merged) {
@@ -963,48 +959,48 @@
         $merged[$site_id] = array('title'=>$title, 'access'=>$access, 'entity_id' =>  $site_entity->guid);
     }
 
-function get_group_or_channel_members($group_channel) {
-	$share_type = substr($group_channel, 0, 2);
-	$id = substr($group_channel, 2);	
-	if ($share_type == 'gr') {		
-		$members = get_group_members_mails($id);
-	} else {
-		$members = get_channel_members_mails($id);
+	function get_group_or_channel_members($group_channel) {
+		$share_type = substr($group_channel, 0, 2);
+		$id = substr($group_channel, 2);	
+		if ($share_type == 'gr') {		
+			$members = get_group_members_mails($id);
+		} else {
+			$members = get_channel_members_mails($id);
+		}
+		return $members;
 	}
-	return $members;
-}
 
- function get_group_members_mails($group_id) {
-    $members=get_group_members($group_id, 9999);
-	return get_members_mails($members);
- }
+	function get_group_members_mails($group_id) {
+	   	$members=get_group_members($group_id, 9999);
+		return get_members_mails($members);
+	}
 
- function get_channel_members_mails($channel_id) {
-    $members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $channel_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
-	return get_members_mails($members);
- }
+	function get_channel_members_mails($channel_id) {
+	   	$members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $channel_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
+		return get_members_mails($members);
+	}
 
-function get_members_mails($members) {
-	$members_mails = array();
-	foreach ($members as $member) {
-        $members_emails[]=$member['email'];
-    }
+	function get_members_mails($members) {
+		$members_mails = array();
+		foreach ($members as $member) {
+	        $members_emails[]=$member['email'];
+	    }
 
-    return  $members_emails;
- }
+	    return  $members_emails;
+	 }
 
- function get_members_not_shared($members, $doc) {
+	 function get_members_not_shared($members, $doc) {
 
-    $collaborators = $doc['collaborators'];
-    $collaborators=array_flip($collaborators);
+	    $collaborators = $doc['collaborators'];
+	    $collaborators=array_flip($collaborators);
     
-    $members_not_shared = array();
+	    $members_not_shared = array();
 
-    foreach ($members as $member) {
-        if (is_null($collaborators[$member])) {$members_not_shared[]=$member; }
-    }
+	    foreach ($members as $member) {
+	        if (is_null($collaborators[$member])) {$members_not_shared[]=$member; }
+	    }
 
-    return $members_not_shared;
- }
+	    return $members_not_shared;
+	 }
 
 ?>

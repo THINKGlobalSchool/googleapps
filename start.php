@@ -75,7 +75,7 @@ function googleapps_init() {
 	
 	// Register subtypes
 	register_entity_type('object','site_activity', 'Site activity');
-  	register_entity_type('object','doc_activity', 'Doc activity');
+  	register_entity_type('object','shared_doc', 'Doc activity');
 
 	// Pagesetup event handler
 	elgg_register_event_handler('pagesetup','system','googleapps_pagesetup');

@@ -51,7 +51,7 @@
 	$content .= '';
 	$content .= '<br />View access level: <select name="access" id="access" onchange="showGroups()">';
 	$content .= '<option value="public">Public</option>';
-	$content .= '<option value="logged_in">Logged in users</option>';
+	$content .= '<option selected="selected" value="logged_in">Logged in users</option>';
 	if (is_array($groups) || is_array($shared_access)) {
 		$content.='<option value="group">Group or Shared Access</option>';
 	}

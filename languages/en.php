@@ -12,7 +12,7 @@ $english = array(
 	
 		// Entity/Object labels
 		'item:object:site_activity' => 'Wiki activity',
-    	'item:object:doc_activity' => 'Doc activity',
+    	'item:object:shared_doc' => 'Google Shared Document',
 		'item:user:googleapps' => 'googleapps users',
 		
 		// Login related
@@ -59,7 +59,7 @@ $english = array(
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 		
 		// General labels
-		'googleapps:google_docs' => 'Share Google Docs',
+		'googleapps:google_docs' => 'Google Docs',
 		'googleapps:google_docs:description' => '',
 		'googleapps:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 		'googleapps:sites' => 'Wikis',
