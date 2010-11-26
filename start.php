@@ -45,6 +45,9 @@ function googleapps_init() {
 	$GLOBALS['share_doc_url'] = $share_doc_url;
 	$GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
 	$GLOBALS['oauth_update_interval'] = get_plugin_setting('oauth_update_interval', 'googleapps');
+	
+	// Constants
+	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
 	// Get plugin settings
 	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
@@ -82,10 +85,19 @@ function googleapps_init() {
 	
 	// Login handler
 	elgg_register_event_handler('login', 'user', 'googleapps_login');
+	
+	// Register a handler for creating shared docs
+	register_elgg_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
 
 	elgg_register_plugin_hook_handler('permissions_check','user','googleapps_can_edit');
 	
 	elgg_register_plugin_hook_handler('entity:icon:url','user','googleapps_icon_url');
+	
+	// Plugin hook for write access
+	elgg_register_plugin_hook_handler('access:collections:write', 'all', 'googleapps_shared_doc_write_acl_plugin_hook');
+	
+	// Will add groups to access dropdown for google doc sharing
+	elgg_register_plugin_hook_handler('access:collections:write', 'all', 'googleapps_doc_group_plugin_hook', 999);
 
 	//register CRON hook to poll for Google Site activity
 	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
@@ -118,8 +130,8 @@ function googleapps_init() {
 	register_action('googleapps/return_with_connect', true, $CONFIG->pluginspath . 'googleapps/actions/return_with_connect.php');
 	register_action('googleapps/save_wiki_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_wiki_settings.php');
 	register_action('googleapps/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
-	register_action('googleapps/share_doc', false, $CONFIG->pluginspath . 'googleapps/actions/share_doc.php');
-	register_action('googleapps/change_doc_permissions', false, $CONFIG->pluginspath . 'googleapps/actions/change_doc_permissions.php');
+	register_action('googleapps/share_doc', false, $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
+	register_action('googleapps/change_doc_permissions', false, $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
 	register_action('googleapps/sites_reset',false, $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
 }
 
@@ -190,7 +202,7 @@ function googleapps_page_handler($page) {
 						$content_info = googleapps_get_page_content_docs();
 					break;
 					case 'list_form':
-						echo elgg_view('googleapps/forms/docs_list_form');
+						echo elgg_view('googleapps/forms/document_list');
 						// Need to break out of the page handler for this one
 						return true;
 					break;
@@ -236,6 +248,25 @@ function googleapps_login() {
 		}
 }
 
+/**
+ * Handler to pull in groups to an access dropdown, we need this for sharing google docs
+ */
+function googleapps_doc_group_plugin_hook($hook, $entity_type, $returnvalue, $params) {
+	// get all groups if logged in
+	if (($loggedin = get_loggedin_user()) && (get_context() == 'googleapps_share_doc')) {
+		$groups = elgg_get_entities_from_relationship(array('relationship' => 'member', 'relationship_guid' => $loggedin->getGUID(), 'inverse_relationship' => FALSE, 'limit' => 999));
+		if (is_array($groups)) {
+			$group_access = array();
+			foreach ($groups as $group) {
+				$returnvalue[$group->group_acl] = elgg_echo('groups:group') . ': ' . $group->name;
+			}
+		}
+		unset($returnvalue[ACCESS_FRIENDS]);
+		unset($returnvalue[ACCESS_PRIVATE]);
+	}
+	return $returnvalue;
+}
+
 /** 
  * Canedit plugin hook 
  */
@@ -268,6 +299,50 @@ function googleapps_icon_url($hook_name, $entity_type, $return_value, $parameter
 			return $entity->googleapps_icon_url_normal;
 		}
 	}
+}
+
+/**
+ * Shared doc created, create new ACL if access is set to match doc permissions
+ */
+function google_apps_shared_doc_create_event_listener($event, $object_type, $object) {
+	if ($object->getSubtype() == 'shared_doc' && $object->access_id == GOOGLEAPPS_ACCESS_MATCH) {
+		$shared_doc_acl = create_access_collection(elgg_echo('item:object:shared_doc') . ": " . $object->title, $object->getGUID());
+		if ($shared_doc_acl) {
+			$object->shared_acl = $shared_doc_acl;
+			$context = get_context();
+			set_context('shared_doc_acl');
+			foreach ($object->collaborators as $collaborator) {
+				if ($user = get_user_by_email($collaborator)) {
+					$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
+				}
+			}
+			set_context($context);
+			$object->access_id = $shared_doc_acl;
+			$object->save();
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Return the write access for the current todo if the user has write access to it.
+ */
+function googleapps_shared_doc_write_acl_plugin_hook($hook, $entity_type, $returnvalue, $params) {
+	// Only include the shared doc acl if in this context, used for the create event handler
+	if (get_context() == 'shared_doc_acl') {
+		// get all shared docs if logged in
+		if ($loggedin = get_loggedin_user()) {
+			$shared_docs = elgg_get_entities(array('types' => 'object', 'subtypes' => 'shared_doc', 'limit' => 9999));
+			if (is_array($shared_docs)) {
+				foreach ($shared_docs as $doc) {
+					$returnvalue[$doc->shared_acl] = elgg_echo('item:object:shared_doc') . ': ' . $$doc->title;
+				}
+			}
+		}
+	}
+	return $returnvalue;
 }
 
 register_elgg_event_handler('init','system','googleapps_init');

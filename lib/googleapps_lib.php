@@ -1,6 +1,6 @@
 <?php
 	/**
-	 * Googleapps content helper function
+	 * Googleapps content helper functions
 	 * 
 	 * @package Googleapps
 	 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
@@ -9,7 +9,7 @@
 	 * @link http://www.thinkglobalschool.com/
 	 * 
 	 */
-	
+
 	/* Get wiki activity settings content */
 	function googleapps_get_page_content_settings_wikiactivity() {
 		$content_info['title'] = elgg_echo('googleapps:google_sites_settings');		
@@ -51,8 +51,8 @@
 	/* Get google docs content */
 	function googleapps_get_page_content_docs() {
 		$content_info['title'] = elgg_echo('googleapps:google_docs');
-		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/docs_container');
-		$content_info['layout'] = 'one_column';
+		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');	
+		$content_info['layout'] = 'one_column_with_sidebar';
 		return $content_info;
 	}
 	
@@ -92,7 +92,27 @@
 	            $entity->save();
 	        }
 	    }
-
 	    set_context($context); 
+	}
+	
+	function santize_google_doc_input($string) {
+		// Strip out http:// and https://, trim whitespace and '#'s 
+		$string = str_replace(array('http://','https://'), '', trim(strtolower($string), " #"));
+		
+		/* 
+			When you load up a google doc in the browser, sometimes you'll get:
+		
+				docs1.google.com/...
+				spreadsheets2.google.com/...
+				
+		   	Need to normalize the url to be just plain docs or spreadsheets.. or whatever
+		*/
+		
+		$prefix = substr($string, 0, strpos($string, '.'));
+		$new_prefix = trim($prefix, '1234567890');
+		
+		$string = str_replace($prefix, $new_prefix, $string);
+		return $string;
+		
 	}
 ?>

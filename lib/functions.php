@@ -523,65 +523,69 @@
 	}
 
 
+	/**
+	 * Change the google docs permissions based on chosen elgg permissions
+	 *  
+	 * @param Oauth_client 	$client 	OAUTH client
+	 * @param string 		$doc_id 	Document id
+	 * @param mixed 		$access		Either an access_id, or an array of user's emails
+	 */
+	function googleapps_change_doc_sharing($client, $doc_id, $access) {
+		// If we have a single access id
+		if (!is_array($access) )  {
+			switch ($access) {
+				case ACCESS_PUBLIC: 
+					$access_type='default'; 
+				break;
+			    case ACCESS_LOGGED_IN: 
+					$access_type='domain'; 
+				break;
+			}
 
-        function googleapps_change_doc_sharing($client, $doc_id, $access) {
+			$feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
 
-            if ( !is_array($access) )  {
-                    switch ($access) {
-                        case 'public': $access_type='default'; break;
-                        case 'logged_in': $access_type='domain'; break;
-                    }
+			$data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
+					<category scheme='http://schemas.google.com/g/2005#kind'
+					term='http://schemas.google.com/acl/2007#accessRule'/>
+			        <gAcl:role value='reader'/> ";
 
-                    $feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
+			if ($access_type == "domain") {
+			   $domain = get_plugin_setting('googleapps_domain', 'googleapps');
+			   $data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
+			} else {
+			   $data .= "<gAcl:scope type=\"default\"/>";
+			}
 
-                    $data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
-          <category scheme='http://schemas.google.com/g/2005#kind'
-            term='http://schemas.google.com/acl/2007#accessRule'/>
-                                          <gAcl:role value='reader'/> ";
+			$data .= "</entry>";
 
-                   if ($access_type=="domain") {
-                       $domain = get_plugin_setting('googleapps_domain', 'googleapps');
-                       $data.="<gAcl:scope type=\"domain\" value=\"".$domain."\" />";
-                   } else {
-                       $data.="<gAcl:scope type=\"default\"/>";
-                   }
+			$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
 
-                    $data.="</entry>";
+		} else { // Batching ACL requests
 
-                    $result = $client->execute_post($feed, '3.0', null, 'POST', $data);
+			$feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
 
-            } else { // Batching ACL requests
+			$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
+						xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
+						<category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>';
+						
+			$data .= '<entry>
+						<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.$user->email.'</id>
+						<batch:operation type="query"/>
+					</entry>';
 
-                $feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
-
-                $data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
-      xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
-  <category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>
-';
-                $data .= '  <entry>
-    <id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.$user->email.'</id>
-    <batch:operation type="query"/>
-  </entry>
-';
-
-                $i=1;
-                foreach ($access as $member) {
-                    $data .= '  <entry>
-    <batch:id>'.$i.'</batch:id>
-    <batch:operation type=\'insert\'/>
-    <gAcl:role value=\'reader\'/>
-    <gAcl:scope type=\'user\' value=\''.$member.'\'/>
-  </entry>
-';
-                    $i++;
-                }
-
-
-                $result = $client->execute_post($feed, '3.0', null, 'POST', $data);				
-                
-            }
-        }
-
+			$i=1;
+			foreach ($access as $member) {
+				$data .= '<entry>
+						<batch:id>'.$i.'</batch:id>
+						<batch:operation type=\'insert\'/>
+						<gAcl:role value=\'reader\'/>
+						<gAcl:scope type=\'user\' value=\''.$member.'\'/>
+						</entry>';
+				$i++;
+			}
+			$result = $client->execute_post($feed, '3.0', null, 'POST', $data);				
+		}
+	}
 
 
 	/**
@@ -592,11 +596,9 @@
      * @return object
      */
 	function googleapps_google_docs($client, $folder = null) {
-
 		// Get google docs feeds list
-
 		if (empty($folder)) {
-			$feed = 'http://docs.google.com/feeds/default/private/full';
+			$feed = 'http://docs.google.com/feeds/default/private/full/-/mine';	
 		} else {
 			$feed = 'http://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
 		}
@@ -612,10 +614,10 @@
 				//break;
 			}
 
-                        $id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
+            $id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 			$title = $item['title'];
 
-                        $collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
+            $collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
                         
 
 			$links = $item->link;
@@ -875,82 +877,73 @@
 	        }
 	}
 
-        
-    function share_document($doc, $user, $message, $tags, $access, $collaborators = null) {
+    /**
+	 * Create the shared google document 
+	 * 
+	 * @param array 	$document 		Array reprentation of the google document
+	 * @param string 	$description 	Description to add
+	 * @param array 	$tags			Elgg tag array to add to document
+	 * @param mixed		$access_id		Access id, either elgg contants or 'match'
+	 * @return bool
+	 */
+    function share_document($document, $description, $tags, $access_id) {
             $shared_doc = new ElggObject();
-            $shared_doc->subtype = "shared_doc";
-            $shared_doc->owner_guid = $user->guid;
-            $shared_doc->container_guid = $user->guid;
+            $shared_doc->subtype 		= "shared_doc";
+			$shared_doc->title 			= $document['title'];
+			$shared_doc->trunc_title 	= $document['trunc_title'];
+	        $shared_doc->description 	= $description;
+	        $shared_doc->res_id			= $document['id'];
+			$shared_doc->tags			= $tags;
+			$shared_doc->updated		= $document['updated'];
+ 			$shared_doc->access_id 		= $access_id;
+			$shared_doc->collaborators	= $document['collaborators'];
+			$shared_doc->href			= $document['href'];
 
-            $tag_array = string_to_tag_array($tags);
+			// If access id was match, set a flag. After saving the
+			// access id will have changed due to hooking into the create event
+			if ($access_id == GOOGLEAPPS_ACCESS_MATCH) {
+				$access_match = true;
+			}
 
-            // Now let's add tags.
-            if (is_array($tag_array)) {
-                    $shared_doc->tags = $tag_array;
-            }
-
-            if ($access == 'match') { /* Match permissions of Google doc */
-                $shared_doc->access_id = ACCESS_LOGGED_IN;
-                $shared_doc->shared_acces = true;
-                $shared_doc->show_only_for = serialize($collaborators);
-            } elseif  ($access == 'group') {      // Group
-                $shared_doc->access_id = ACCESS_LOGGED_IN;
-                $shared_doc->shared_acces = true;
-                $shared_doc->show_only_for = serialize($collaborators);
-            } else {
-                $shared_doc->access_id = access_translate($access);
-            }
-
-
-            $shared_doc->title = $doc['title'];
-            $shared_doc->text = $message.' <a href="' . $doc["href"] . '">Open document</a> ';
-            $shared_doc->res_id=  $doc['id'];
-
-            $shared_doc->updated = $doc['updated'];
-
-            // Now save the object
             if (!$shared_doc->save()) {
-                    register_error('Doc activity has not saves.');
+                    register_error(elgg_echo('googleapps:saveshareddocerror'));
                     exit;
             }
-
-            // if doc is public add to river
-            if ($shared_doc->access_id!=0) {
-                add_to_river('river/object/shared_doc/create', 'create', $user->guid, $shared_doc->guid, "", strtotime($date));
-            }
+		
+			// Add to river
+            add_to_river('river/object/shared_doc/create', 'create', get_loggedin_userid(), $shared_doc->guid);
+			return true;
      }
 
-
-	//         Document permissions:
-	//             everyone_in_domain
-	//             public
-	//             collaborators
-	//         Acces level
-	//             public
-	//             logged_in
-	//             private
-	//             match
-	//             group
-	function check_document_permission($document_access, $need_access, $group_members = null) {
-		if ( $document_access == 'public')  return true;
-		if ( $document_access == 'everyone_in_domain' and ($need_access == 'logged_in' or $need_access == 'group'))  return true;
-		if ( $need_access == 'match')  return true; // Match permissions of Google doc
-      
-	    // Check that all group members has access to this doc
-		if ( $need_access === 'group')  {
-	    	$document_access=array_flip($document_access);
-	       	$permission=true;
-			foreach ($group_members as $member) {
-	        	if (is_null($document_access[$member])) {
+	/** 
+	 * Determine if the google doc's permissions need to be updated
+	 *
+	 * @param mixed	$collaborators	either everyone_in_domain, public, or array of email addresses
+	 * @param mixed $access_level	access level contants, or 'match'
+	 */
+	function check_document_permission($collaborators, $access_level) {
+		if ($collaborators == 'public') { 
+			return true;	// Document is public on Google, don't need to make any changes
+		} else if ($collaborators == 'everyone_in_domain' && $access_level != ACCESS_PUBLIC) {
+			return true; 	// Document is available to domain, as long as the elgg access isn't public, we're good
+		} else if ($access_level == GOOGLEAPPS_ACCESS_MATCH)  {
+			return true; 	// All good, just need to create a ACL in Elgg.. nothing to see here
+		} else if ($members = get_members_of_access_collection($access_level)) {
+			// We've got a group ACL, check if members have permission
+			$collaborators = array_flip($collaborators);
+			$permission = true;
+			$members_email = get_members_emails($members);
+			foreach ($members_email as $member) {
+				if (is_null($collaborators[$member])) {
 					$permission=false;
 					break;
 				}
-	    	}
-	        	return $permission;
-		}  
-		return false;
+			}
+			return $permission;
+		} else {
+			return false; // All other cases need a change in permissions
+		}
 	}
-
 
     function save_site_to_user_list($site_entity, $site_xml, &$merged) {
         $title = $site_xml['title'];
@@ -963,25 +956,25 @@
 		$share_type = substr($group_channel, 0, 2);
 		$id = substr($group_channel, 2);	
 		if ($share_type == 'gr') {		
-			$members = get_group_members_mails($id);
+			$members = get_group_members_emails($id);
 		} else {
-			$members = get_channel_members_mails($id);
+			$members = get_channel_members_emails($id);
 		}
 		return $members;
 	}
 
-	function get_group_members_mails($group_id) {
+	function get_group_members_emails($group_id) {
 	   	$members=get_group_members($group_id, 9999);
-		return get_members_mails($members);
+		return get_members_emails($members);
 	}
 
-	function get_channel_members_mails($channel_id) {
+	function get_channel_members_emails($channel_id) {
 	   	$members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $channel_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
-		return get_members_mails($members);
+		return get_members_emails($members);
 	}
 
-	function get_members_mails($members) {
-		$members_mails = array();
+	function get_members_emails($members) {
+		$members_emails = array();
 		foreach ($members as $member) {
 	        $members_emails[]=$member['email'];
 	    }
@@ -992,12 +985,14 @@
 	 function get_members_not_shared($members, $doc) {
 
 	    $collaborators = $doc['collaborators'];
-	    $collaborators=array_flip($collaborators);
-    
+	    $collaborators = array_flip($collaborators);
+    	
 	    $members_not_shared = array();
 
 	    foreach ($members as $member) {
-	        if (is_null($collaborators[$member])) {$members_not_shared[]=$member; }
+	        if (is_null($collaborators[$member])) {
+				$members_not_shared[]=$member; 
+			}
 	    }
 
 	    return $members_not_shared;

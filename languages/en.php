@@ -54,9 +54,15 @@ $english = array(
 		'googleapss:usernotready' => 'This user is not ready for synchronization.',
 		'googleapps:noemail' => 'No email', 
 		'googleapps:emailexists' => 'Sorry, but email %s already exists and in use by other user.',
+		'googleapps:saveshareddocerror' => 'There was an error sharing the document.',
+		'googleapps:doc:share:no_doc_id' => 'You need to select a document first.',
+    	'googleapps:doc:share:wrong_permissions' => 'Document permissions need to be updated',
+		'googleapps:doc:share:invalid_url' => 'Invalid Google Document URL',
 		
 		// Success messages
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
+		'googleapps:doc:share:ok' => 'Document shared',
+		'googleapps:googlesitesreset' => 'Google Sites have been successfully reset',
 		
 		// General labels
 		'googleapps:google_docs' => 'Google Docs',
@@ -69,14 +75,17 @@ $english = array(
 		'googleapps:sites:all' => 'All Wikis',
 		'googleapps:site:user' => "%s's wiki",
 		'googleapps:site:add' => 'Create new Wiki',
-    	'googleapps:doc:share:ok' => 'Document shared',
-    	'googleapps:doc:share:no_doc_id' => 'You should select a document',
-    	'googleapps:doc:share:no_comment' => 'You should add comment',
-    	'googleapps:doc:share:wrong_permissions' => 'Please, give document permissions',
 		'googleapps:admindebugtitle' => 'Google Sites Debug',
-		'googleapps:googlesitesreset' => 'Google Sites have been successfully reset',
 		'googleapps:access_level' => 'Access Level',
 		'googleapps:docsloading' => 'Loading...',
+		'googleapps:tab:share_url' => 'Enter URL',
+		'googleapps:tab:share_browse' => 'Browse Documents',
+		'googleapps:doc:match_permissions' => 'Match permissions of Google Document?',
+		
+		// Permissions submit buttons
+		'googleapps:submit:grant' => 'Grant view permissons',
+		'googleapps:submit:ignore' => 'Ignore and continue',
+		'googleapps:submit:cancel' => 'Cancel',
   );
 
 add_translation('en',$english);

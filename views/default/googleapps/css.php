@@ -58,6 +58,7 @@
 }
 .document-icon {
     background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/mimetypes.gif") no-repeat 0 0;
+	background-position:0 -170px;
     width:10px;
     height:10px;
     display:block;
@@ -68,6 +69,11 @@
 .document{
     background-position:0 -60px;
 }
+
+.rtf {
+    background-position:0 -60px;
+}
+
 .spreadsheet {
     background-position:0 -140px;
 }
@@ -77,8 +83,6 @@
 .form {
     background-position:0 -130px;
 }
-
-
 
 .pdf{
     background-position:0 -180px;
@@ -93,6 +97,10 @@
 }
 
 .excel {
+    background-position:0 -30px;
+}
+
+.csv {
     background-position:0 -30px;
 }
 
@@ -120,10 +128,11 @@
     background-position:0 -190px;
 }
 
+
 .docs_table {
-    width: 100%;
     height: 250px;
     overflow: auto; !important;
+	border: 1px solid #666;
 }
 
 .docs_comment {
@@ -133,6 +142,12 @@
 .docs_tags {
     width: 90%;
 } 
+
+div#share_browse {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
 
 /* messages/new messages icon & counter in elgg_topbar */
 a.emailnotifier {

@@ -20,9 +20,9 @@
 	$content .= '<form action="'. $GLOBALS['change_doc_permissions_url'] .'" onsubmit="return ajax_submit(this);"  method="post">';
 	$content .= '<h3>'. elgg_echo('googleapps:doc:share:wrong_permissions') .'</h3>';
 	$content .= '<input type="hidden" value="" name="answer">';
-	$content .= '<input type="submit" value="Grant view permisson" onclick="save_answer(this)">&nbsp;';
-	$content .= '<input type="submit" value="Ignore and continue" onclick="save_answer(this)">&nbsp;';
-	$content .= '<input type="submit" value="Cancel" onclick="save_answer(this)">&nbsp;';
+	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:grant') . '" onclick="save_answer(this)">&nbsp;';
+	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:ignore') . '" onclick="save_answer(this)">&nbsp;';
+	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:cancel') . '" onclick="save_answer(this)">&nbsp;';
 	$content .= '</form></div><div class="clearfloat"></div>';
 
 	echo $script . $content;
