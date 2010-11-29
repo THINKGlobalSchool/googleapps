@@ -172,9 +172,23 @@ $script = <<<EOT
 		var data = {};
 		$($(x).serializeArray()).each(function (i, e) {
 			data[e.name] = e.value;
+			// TinyMCE does some voodoo magic.. need to account for that
+			if (e.name == 'description' && tinyMCE) {
+				data[e.name] = tinyMCE.get('description').getContent();
+			}
 		});
 		$.post(x.action.replace(/^http(s?):\/\/.*?\//, "/"), data, function (r) {
-			var dlg = $("<div></div>").html(r).dialog().find('form').submit(function () {
+			var dlg = $("<div id='googleappsdialog'></div>").html(r).dialog({
+								width: 500, 
+								modal: true,
+								open: function(event, ui) { 
+									$(".ui-dialog-titlebar-close").hide(); 	
+								},
+								buttons: {
+									"X": function() { 
+										$(this).dialog("close"); 
+									} 
+								}}).find('form').submit(function () {
 				dlg.parents('.ui-dialog').remove();
 			});
 			if (r.toUpperCase() === 'OK') {

@@ -253,6 +253,23 @@ table.wiki_activity_settings td.submit_cell {
 	color: #333;
 }
 
+/* SUPER CUSTOM DIALOG */
+
+#googleappsdialog  {
+	padding: 10px;
+	border: 8px solid #555555;
+	background: #ffffff;
+	-moz-border-radius:5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+}
+
+p.googleappsdialog_message {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: bold;
+	color: #333333;
+}
+
 /* TABLESORTER */
 table.tablesorter {
 	font-size: 12px;

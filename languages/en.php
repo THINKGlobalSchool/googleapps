@@ -55,13 +55,13 @@ $english = array(
 		'googleapps:noemail' => 'No email', 
 		'googleapps:emailexists' => 'Sorry, but email %s already exists and in use by other user.',
 		'googleapps:saveshareddocerror' => 'There was an error sharing the document.',
-		'googleapps:doc:share:no_doc_id' => 'You need to select a document first.',
+		'googleapps:doc:share:no_doc_id' => '<h2>Uh oh..</h2><p class="googleappsdialog_message">You need to select a document first.</p>',
     	'googleapps:doc:share:wrong_permissions' => 'Document permissions need to be updated',
 		'googleapps:doc:share:invalid_url' => 'Invalid Google Document URL',
 		
 		// Success messages
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
-		'googleapps:doc:share:ok' => 'Document shared',
+		'googleapps:doc:share:ok' => '<h2>Success!</h2><p class="googleappsdialog_message">Document shared</p>',
 		'googleapps:googlesitesreset' => 'Google Sites have been successfully reset',
 		
 		// General labels
@@ -81,11 +81,15 @@ $english = array(
 		'googleapps:tab:share_url' => 'Enter URL',
 		'googleapps:tab:share_browse' => 'Browse Documents',
 		'googleapps:doc:match_permissions' => 'Match permissions of Google Document?',
+		'googleapps:label:action_required' => 'Action Required',
 		
 		// Permissions submit buttons
 		'googleapps:submit:grant' => 'Grant view permissons',
 		'googleapps:submit:ignore' => 'Ignore and continue',
 		'googleapps:submit:cancel' => 'Cancel',
+		
+		// River
+		'googleapps:river:shared_doc:create' => '%s shared a Google Document titled ',
   );
 
 add_translation('en',$english);

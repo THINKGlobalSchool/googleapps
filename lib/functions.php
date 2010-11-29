@@ -898,7 +898,7 @@
  			$shared_doc->access_id 		= $access_id;
 			$shared_doc->collaborators	= $document['collaborators'];
 			$shared_doc->href			= $document['href'];
-
+		
 			// If access id was match, set a flag. After saving the
 			// access id will have changed due to hooking into the create event
 			if ($access_id == GOOGLEAPPS_ACCESS_MATCH) {
@@ -909,7 +909,7 @@
                     register_error(elgg_echo('googleapps:saveshareddocerror'));
                     exit;
             }
-		
+	
 			// Add to river
             add_to_river('river/object/shared_doc/create', 'create', get_loggedin_userid(), $shared_doc->guid);
 			return true;
