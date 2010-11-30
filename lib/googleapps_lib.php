@@ -48,8 +48,86 @@
 		return $content_info;
 	}
 	
-	/* Get google docs content */
-	function googleapps_get_page_content_docs() {
+	/* Get google docs listing content */
+	function googleapps_get_page_content_docs($user_guid = null) {
+		if ($user_guid) {
+			$user = get_entity($user_guid);
+			elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'pg/googleapps/docs');
+			elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
+			$header_context = 'mine';
+			$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'owner_guid' => $user_guid));
+			$content_info['title'] = elgg_echo('googleapps:menu:yourshareddocs');
+		} else {
+		 	$header_context = 'everyone';
+			$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc'));
+			$content_info['title'] = elgg_echo('googleapps:menu:allshareddocs');
+		}
+		
+		// If theres no content, display a nice message
+		if (!$content) {
+			$content = elgg_view('googleapps/noresults');
+		}
+			
+		$header = "<div id='google_docs_header'>" . elgg_view('page_elements/content_header', array(
+			'context' => $header_context,
+			'type' => 'shared_doc',
+			'all_link' => elgg_get_site_url() . "pg/googleapps/docs",
+			'mine_link' => elgg_get_site_url() . "pg/googleapps/docs/" . get_loggedin_user()->username,
+			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends"
+		)) . "</div>";
+		
+		
+		$content_info['content'] = $header . $content;
+		$content_info['layout'] = 'one_column_with_sidebar';
+		return $content_info;
+	}
+	
+	/* Get friends docs */
+	function googleapps_get_page_content_docs_friends($user_guid) {
+		global $CONFIG;
+		$user = get_entity($user_guid);
+		elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'pg/googleapps/docs');
+		elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
+		elgg_push_breadcrumb(elgg_echo('friends'));
+		
+		$content = "<div id='google_docs_header'>" . elgg_view('page_elements/content_header', array(
+			'context' => 'friends',
+			'type' => 'shared_doc',
+			'all_link' => elgg_get_site_url() . "pg/googleapps/docs",
+			'mine_link' => elgg_get_site_url() . "pg/googleapps/docs/" . get_loggedin_user()->username,
+			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends"
+		)) . "</div>";
+
+		if (!$friends = get_user_friends($user_guid, ELGG_ENTITIES_ANY_VALUE, 0)) {
+			$content .= elgg_echo('friends:none:you');
+		} else {
+			$options = array(
+				'type' => 'object',
+				'subtype' => 'shared_doc',
+				'full_view' => FALSE,
+			);
+
+			foreach ($friends as $friend) {
+				$options['container_guids'][] = $friend->getGUID();
+			}
+			
+			$content_info['title'] = elgg_echo('googleapps:menu:friendsshareddocs');
+			
+			$list = elgg_list_entities($options);
+			if (!$list) {
+				$content .= elgg_view('googleapps/noresults');
+			} else {
+				$content .= $list;
+			}
+		}
+		$content_info['content'] = $content;
+		$content_info['layout'] = 'one_column_with_sidebar';
+		
+		return $content_info;
+	}
+	
+	/* Get google docs share content */
+	function googleapps_get_page_content_docs_sharebox() {
 		$content_info['title'] = elgg_echo('googleapps:label:google_docs');
 		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');	
 		$content_info['layout'] = 'one_column_with_sidebar';

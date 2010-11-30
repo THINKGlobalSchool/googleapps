@@ -101,6 +101,9 @@ function googleapps_init() {
 
 	// Setup main page handler
 	register_page_handler('googleapps','googleapps_page_handler');
+	
+	// Setup url handler for google shared docs
+	register_entity_url_handler('googleapps_shared_doc_url_handler','object', 'shared_doc');
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = get_loggedin_user();
@@ -130,6 +133,7 @@ function googleapps_init() {
 	register_action('googleapps/share_doc', false, $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
 	register_action('googleapps/change_doc_permissions', false, $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
 	register_action('googleapps/sites_reset',false, $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
+	register_action('googleapps/delete_shared_document', false, $CONFIG->pluginspath . 'googleapps/actions/delete_shared_document.php');
 }
 
 function googleapps_pagesetup() {
@@ -152,6 +156,16 @@ function googleapps_pagesetup() {
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:create_new_wiki'), 
 								'href' => $GLOBALS['link_to_add_site']), 'wikis');
 	
+	// Docs 
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:yourshareddocs'), 
+								'href' => elgg_get_site_url() . 'pg/googleapps/docs/' . get_loggedin_user()->username), 'docs');
+								
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:friendsshareddocs'), 
+								'href' => elgg_get_site_url() . 'pg/googleapps/docs/friends' ), 'docs');
+
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:allshareddocs'), 
+								'href' => elgg_get_site_url() . 'pg/googleapps/docs/' ), 'docs');
+
 	// Admin
 	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admin:debug_title'),
 								'href'=> $CONFIG->url . "pg/googleapps/settings/debug",
@@ -192,15 +206,30 @@ function googleapps_page_handler($page) {
 			case 'docs':
 				set_context('docs');
 				// Google Docs pages
-				switch ($page[1]) {
-					default:
-						$content_info = googleapps_get_page_content_docs();
-					break;
-					case 'list_form':
-						echo elgg_view('googleapps/forms/document_list');
-						// Need to break out of the page handler for this one
-						return true;
-					break;
+				if (isset($page[1]) && !empty($page[1])) {
+					switch ($page[1]) {
+						case 'friends': 
+							$content_info = googleapps_get_page_content_docs_friends(get_loggedin_userid());
+						break;
+						case 'share':
+							$content_info = googleapps_get_page_content_docs_sharebox();
+						break;
+						case 'list_form':
+							echo elgg_view('googleapps/forms/document_list');
+							// Need to break out of the page handler for this one
+							return true;
+						break;
+						default:
+							// Should be a username if we're here.. so check, if not get outta here
+							if ($user = get_user_by_username($page[1])) {
+								$content_info = googleapps_get_page_content_docs($user->getGUID());
+							} else {
+								forward('pg/googleapps/docs');
+							}
+						break;
+					}
+				} else {
+					$content_info = googleapps_get_page_content_docs();
 				}
 			break;
 			case 'wikis':
@@ -216,7 +245,7 @@ function googleapps_page_handler($page) {
 	$sidebar = isset($content_info['sidebar']) ? $content_info['sidebar'] : '';
 
 	$params = array(
-		'content' => $content_info['content'],
+		'content' => elgg_view('navigation/breadcrumbs') . $content_info['content'],
 		'sidebar' => $sidebar,
 	);
 	$body = elgg_view_layout($content_info['layout'], $params);
@@ -338,6 +367,18 @@ function googleapps_shared_doc_write_acl_plugin_hook($hook, $entity_type, $retur
 		}
 	}
 	return $returnvalue;
+}
+
+/**
+ * Populates the ->getUrl() method for shared google docs
+ *
+ * @param ElggEntity entity
+ * @return string request url
+ */
+function googleapps_shared_doc_url_handler($entity) {
+	global $CONFIG;
+	
+	return $entity->href;
 }
 
 register_elgg_event_handler('init','system','googleapps_init');

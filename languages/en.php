@@ -14,6 +14,7 @@ $english = array(
 		'item:object:site_activity' => 'Wiki activity',
     	'item:object:shared_doc' => 'Google Shared Document',
 		'item:user:googleapps' => 'googleapps users',
+		'shared_doc' => 'Google Docs',
 		
 		// Menu/Submenu's
 		'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -22,6 +23,9 @@ $english = array(
 		'googleapps:menu:wikiseveryone' => 'All Wikis',
 		'googleapps:menu:wikis' => 'Wikis',
 		'googleapps:menu:create_new_wiki' => 'Create New Wiki',
+		'googleapps:menu:yourshareddocs' => 'Your Shared Docs',
+		'googleapps:menu:allshareddocs' => 'All Shared Google Docs', 
+		'googleapps:menu:friendsshareddocs' => 'Friend\'s Shared Docs',
 		
 		// Admin Settings
 		'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
@@ -58,11 +62,14 @@ $english = array(
 		'googleapps:error:document_id_required' => '<h2>Uh oh..</h2><p class="googleappsdialog_message">You need to select a document first.</p>',
     	'googleapps:error:document_permissions_update' => 'Document permissions need to be updated',
 		'googleapps:error:invalid_url' => 'Invalid Google Document URL',
+		'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
+		'googleapps:error:notfound' => 'Document not found',
 		
 		// Success messages
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 		'googleapps:success:shared' => '<h2>Success!</h2><p class="googleappsdialog_message">Document shared</p>',
 		'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
+		'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 		
 		// General labels
 		'googleapps:label:google_docs' => 'Google Docs',
@@ -72,6 +79,8 @@ $english = array(
 		'googleapps:label:loading' => 'Loading...',
 		'googleapps:label:match_permissions' => 'Match permissions of Google Document?',
 		'googleapps:label:action_required' => 'Action Required',
+		'googleapps:label:shared_by' => 'Shared by %s',
+		'googleapps:label:deleteconfirm' => 'Remove Shared Doc? (This will not delete the document from Google Documents, only from Spot)',
 		
 		// Tabs
 		'googleapps:tab:share_url' => 'Enter URL',

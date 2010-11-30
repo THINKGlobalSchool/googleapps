@@ -253,6 +253,10 @@ table.wiki_activity_settings td.submit_cell {
 	color: #333;
 }
 
+#google_docs_header a.action_button {
+	display: none;
+}
+
 /* SUPER CUSTOM DIALOG */
 
 #googleappsdialog  {
