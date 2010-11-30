@@ -19,6 +19,12 @@ $parsed_url = parse_url($address);
 //sort out the access level for display
 $object_acl = get_readable_access_level($vars['entity']->access_id);
 
+// Function above works sometimes.. its weird. So load ACL name if any
+if (!$object_acl) {
+	$acl = get_access_collection($vars['entity']->access_id);
+	$object_acl = $acl->name;
+}
+
 //files with these access level don't need an icon
 $general_access = array('Public', 'Logged in users', 'Friends');
 
