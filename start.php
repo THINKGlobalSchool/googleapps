@@ -232,7 +232,7 @@ function googleapps_page_handler($page) {
 							$content_info = googleapps_get_page_content_docs_sharebox();
 						break;
 						case 'list_form':
-							echo elgg_view('googleapps/forms/document_list');
+							echo elgg_view('googleapps/forms/document_chooser');
 							// Need to break out of the page handler for this one
 							return true;
 						break;

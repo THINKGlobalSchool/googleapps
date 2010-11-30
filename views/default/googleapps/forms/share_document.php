@@ -57,13 +57,7 @@ $match_input = elgg_view('input/pulldown', array(	'internalname' => 'match_permi
 																				1 => 'Yes')		
 													));
 
-$url_label = elgg_echo("url");
-$url_input = elgg_view("input/text", array('internalname' => 'document_url', 'value' => $url));
-
 $submit_input = elgg_view('input/submit', array('internalname' => 'submit', 'value' => elgg_echo('save')));	
-
-$share_url_label = elgg_echo('googleapps:tab:share_url');
-$share_browse_label = elgg_echo('googleapps:tab:share_browse');
 
 // Browse document container
 $browse_content .= '<div id="googleapps">
@@ -80,25 +74,7 @@ $form_url = elgg_get_site_url() . 'pg/googleapps/docs/list_form';
 $form_body = <<<EOT
 <form action="$action" method="post" onsubmit="return ajax_submit(this)" >
 	<div class='margin_top'>
-		<div class="elgg_horizontal_tabbed_nav margin_top">
-			<ul>
-				<li id='share_url' class='selected edt_tab_nav'>
-					<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_url')">$share_url_label</a>
-				</li>
-				<li id='share_browse' class='edt_tab_nav'>
-					<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_browse')">$share_browse_label</a>
-				</li>
-			</ul>
-		</div>
-		<div id='share_url' class='tab_content'>
-			<br />
-		        $url_input
-			<br /><br />
-		</div>
-		<div id='share_browse' class='tab_content hidden'>
-			$browse_content
-			<br />
-		</div>
+		$browse_content
 		<div>
 			<label>$description_label</label><br />
 	        $description_input
@@ -142,27 +118,6 @@ $script = <<<EOT
 			$('#access_label').attr('style', 'color: #999999');
 		}
 	});
-
-	function googleShareFormSwitchTab(tab_id)
-	{
-		var nav_name = "li#" + tab_id;
-		var tab_name = "div#" + tab_id;
-		// Hide all tabs
-		$(".tab_content").hide();
-		
-		// Disable all tabs inputs
-		$(".tab_content input").attr('disabled', 'disabled');
-		
-		// Remove selected from all tabs
-		$(".edt_tab_nav").removeClass("selected");
-		
-		// Show selected tab
-		$(tab_name).show();
-		// Add selected class to selected tab
-		$(nav_name).addClass("selected");
-		// Enable selected tab
-		$(tab_name + ' input').removeAttr('disabled');
-	}
 	
 	function load_docs() {
 		$("#googleapps").load("$form_url");
