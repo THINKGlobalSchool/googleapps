@@ -868,15 +868,6 @@
 	    return $str;
 	}
 
-
-	function access_translate($access) {
-	        switch ($access) {
-	            case 'logged_in': return ACCESS_LOGGED_IN; break; // logged_in
-	            case 'public': return ACCESS_PUBLIC; break; // public
-	            default: return ACCESS_DEFAULT;
-	        }
-	}
-
     /**
 	 * Create the shared google document 
 	 * 
@@ -951,27 +942,6 @@
         $access = $site_entity->site_access_id;
         $merged[$site_id] = array('title'=>$title, 'access'=>$access, 'entity_id' =>  $site_entity->guid);
     }
-
-	function get_group_or_channel_members($group_channel) {
-		$share_type = substr($group_channel, 0, 2);
-		$id = substr($group_channel, 2);	
-		if ($share_type == 'gr') {		
-			$members = get_group_members_emails($id);
-		} else {
-			$members = get_channel_members_emails($id);
-		}
-		return $members;
-	}
-
-	function get_group_members_emails($group_id) {
-	   	$members=get_group_members($group_id, 9999);
-		return get_members_emails($members);
-	}
-
-	function get_channel_members_emails($channel_id) {
-	   	$members = elgg_get_entities_from_relationship(array('relationship' => 'shared_access_member', 'relationship_guid' => $channel_id, 'inverse_relationship' => TRUE, 'limit' => 9999));
-		return get_members_emails($members);
-	}
 
 	function get_members_emails($members) {
 		$members_emails = array();

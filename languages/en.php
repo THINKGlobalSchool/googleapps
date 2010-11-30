@@ -23,9 +23,9 @@ $english = array(
 		'googleapps:menu:wikiseveryone' => 'All Wikis',
 		'googleapps:menu:wikis' => 'Wikis',
 		'googleapps:menu:create_new_wiki' => 'Create New Wiki',
-		'googleapps:menu:yourshareddocs' => 'Your Shared Docs',
+		'googleapps:menu:yourshareddocs' => 'Your Shared Google Docs',
 		'googleapps:menu:allshareddocs' => 'All Shared Google Docs', 
-		'googleapps:menu:friendsshareddocs' => 'Friend\'s Shared Docs',
+		'googleapps:menu:friendsshareddocs' => 'Friend\'s Shared Google Docs',
 		
 		// Admin Settings
 		'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
