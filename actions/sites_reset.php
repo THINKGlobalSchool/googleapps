@@ -11,6 +11,6 @@
 gatekeeper();
 reset_googlesites();
 
-system_message(elgg_echo('googleapps:googlesitesreset'));
+system_message(elgg_echo('googleapps:success:sites_reset'));
 forward($_SERVER['HTTP_REFERER']);
 

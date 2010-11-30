@@ -107,16 +107,16 @@ function googleapps_init() {
 	if (!empty($user) && $user->google) {
 		if ($oauth_sync_sites != 'no') {
 			// Sync wikis enabled
-			add_menu(elgg_echo('googleapps:sites'), $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $user->username);	
+			add_menu(elgg_echo('googleapps:menu:wikis'), $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $user->username);	
 		}
 		if ($oauth_sync_docs != 'no') {
 			// Share docs enabled
-			add_menu(elgg_echo('googleapps:google_docs'), $CONFIG->wwwroot . 'pg/googleapps/docs/');
+			add_menu(elgg_echo('googleapps:label:google_docs'), $CONFIG->wwwroot . 'pg/googleapps/docs/');
 		}
 	}
 	
 	// Register widgets
-	add_widget_type('google_docs', elgg_echo('googleapps:google_docs'), elgg_echo('googleapps:google_docs:description'));
+	add_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 	
 	// Register actions
 	register_action('googleapps/oauth_update', true, $CONFIG->pluginspath . 'googleapps/actions/oauth_update.php');
@@ -135,27 +135,25 @@ function googleapps_init() {
 function googleapps_pagesetup() {
 	global $CONFIG;
 	
-	$page_owner = elgg_get_page_owner();
-
 	// Settings items
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:google_sites_settings'), 
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wiki_settings'), 
 								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/wikiactivity"), 'settings', 'z');
 
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:google_sync_settings'), 
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:google_sync_settings'), 
 								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/account"), 'settings', 'z');	
 
 	// Wikis
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:sites:your'), 
-								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $page_owner->username), 'wikis');
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wikisyour'), 
+								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis/' . get_loggedin_user()->username), 'wikis');
 
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:sites:everyone'), 
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wikiseveryone'), 
 								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis'), 'wikis');
 														
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:site:add'), 
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:create_new_wiki'), 
 								'href' => $GLOBALS['link_to_add_site']), 'wikis');
 	
 	// Admin
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admindebugtitle'),
+	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admin:debug_title'),
 								'href'=> $CONFIG->url . "pg/googleapps/settings/debug",
 								'id'=>'googlesitesdebug'),'admin', 'zzz'); // zzz puts the debug at the bottom (alphabetically)
 }	

@@ -29,7 +29,7 @@ $subtype = $user->getSubtype();
 if ($user->google) {
 	
 	if (empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:passwordrequired:disconnect')));
+		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passworddisconnect')));
 		forward($_SERVER['HTTP_REFERER']);
 	}
 	

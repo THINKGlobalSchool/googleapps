@@ -50,7 +50,7 @@ $access_label = elgg_echo('access');
 $access_input = elgg_view('input/access', array('internalname' => 'access_id', 'internalid' => 'access_id', 'value' => ACCESS_LOGGED_IN));
 set_context($context);
 
-$match_label = elgg_echo('googleapps:doc:match_permissions');
+$match_label = elgg_echo('googleapps:label:match_permissions');
 $match_input = elgg_view('input/pulldown', array(	'internalname' => 'match_permissions',
 													'internalid' => 'match_permissions',
 													'options_values' =>	array(	0 => 'No',
@@ -69,7 +69,7 @@ $share_browse_label = elgg_echo('googleapps:tab:share_browse');
 $browse_content .= '<div id="googleapps">
 				<div id="google_docs_loading">
 					<img src="' . elgg_get_site_url() . '_graphics/ajax_loader_bw.gif" />
-					<p>' . elgg_echo('googleapps:docsloading') . '</p>
+					<p>' . elgg_echo('googleapps:label:loading') . '</p>
 				</div>
 			</div>';
 

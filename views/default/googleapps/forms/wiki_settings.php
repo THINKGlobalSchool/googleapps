@@ -38,9 +38,9 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 			
 			if (!empty($site_list)) {
 				
-				echo '<p>'.elgg_echo('googleapps:google_sites_settings_description').'</p>';
+				echo '<p>'.elgg_echo('googleapps:usersettings:sites_description').'</p>';
 				
-				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:site').'</th><th>'.elgg_echo('googleapps:access_level').'</th></tr>';
+				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:label:site').'</th><th>'.elgg_echo('googleapps:label:access_level').'</th></tr>';
 				foreach ($site_list as $site_id => $site_obj) {
 
           			$title = $site_obj['title'];

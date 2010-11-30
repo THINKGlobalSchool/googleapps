@@ -18,7 +18,7 @@ $google = Google_OpenID::create_from_response($_REQUEST);
 $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
-	register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:notauthorized')));
+	register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:notauthorized')));
 	forward('pg/googleapps/settings/account');
 } else {
 	
@@ -33,7 +33,7 @@ if (!$google->is_authorized()) {
 	$entities = get_user_by_email($email);
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), sprintf(elgg_echo('googleapps:emailexists'), $email)));
+		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), sprintf(elgg_echo('googleapps:error:emailexists'), $email)));
 		forward('pg/googleapps/settings/account');
 	}
 	
@@ -42,7 +42,7 @@ if (!$google->is_authorized()) {
 	if ($is_sync) {
 		
 		if (empty($email)) {
-			register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:nodata')));
+			register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:nodata')));
 			forward();
 		}
 		
@@ -61,7 +61,7 @@ if (!$google->is_authorized()) {
 		forward($googleapps_return);
 		
 	} else {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:usernotready')));
+		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:usernotready')));
 		forward('pg/googleapps/settings/account');
 	}
 }

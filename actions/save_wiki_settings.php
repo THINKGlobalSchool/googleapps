@@ -30,7 +30,7 @@ $subtype = $user->getSubtype();
 
 if ($user->google == 1) {
 	if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleapps:googleappserror'), elgg_echo('googleapps:passwordrequired')));
+		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passwordstop')));
 		forward($_SERVER['HTTP_REFERER']);
 	}
 	if (elgg_strlen($googleapps_controlled_profile) > 50) {

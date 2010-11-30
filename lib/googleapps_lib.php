@@ -12,7 +12,7 @@
 
 	/* Get wiki activity settings content */
 	function googleapps_get_page_content_settings_wikiactivity() {
-		$content_info['title'] = elgg_echo('googleapps:google_sites_settings');		
+		$content_info['title'] = elgg_echo('googleapps:menu:wiki_settings');		
 		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/wiki_settings');
 		$content_info['layout'] = 'one_column_with_sidebar';
 		return $content_info;
@@ -34,7 +34,7 @@
 			break;
 		}
 		
-		$content_info['title'] = elgg_echo("googleapps:admindebugtitle");
+		$content_info['title'] = elgg_echo("googleapps:admin:debug_title");
 		$content_info['content'] = elgg_view_title($content_info['title']) . $content;
 		$content_info['layout'] = 'administration';
 		return $content_info;
@@ -42,7 +42,7 @@
 	
 	/* Get account settings content */ 
 	function googleapps_get_page_content_settings_account() {
-		$content_info['title'] = elgg_echo('googleapps:google_sync_settings');
+		$content_info['title'] = elgg_echo('googleapps:menu:google_sync_settings');
  		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/sync_form');
 		$content_info['layout'] = 'one_column_with_sidebar';
 		return $content_info;
@@ -50,7 +50,7 @@
 	
 	/* Get google docs content */
 	function googleapps_get_page_content_docs() {
-		$content_info['title'] = elgg_echo('googleapps:google_docs');
+		$content_info['title'] = elgg_echo('googleapps:label:google_docs');
 		$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');	
 		$content_info['layout'] = 'one_column_with_sidebar';
 		return $content_info;
@@ -73,9 +73,9 @@
 			$sites = $res['site_entities'];
 		}
 		
-		$content_info['title'] = elgg_echo('googleapps:sites:' . $postfix);
+		$content_info['title'] = elgg_echo('googleapps:menu:wikis' . $postfix);
 		$content_info['content']  = elgg_view_title($content_info['title']) . elgg_view('googleapps/wiki_list', array('wikis' => $sites));
-		$content_info['layout'] = 'one_column';
+		$content_info['layout'] = 'one_column_with_sidebar';
 		return $content_info;
 		
 	}

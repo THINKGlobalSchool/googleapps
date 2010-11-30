@@ -46,7 +46,7 @@ if (!$user->google) {
 		$url = $google->get_authorization_url();
 		forward($url);
 	} catch(Exception $e) {
-		register_error(sprintf(elgg_echo("googleapps:wrongdomain"), $username));
+		register_error(sprintf(elgg_echo("googleapps:error:wrongdomain"), $username));
 		forward();
 	}
 } else {

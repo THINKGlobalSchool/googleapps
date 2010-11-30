@@ -49,7 +49,7 @@ switch (get_input('answer')) {
 	break;
 
 }
-     die ( elgg_echo("googleapps:doc:share:ok") );
+     die ( elgg_echo("googleapps:success:shared") );
      exit;
 
 ?>

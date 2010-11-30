@@ -21,7 +21,7 @@ if ($document_match && $access_level === null) {
 
 // Check for a document url/id
 if (empty($document_id) && empty($document_url)) {
-    echo elgg_echo("googleapps:doc:share:no_doc_id");
+    echo elgg_echo("googleapps:error:document_id_required");
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($document_url && !empty($document_url)) {
 		} 
 	}
 	if (!$found) {
-		echo elgg_echo('googleapps:doc:share:invalid_url');
+		echo elgg_echo('googleapps:error:invalid_url');
 		exit;
 	}
 } else {
@@ -71,7 +71,7 @@ if (!check_document_permission($collaborators, $access_level) ) {
 	exit;
 } else {
 	share_document($document, $document_description, $document_tags, $access_level); // Share and public document activity
-	echo elgg_echo("googleapps:doc:share:ok");
+	echo elgg_echo("googleapps:success:shared");
 	exit;
  }
 ?>

@@ -906,7 +906,7 @@
 			}
 
             if (!$shared_doc->save()) {
-                    register_error(elgg_echo('googleapps:saveshareddocerror'));
+                    register_error(elgg_echo('googleapps:error:share_doc'));
                     exit;
             }
 	
