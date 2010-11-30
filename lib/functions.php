@@ -877,7 +877,7 @@
 	 * @param mixed		$access_id		Access id, either elgg contants or 'match'
 	 * @return bool
 	 */
-    function share_document($document, $description, $tags, $access_id) {
+    function share_document($document, $description, $tags, $access_id, $container_guid) {
             $shared_doc = new ElggObject();
             $shared_doc->subtype 		= "shared_doc";
 			$shared_doc->title 			= $document['title'];
@@ -889,6 +889,7 @@
  			$shared_doc->access_id 		= $access_id;
 			$shared_doc->collaborators	= $document['collaborators'];
 			$shared_doc->href			= $document['href'];
+			$shared_doc->container_guid	= $container_guid;
 		
 			// If access id was match, set a flag. After saving the
 			// access id will have changed due to hooking into the create event

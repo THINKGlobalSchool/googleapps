@@ -98,12 +98,19 @@ function googleapps_init() {
 
 	//register CRON hook to poll for Google Site activity
 	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
+	
+	// Register profile menu hook
+	elgg_register_plugin_hook_handler('profile_menu', 'profile', 'googleapps_docs_profile_menu');
 
 	// Setup main page handler
 	register_page_handler('googleapps','googleapps_page_handler');
 	
 	// Setup url handler for google shared docs
 	register_entity_url_handler('googleapps_shared_doc_url_handler','object', 'shared_doc');
+	
+	// add group profile and tool entries
+	elgg_extend_view('groups/tool_latest', 'googleapps/group_shared_documents');
+	add_group_tool_option('shared_doc', elgg_echo('googleapps:label:enableshareddoc'), true);
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = get_loggedin_user();
@@ -212,6 +219,16 @@ function googleapps_page_handler($page) {
 							$content_info = googleapps_get_page_content_docs_friends(get_loggedin_userid());
 						break;
 						case 'share':
+							// Page owner fun
+							if ($container = (int) get_input('container_guid')) {
+								set_page_owner($container);
+							}
+							$page_owner = page_owner_entity();
+							if (!$page_owner) {
+								$page_owner_guid = get_loggedin_userid();
+								if ($page_owner_guid)
+									set_page_owner($page_owner_guid);
+							}
 							$content_info = googleapps_get_page_content_docs_sharebox();
 						break;
 						case 'list_form':
@@ -221,11 +238,17 @@ function googleapps_page_handler($page) {
 						break;
 						default:
 							// Should be a username if we're here.. so check, if not get outta here
-							if ($user = get_user_by_username($page[1])) {
-								$content_info = googleapps_get_page_content_docs($user->getGUID());
+							if (isset($page[1])) {
+								$owner_name = $page[1];
+								set_input('username', $owner_name);
+
+								// grab the page owner
+								$owner = elgg_get_page_owner();
 							} else {
-								forward('pg/googleapps/docs');
+								set_page_owner(get_loggedin_userid());
 							}
+							$content_info = googleapps_get_page_content_docs($owner->getGUID());
+							
 						break;
 					}
 				} else {
@@ -368,6 +391,21 @@ function googleapps_shared_doc_write_acl_plugin_hook($hook, $entity_type, $retur
 	}
 	return $returnvalue;
 }
+
+/**
+ * Add google docs to the owner block
+ */
+function googleapps_docs_profile_menu($hook, $entity_type, $return_value, $params) {
+	global $CONFIG;
+
+	$return_value[] = array(
+		'text' => elgg_echo('googleapps:label:google_docs'),
+		'href' => "pg/googleapps/docs/{$params['owner']->username}",
+	);
+
+	return $return_value;
+}
+
 
 /**
  * Populates the ->getUrl() method for shared google docs

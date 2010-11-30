@@ -52,10 +52,17 @@
 	function googleapps_get_page_content_docs($user_guid = null) {
 		if ($user_guid) {
 			$user = get_entity($user_guid);
-			elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'pg/googleapps/docs');
-			elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
+			if ($user instanceof ElggGroup) {
+				// Got a group
+				elgg_push_breadcrumb(elgg_echo('groups'), elgg_get_site_url() . 'pg/googleapps/docs');
+				elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
+				elgg_push_breadcrumb(elgg_echo('googleapps:label:groupdocs'));
+			} else {
+				elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'pg/googleapps/docs');
+				elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
+			}
 			$header_context = 'mine';
-			$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'owner_guid' => $user_guid));
+			$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'container_guid' => $user_guid));
 			$content_info['title'] = elgg_echo('googleapps:menu:yourshareddocs');
 		} else {
 		 	$header_context = 'everyone';

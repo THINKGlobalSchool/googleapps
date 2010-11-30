@@ -13,6 +13,12 @@ $description = $data['description'];
 $tags = $data['tags'];
 $access_id = $data['access'];
 $document_id = $data['doc_id'];
+$container_guid = get_input('container_guid');
+
+// Make sure user can write to the container (group)
+if (!can_write_to_container(get_loggedin_userid(), $container_guid)) {
+	echo elgg_echo('googleapps:error:nopermission');
+}
 
 // Get google docs from session
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
@@ -34,14 +40,14 @@ switch (get_input('answer')) {
 			$members_email = get_members_emails($members);
 			$share_to = get_members_not_shared($members_email, $document);
 			googleapps_change_doc_sharing($client, $document['id'], $share_to) ; // change permissions
-            share_document($document, $description, $tags, $access_id);
+            share_document($document, $description, $tags, $access_id, $container_guid);
             break;
 		}
         googleapps_change_doc_sharing($client, $document['id'], $access_id) ;
-        share_document($document, $description, $tags, $access_id);
+        share_document($document, $description, $tags, $access_id, $container_guid);
 	break;
     case elgg_echo('googleapps:submit:ignore'):
-        share_document($document, $description, $tags, $access_id);
+        share_document($document, $description, $tags, $access_id, $container_guid);
     break;
     case elgg_echo('googleapps:submit:cancel'):  
 		echo 'Canceled'; 

@@ -64,6 +64,7 @@ $english = array(
 		'googleapps:error:invalid_url' => 'Invalid Google Document URL',
 		'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 		'googleapps:error:notfound' => 'Document not found',
+		'googleapps:error:nopermission' => 'You do not have permission to share this document to the group',
 		
 		// Success messages
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
@@ -81,6 +82,9 @@ $english = array(
 		'googleapps:label:action_required' => 'Action Required',
 		'googleapps:label:shared_by' => 'Shared by %s',
 		'googleapps:label:deleteconfirm' => 'Remove Shared Doc? (This will not delete the document from Google Documents, only from Spot)',
+		'googleapps:label:enableshareddoc' => 'Enable group shared google docs',
+		'googleapps:label:shareadoc' => 'Share a Google Doc',
+		'googleapps:label:groupdocs' => 'Group Google Docs',
 		
 		// Tabs
 		'googleapps:tab:share_url' => 'Enter URL',

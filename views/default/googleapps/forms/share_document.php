@@ -33,7 +33,7 @@ if (isset($vars['entity'])) {
 	$entity_hidden = "";
 }
 
-$container_guid = get_input('container_guid', page_owner());
+$container_guid = get_input('container_guid', elgg_get_page_owner_guid());
 $container_hidden = elgg_view('input/hidden', array('internalname' => 'container_guid', 'value' => $container_guid));
 
 // Labels/Input

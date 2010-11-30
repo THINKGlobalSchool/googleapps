@@ -14,6 +14,12 @@ $document_tags = string_to_tag_array(get_input('tags', ''));
 $access_level = get_input('access_id', null);
 $document_url = get_input('document_url', null);
 $document_match = get_input('match_permissions', null);
+$document_container_guid = get_input('container_guid');
+
+// Make sure user can write to the container (group)
+if (!can_write_to_container(get_loggedin_userid(), $document_container_guid)) {
+	echo elgg_echo('googleapps:error:nopermission');
+}
 
 if ($document_match && $access_level === null) {
 	$access_level = GOOGLEAPPS_ACCESS_MATCH;
@@ -67,10 +73,10 @@ $_SESSION['google_docs_to_share_data'] = serialize($document_info); // remember 
 $collaborators = $document['collaborators'];
 
 if (!check_document_permission($collaborators, $access_level) ) {
-	echo elgg_view('googleapps/forms/docs_permissions');
+	echo elgg_view('googleapps/forms/docs_permissions', array('container_guid' => $document_container_guid));
 	exit;
 } else {
-	share_document($document, $document_description, $document_tags, $access_level); // Share and public document activity
+	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid); // Share and public document activity
 	echo elgg_echo("googleapps:success:shared");
 	exit;
  }
