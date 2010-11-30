@@ -49,11 +49,6 @@ switch (get_input('answer')) {
     case elgg_echo('googleapps:submit:ignore'):
         share_document($document, $description, $tags, $access_id, $container_guid);
     break;
-    case elgg_echo('googleapps:submit:cancel'):  
-		echo 'Canceled'; 
-		exit; 
-	break;
-
 }
      die ( elgg_echo("googleapps:success:shared") );
      exit;

@@ -23,7 +23,6 @@
 	$content .= '<input type="hidden" value="" name="answer">';
 	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:grant') . '" onclick="save_answer(this)">&nbsp;';
 	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:ignore') . '" onclick="save_answer(this)">&nbsp;';
-	$content .= '<input type="submit" value="' . elgg_echo('googleapps:submit:cancel') . '" onclick="save_answer(this)">&nbsp;';
 	$content .= '<input type="hidden" name="container_guid" value="' . $vars['container_guid'] . '" />';
 	$content .= '</form></div><div class="clearfloat"></div>';
 
