@@ -36,7 +36,7 @@ foreach ($google_docs as $id => $doc) {
 		<td class="doc_select"><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
 		<td class="doc_name">
 			<span class="document-icon ' . $doc["type"] . '"></span>
-		 	<a href="' . $doc["href"] . '" target="_blank">' . $doc["trunc_title"] . '</a>
+		 	<a href="' . $doc["href"] . '" target="_blank">' . $doc["title"] . '</a>
 		</td>
 		<td class="doc_collaborators">' . $permission_str.'</td>
 		<td class="doc_updated">' . friendly_time($doc["updated"]) . '</td>

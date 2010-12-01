@@ -262,7 +262,7 @@ table.wiki_activity_settings td.submit_cell {
 	height: 300px;
 	overflow: scroll;
 	overflow-x: hidden;
-	width: 600px;
+	width: 100%
 }
 
 #googleapps_browse_table table {
@@ -289,19 +289,19 @@ table.wiki_activity_settings td.submit_cell {
 }
 
 td.doc_select {
-	width: 30px;
+	width: 10px;
 }
 
 td.doc_name {
-	width: 270px;
+	width: 40%;
 }
 
 td.doc_collaborators {
-	width: 150px;
+	width: 25%;
 }
 
 td.doc_updated {
-	width: 150px;
+	width: 25%;
 }
 
 a.gapps_tooltip {
