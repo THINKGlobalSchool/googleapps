@@ -353,21 +353,35 @@ function googleapps_icon_url($hook_name, $entity_type, $return_value, $parameter
  */
 function google_apps_shared_doc_create_event_listener($event, $object_type, $object) {
 	if ($object->getSubtype() == 'shared_doc' && $object->access_id == GOOGLEAPPS_ACCESS_MATCH) {
-		$shared_doc_acl = create_access_collection(elgg_echo('item:object:shared_doc') . ": " . $object->title, $object->getGUID());
-		if ($shared_doc_acl) {
-			$object->shared_acl = $shared_doc_acl;
-			$context = get_context();
-			set_context('shared_doc_acl');
-			foreach ($object->collaborators as $collaborator) {
-				if ($user = get_user_by_email($collaborator)) {
-					$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
+		if ($object->collaborators != 'public' && $object->collaborators != 'everyone_in_domain') { // Might be public or domain
+			$shared_doc_acl = create_access_collection(elgg_echo('item:object:shared_doc') . ": " . $object->title, $object->getGUID());
+			if ($shared_doc_acl) {
+				$object->shared_acl = $shared_doc_acl;
+				$context = get_context();
+				set_context('shared_doc_acl');
+				foreach ($object->collaborators as $collaborator) {
+					if ($user = get_user_by_email($collaborator)) {
+						$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
+					}
 				}
+				set_context($context);
+				$object->access_id = $shared_doc_acl;
+				$object->save();
+			} else {
+				return false;
 			}
-			set_context($context);
-			$object->access_id = $shared_doc_acl;
-			$object->save();
 		} else {
-			return false;
+			// Google doc has public or domain permissions, assign accordingly
+			switch ($object->collaborators) {
+				case 'public':
+					$object->access_id = ACCESS_PUBLIC;
+				break;
+				case 'everyone_in_domain':
+					$object->access_id = ACCESS_LOGGED_IN;
+				break;
+				
+			}
+			$object->save();
 		}
 	}
 	return true;
