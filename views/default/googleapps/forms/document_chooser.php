@@ -14,7 +14,16 @@ $user = get_loggedin_user();
 googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
-$docs_list = '<table><tbody>';
+
+$docs_list = '<div id="googleapps_browse_table">
+				<table>
+					<tbody>
+						<tr>
+							<th>' . elgg_echo('googleapps:label:table_select') . '</th>
+							<th>' . elgg_echo('googleapps:label:table_name') . '</th>
+							<th>' . elgg_echo('googleapps:label:table_collaborators') . '</th>
+							<th>' . elgg_echo('googleapps:label:table_updated') . '</th>
+						</tr>';
 
 $documents_collaborators = array();
 foreach ($google_docs as $id => $doc) {
@@ -24,18 +33,18 @@ foreach ($google_docs as $id => $doc) {
 
     $docs_list .= '
     <tr>
-		<td><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
-		<td>
+		<td class="doc_select"><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
+		<td class="doc_name">
 			<span class="document-icon ' . $doc["type"] . '"></span>
-		 	<a href="' . $doc["href"] . '">' . $doc["trunc_title"] . '</a>
+		 	<a href="' . $doc["href"] . '" target="_blank">' . $doc["trunc_title"] . '</a>
 		</td>
-		<td>' . $permission_str.'</td>
-		<td>' . friendly_time($doc["updated"]) . '</td>
+		<td class="doc_collaborators">' . $permission_str.'</td>
+		<td class="doc_updated">' . friendly_time($doc["updated"]) . '</td>
     </tr>
     ';
 }
 
-$docs_list .= '</tbody></table>';
+$docs_list .= '</tbody></table></div>';
 
 // Labels for the tabs
 $share_url_label = elgg_echo('googleapps:tab:share_url');

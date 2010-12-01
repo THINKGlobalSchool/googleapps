@@ -85,6 +85,14 @@ $english = array(
 		'googleapps:label:enableshareddoc' => 'Enable group shared google docs',
 		'googleapps:label:shareadoc' => 'Share a Google Doc',
 		'googleapps:label:groupdocs' => 'Group Google Docs',
+		'googleapps:label:table_select' => 'Select',
+		'googleapps:label:table_name' => 'Name',
+		'googleapps:label:table_collaborators' => 'Collaborators',
+		'googleapps:label:table_updated' => 'Last Updated',
+		'googleapps:label:tooltipname' => 'What is this?',
+		
+		// Tooltips
+		'googleapps:tooltip:match' => 'Match description here......',
 		
 		// Tabs
 		'googleapps:tab:share_url' => 'Enter URL',

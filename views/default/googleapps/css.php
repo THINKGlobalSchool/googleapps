@@ -257,6 +257,86 @@ table.wiki_activity_settings td.submit_cell {
 	display: none;
 }
 
+#googleapps_browse_table {
+	border: 1px solid #bbb;
+	height: 300px;
+	overflow: scroll;
+	overflow-x: hidden;
+	width: 600px;
+}
+
+#googleapps_browse_table table {
+	width: 100%;
+}
+
+#googleapps_browse_table table td {
+	padding: 4px;
+	border-right: 1px solid #aaa;
+}
+
+#googleapps_browse_table table th {
+	text-align: center;
+	border-top: 0;
+	border-left: 0;
+	border-right: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
+	color: #666;
+	font-weight: bold;
+}
+
+#googleapps_browse_table table tr:nth-child(odd) {
+	background: #ddd;
+}
+
+td.doc_select {
+	width: 30px;
+}
+
+td.doc_name {
+	width: 270px;
+}
+
+td.doc_collaborators {
+	width: 150px;
+}
+
+td.doc_updated {
+	width: 150px;
+}
+
+a.gapps_tooltip {
+	padding-left: 5px;
+	font-size: 11px;
+	z-index: 10;
+}
+
+a.gapps_tooltip:hover {
+	position:relative;
+	z-index:100;
+	text-decoration: none;
+	cursor: pointer;
+}
+			
+a.gapps_tooltip span{
+	display:none;
+}
+
+a.gapps_tooltip:hover span {
+	display: block;
+	position: absolute;
+	float: left;
+	white-space: nowrap;
+	top: -2.2em;
+	left: .5em;
+	background: #eeeeee;
+	padding: 4px;
+	border: 1px solid #444;
+	color: #333;
+	padding: 1px 5px;
+	z-index: 10;
+	text-decoration: none;			
+}
+
 /* SUPER CUSTOM DIALOG */
 
 #googleappsdialog  {
@@ -273,46 +353,3 @@ p.googleappsdialog_message {
 	font-weight: bold;
 	color: #333333;
 }
-
-/* TABLESORTER */
-table.tablesorter {
-	font-size: 12px;
-	background-color: #FFF;
-	border: 1px solid #000;
-}
-table.tablesorter th {
-	text-align: left;
-	padding: 5px;
-	background-color: #6E6E6E;
-	border-bottom: 1px solid #000;
-}
-table.tablesorter td {
-	color: #000;
-	padding: 5px;
-}
-table.tablesorter .even {
-	background-color: #3D3D3D;
-}
-table.tablesorter .odd {
-	background-color: #6E6E6E;
-}
-table.tablesorter .header {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>bg.png);
-	background-repeat: no-repeat;
-	border-left: 1px solid #FFF;
-	border-right: 1px solid #000;
-	border-top: 1px solid #FFF;
-	padding-left: 30px;
-	padding-top: 8px;
-	height: auto;
-}
-table.tablesorter .headerSortUp {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>asc.png);
-	background-repeat: no-repeat;
-}
-table.tablesorter .headerSortDown {
-	background-image: url(<?php echo elgg_get_site_url() . "mod/googleapps/graphics/"; ?>desc.png);
-	background-repeat: no-repeat;
-}
-
-

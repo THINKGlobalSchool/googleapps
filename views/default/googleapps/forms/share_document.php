@@ -56,6 +56,8 @@ $match_input = elgg_view('input/pulldown', array(	'internalname' => 'match_permi
 													'options_values' =>	array(	0 => 'No',
 																				1 => 'Yes')		
 													));
+													
+$match_tooltip = "<a class='gapps_tooltip' href='#'>" . elgg_echo('googleapps:label:tooltipname') . "<span>" . elgg_echo('googleapps:tooltip:match') . "</span></a>";
 
 $submit_input = elgg_view('input/submit', array('internalname' => 'submit', 'value' => elgg_echo('save')));	
 
@@ -86,6 +88,7 @@ $form_body = <<<EOT
 		<div>
 			<label>$match_label</label>
 			$match_input
+			$match_tooltip
 		</div><br />
 		<div>
 			<label id='access_label'>$access_label</label>
