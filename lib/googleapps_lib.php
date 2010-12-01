@@ -75,13 +75,14 @@
 			$content = elgg_view('googleapps/noresults');
 		}
 			
-		$header = "<div id='google_docs_header'>" . elgg_view('page_elements/content_header', array(
+		$header = elgg_view('page_elements/content_header', array(
 			'context' => $header_context,
 			'type' => 'shared_doc',
 			'all_link' => elgg_get_site_url() . "pg/googleapps/docs",
 			'mine_link' => elgg_get_site_url() . "pg/googleapps/docs/" . get_loggedin_user()->username,
-			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends"
-		)) . "</div>";
+			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends",
+			'new_link' => elgg_get_site_url() . "pg/googleapps/docs/share"
+		));
 		
 		
 		$content_info['content'] = $header . $content;
@@ -97,13 +98,14 @@
 		elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
 		elgg_push_breadcrumb(elgg_echo('friends'));
 		
-		$content = "<div id='google_docs_header'>" . elgg_view('page_elements/content_header', array(
+		$content = elgg_view('page_elements/content_header', array(
 			'context' => 'friends',
 			'type' => 'shared_doc',
 			'all_link' => elgg_get_site_url() . "pg/googleapps/docs",
 			'mine_link' => elgg_get_site_url() . "pg/googleapps/docs/" . get_loggedin_user()->username,
-			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends"
-		)) . "</div>";
+			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends",
+			'new_link' => elgg_get_site_url() . "pg/googleapps/docs/share"
+		));
 
 		if (!$friends = get_user_friends($user_guid, ELGG_ENTITIES_ANY_VALUE, 0)) {
 			$content .= elgg_echo('friends:none:you');

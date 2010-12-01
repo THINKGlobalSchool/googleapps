@@ -15,6 +15,7 @@ $english = array(
     	'item:object:shared_doc' => 'Google Shared Document',
 		'item:user:googleapps' => 'googleapps users',
 		'shared_doc' => 'Google Docs',
+		'shared_doc:new' => 'Share New Google Doc',
 		
 		// Menu/Submenu's
 		'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -68,7 +69,6 @@ $english = array(
 		
 		// Success messages
 		'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
-		'googleapps:success:shared' => '<h2>Success!</h2><p class="googleappsdialog_message">Document shared</p>',
 		'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 		'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 		

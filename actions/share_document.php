@@ -77,7 +77,7 @@ if (!check_document_permission($collaborators, $access_level) ) {
 	exit;
 } else {
 	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid); // Share and public document activity
-	echo elgg_echo("googleapps:success:shared");
+	echo elgg_view('googleapps/success');
 	exit;
  }
 ?>
