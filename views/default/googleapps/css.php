@@ -325,7 +325,6 @@ a.gapps_tooltip:hover span {
 	display: block;
 	position: absolute;
 	float: left;
-	white-space: nowrap;
 	top: -2.2em;
 	left: .5em;
 	background: #eeeeee;
@@ -334,7 +333,9 @@ a.gapps_tooltip:hover span {
 	color: #333;
 	padding: 1px 5px;
 	z-index: 10;
-	text-decoration: none;			
+	text-decoration: none;	
+	height: auto;
+	width: 200px;		
 }
 
 /* SUPER CUSTOM DIALOG */
