@@ -8,7 +8,8 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$forward_url = elgg_get_site_url() . 'pg/googleapps/docs/' . get_loggedin_user()->username;
+$owner = get_entity($vars['container_guid']);
+$forward_url = elgg_get_site_url() . 'pg/googleapps/docs/' . $owner->username;
 
 ?>
 

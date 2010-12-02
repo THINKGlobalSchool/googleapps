@@ -57,6 +57,7 @@
 				elgg_push_breadcrumb(elgg_echo('groups'), elgg_get_site_url() . 'pg/googleapps/docs');
 				elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
 				elgg_push_breadcrumb(elgg_echo('googleapps:label:groupdocs'));
+				$container_guid = "?container_guid=" .$user->getGUID();
 			} else {
 				elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'pg/googleapps/docs');
 				elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'pg/googleapps/docs/' . $user->username);
@@ -81,7 +82,7 @@
 			'all_link' => elgg_get_site_url() . "pg/googleapps/docs",
 			'mine_link' => elgg_get_site_url() . "pg/googleapps/docs/" . get_loggedin_user()->username,
 			'friend_link' => elgg_get_site_url() . "pg/googleapps/docs/friends",
-			'new_link' => elgg_get_site_url() . "pg/googleapps/docs/share"
+			'new_link' => elgg_get_site_url() . "pg/googleapps/docs/share/" . $container_guid,
 		));
 		
 		

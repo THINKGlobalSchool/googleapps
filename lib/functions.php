@@ -891,12 +891,6 @@
 			$shared_doc->href			= $document['href'];
 			$shared_doc->container_guid	= $container_guid;
 		
-			// If access id was match, set a flag. After saving the
-			// access id will have changed due to hooking into the create event
-			if ($access_id == GOOGLEAPPS_ACCESS_MATCH) {
-				$access_match = true;
-			}
-
             if (!$shared_doc->save()) {
                     register_error(elgg_echo('googleapps:error:share_doc'));
                     exit;

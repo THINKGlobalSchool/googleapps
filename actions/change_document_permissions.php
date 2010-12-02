@@ -50,7 +50,7 @@ switch (get_input('answer')) {
         share_document($document, $description, $tags, $access_id, $container_guid);
     break;
 }
-     die (elgg_view('googleapps/success'));
+     die (elgg_view('googleapps/success', array('container_guid' => $container_guid)));
      exit;
 
 ?>
