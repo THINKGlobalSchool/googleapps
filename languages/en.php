@@ -92,7 +92,7 @@ $english = array(
 		'googleapps:label:tooltipname' => 'What is this?',
 		
 		// Tooltips
-		'googleapps:tooltip:match' => 'Selecting \'Match Permissions\' will share the Google Document on Spot with only those user\'s who you have given view permissions on the document itself.',
+		'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',
 		
 		// Tabs
 		'googleapps:tab:share_url' => 'Enter URL',
