@@ -56,24 +56,30 @@ $url_input = elgg_view("input/text", array('internalname' => 'document_url', 'va
 echo <<<EOT
 	<div class="elgg_horizontal_tabbed_nav margin_top">
 		<ul>
-			<li id='share_url' class='selected edt_tab_nav'>
-				<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_url')">$share_url_label</a>
-			</li>
 			<li id='share_browse' class='edt_tab_nav'>
 				<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_browse')">$share_browse_label</a>
 			</li>
+			<li id='share_url' class='edt_tab_nav'>
+				<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_url')">$share_url_label</a>
+			</li>
 		</ul>
 	</div>
-	<div id='share_url' class='tab_content'>
+	<div id='share_browse' class='tab_content'>
+		$docs_list
+		<br />
+	</div>
+	<div id='share_url' class='tab_content hidden'>
 		<br />
 	        $url_input
 		<br /><br />
 	</div>
-	<div id='share_browse' class='tab_content hidden'>
-		$docs_list
-		<br />
-	</div>
 	<script type='text/javascript'>
+		$(document).ready(function() {
+			$("div#share__browse").show();
+			$("li#share_browse").addClass('selected');
+
+		});
+		
 		function googleShareFormSwitchTab(tab_id)
 		{
 			var nav_name = "li#" + tab_id;

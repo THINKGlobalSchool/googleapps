@@ -230,9 +230,11 @@ table.wiki_activity_settings td.submit_cell {
 #googleapps #google_docs_loading {
 	border: 1px solid #666;
 	background: #fff;
-	padding: 15px;
-	margin: 15px;
-	width: 100px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	width: 100%;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);

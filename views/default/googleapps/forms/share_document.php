@@ -105,13 +105,7 @@ EOT;
 
 $script = <<<EOT
 	<script type="text/javascript">
-	$(document).ready(function() {
-		$("div#share_url").show();
-		$("li#share_url").addClass('selected');
 		
-	});
-	
-	
 	$('#match_permissions').change(function() {
 		if ($(this).val() == 0) {
 			$('#access_id').removeAttr('disabled');
