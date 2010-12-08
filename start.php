@@ -273,7 +273,7 @@ function googleapps_page_handler($page) {
 	);
 	$body = elgg_view_layout($content_info['layout'], $params);
 
-	echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'page_shells/admin' : 'page_shells/default');
+	echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'admin' : 'default');
 }
 
 
