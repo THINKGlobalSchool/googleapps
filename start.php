@@ -62,7 +62,7 @@ function googleapps_init() {
 	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
 	
 	// Include oauth update scripts
-	elgg_extend_view('metatags', 'googleapps/oauth_scripts');
+	elgg_extend_view('html_head/extend', 'googleapps/oauth_scripts');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css','googleapps/css');
