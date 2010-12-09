@@ -8,7 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-gatekeeper();
 reset_googlesites();
 
 system_message(elgg_echo('googleapps:success:sites_reset'));

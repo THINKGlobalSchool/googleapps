@@ -139,7 +139,7 @@ function googleapps_init() {
 	elgg_register_action('googleapps/save_user_sync_settings', $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
 	elgg_register_action('googleapps/share_doc', $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
 	elgg_register_action('googleapps/change_doc_permissions', $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
-	elgg_register_action('googleapps/sites_reset', $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
+	elgg_register_action('googleapps/sites_reset', $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php', 'admin');
 	elgg_register_action('googleapps/delete_shared_document', $CONFIG->pluginspath . 'googleapps/actions/delete_shared_document.php');
 }
 

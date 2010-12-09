@@ -8,8 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-gatekeeper();
-
 global $SESSION;
 
 $googleapps_controlled_profile = strip_tags(get_input('googleapps_controlled_profile'));

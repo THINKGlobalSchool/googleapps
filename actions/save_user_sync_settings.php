@@ -8,8 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-gatekeeper();
-
 global $SESSION;
 $user = $_SESSION['user'];
 
