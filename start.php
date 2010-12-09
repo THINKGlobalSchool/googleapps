@@ -129,18 +129,18 @@ function googleapps_init() {
 	add_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 	
 	// Register actions
-	register_action('googleapps/oauth_update', true, $CONFIG->pluginspath . 'googleapps/actions/oauth_update.php');
-	register_action('googleapps/login', true, $CONFIG->pluginspath . 'googleapps/actions/login.php');
-	register_action('googleapps/connect', true, $CONFIG->pluginspath . 'googleapps/actions/connect.php');
-	register_action('googleapps/disconnect', true, $CONFIG->pluginspath . 'googleapps/actions/disconnect.php');
-	register_action('googleapps/return', true, $CONFIG->pluginspath . 'googleapps/actions/return.php');
-	register_action('googleapps/return_with_connect', true, $CONFIG->pluginspath . 'googleapps/actions/return_with_connect.php');
-	register_action('googleapps/save_wiki_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_wiki_settings.php');
-	register_action('googleapps/save_user_sync_settings', false, $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
-	register_action('googleapps/share_doc', false, $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
-	register_action('googleapps/change_doc_permissions', false, $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
-	register_action('googleapps/sites_reset',false, $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
-	register_action('googleapps/delete_shared_document', false, $CONFIG->pluginspath . 'googleapps/actions/delete_shared_document.php');
+	elgg_register_action('googleapps/oauth_update', $CONFIG->pluginspath . 'googleapps/actions/oauth_update.php', 'public');
+	elgg_register_action('googleapps/login', $CONFIG->pluginspath . 'googleapps/actions/login.php', 'public');
+	elgg_register_action('googleapps/connect', $CONFIG->pluginspath . 'googleapps/actions/connect.php', 'public');
+	elgg_register_action('googleapps/disconnect', $CONFIG->pluginspath . 'googleapps/actions/disconnect.php', 'public');
+	elgg_register_action('googleapps/return', $CONFIG->pluginspath . 'googleapps/actions/return.php', 'public');
+	elgg_register_action('googleapps/return_with_connect', $CONFIG->pluginspath . 'googleapps/actions/return_with_connect.php', 'public');
+	elgg_register_action('googleapps/save_wiki_settings', $CONFIG->pluginspath . 'googleapps/actions/save_wiki_settings.php');
+	elgg_register_action('googleapps/save_user_sync_settings', $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
+	elgg_register_action('googleapps/share_doc', $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
+	elgg_register_action('googleapps/change_doc_permissions', $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
+	elgg_register_action('googleapps/sites_reset', $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php');
+	elgg_register_action('googleapps/delete_shared_document', $CONFIG->pluginspath . 'googleapps/actions/delete_shared_document.php');
 }
 
 function googleapps_pagesetup() {
