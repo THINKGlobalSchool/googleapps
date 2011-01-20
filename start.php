@@ -56,7 +56,7 @@ function googleapps_init() {
 
 	// Get google apps domain
 	$domain = get_plugin_setting('googleapps_domain', 'googleapps');
-	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site";
+	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
 
 	// Extend login view google login button
 	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
