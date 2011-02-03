@@ -16,7 +16,7 @@ require_once (dirname(dirname(__FILE__)) . '/lib/OAuth.php');
 require_once (dirname(dirname(__FILE__)) . '/lib/client.inc');
 
 //print_r($GLOBALS);
-$user = get_loggedin_user();
+$user = $_SESSION['user'];
 
 $CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
 $CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
@@ -118,6 +118,9 @@ if (!$google->is_authorized()) {
 			$user->googleapps_controlled_profile = 'yes';
 			
 			if ($user->save()) {
+				//automatically validate user
+				elgg_set_user_validation_status($user->guid,true);
+
 				$new_account = true;
 				$do_login = true;
 				
