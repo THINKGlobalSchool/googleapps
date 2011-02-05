@@ -281,6 +281,9 @@ function googleapps_page_handler($page) {
  * googleapps login event handler, triggered on login
  */ 
 function googleapps_login() {
+	//ignore if this is an api call
+	if (elgg_get_context()=='api') return;
+	
 	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
 	$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
 	$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleapps');
