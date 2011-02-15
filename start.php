@@ -109,8 +109,10 @@ function googleapps_init() {
 	register_entity_url_handler('googleapps_shared_doc_url_handler','object', 'shared_doc');
 	
 	// add group profile and tool entries
-	elgg_extend_view('groups/tool_latest', 'googleapps/group_shared_documents');
-	add_group_tool_option('shared_doc', elgg_echo('googleapps:label:enableshareddoc'), true);
+	if (get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
+		elgg_extend_view('groups/tool_latest', 'googleapps/group_shared_documents');
+		add_group_tool_option('shared_doc', elgg_echo('googleapps:label:enableshareddoc'), true);
+	}
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = get_loggedin_user();
