@@ -90,6 +90,9 @@ function googleapps_init() {
 	
 	elgg_register_plugin_hook_handler('entity:icon:url','user','googleapps_icon_url');
 	
+	// Change heading for shared docs
+	elgg_register_plugin_hook_handler('ubertags:subtype:heading', 'shared_doc', 'googleapps_subtype_heading_handler');
+	
 	// Register handler to set up an icon for google docs on the timeline
 	elgg_register_plugin_hook_handler('ubertags:timeline:icon', 'shared_doc', 'googleapps_timeline_doc_icon_handler');
 	
@@ -362,6 +365,13 @@ function googleapps_timeline_doc_icon_handler($hook, $type, $returnvalue, $param
 		return elgg_get_site_url() . "mod/googleapps/graphics/shared_doc.gif";
 	}
 	return false;
+}
+
+/* Handler to change the subtype heading for shared docs */
+function googleapps_subtype_heading_handler($hook, $type, $returnvalue, $params) {
+	if ($type == 'shared_doc') {
+		return 'Shared Docs';
+	}
 }
 
 /**
