@@ -90,6 +90,9 @@ function googleapps_init() {
 	
 	elgg_register_plugin_hook_handler('entity:icon:url','user','googleapps_icon_url');
 	
+	// Register handler to set up an icon for google docs on the timeline
+	elgg_register_plugin_hook_handler('ubertags:timeline:icon', 'shared_doc', 'googleapps_timeline_doc_icon_handler');
+	
 	// Plugin hook for write access
 	elgg_register_plugin_hook_handler('access:collections:write', 'all', 'googleapps_shared_doc_write_acl_plugin_hook');
 	
@@ -351,6 +354,14 @@ function googleapps_icon_url($hook_name, $entity_type, $return_value, $parameter
 			return $entity->googleapps_icon_url_normal;
 		}
 	}
+}
+
+/* Handler to register a timeline icon for shared docs */
+function googleapps_timeline_doc_icon_handler($hook, $type, $returnvalue, $params) {
+	if ($type == 'shared_doc') {
+		return elgg_get_site_url() . "mod/googleapps/graphics/shared_doc.gif";
+	}
+	return false;
 }
 
 /**
