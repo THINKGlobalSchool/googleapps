@@ -27,15 +27,15 @@ function googleapps_init() {
 	require_once 'lib/googleapps_lib.php';
 	
 	// Need to use SSL for google urls
-	$CONFIG->sslroot = str_replace('http://','https://', $CONFIG->wwwroot);
+	$CONFIG->sslroot = str_replace('http://','https://', elgg_get_site_url());
 
 	// Set up some urls
-	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/login', FALSE);
-	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/connect', FALSE);
-	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/disconnect', FALSE);
-	$oauth_update_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/oauth_update', FALSE);
-	$share_doc_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/share_doc', FALSE);
-	$change_doc_permissions_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/change_doc_permissions', FALSE);
+	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
+	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/connect', FALSE);
+	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/disconnect', FALSE);
+	$oauth_update_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/oauth_update', FALSE);
+	$share_doc_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/share', FALSE);
+	$change_doc_permissions_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/update_permissions', FALSE);
 
 	// Set to globals
 	$GLOBALS['googleapps_url'] = $googleapps_url;
@@ -65,7 +65,7 @@ function googleapps_init() {
 	elgg_extend_view('html_head/extend', 'googleapps/oauth_scripts');
 
 	// Extend system CSS with our own styles
-	elgg_extend_view('css/screen','googleapps/css');
+	elgg_extend_view('css/elgg','googleapps/css');
 		
 	// Include tablesorter
 	elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
@@ -109,10 +109,10 @@ function googleapps_init() {
 	elgg_register_plugin_hook_handler('profile_menu', 'profile', 'googleapps_docs_profile_menu');
 
 	// Setup main page handler
-	register_page_handler('googleapps','googleapps_page_handler');
+	elgg_register_page_handler('googleapps','googleapps_page_handler');
 	
 	// Setup url handler for google shared docs
-	register_entity_url_handler('googleapps_shared_doc_url_handler','object', 'shared_doc');
+	elgg_register_entity_url_handler('object', 'shared_doc', 'googleapps_shared_doc_url_handler');
 	
 	// add group profile and tool entries
 	if (get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
@@ -121,15 +121,15 @@ function googleapps_init() {
 	}
 
 	// Add menu items if user is synced and if sites/docs are enabled
-	$user = get_loggedin_user();
+	$user = elgg_get_logged_in_user_entity();
 	if (!empty($user) && $user->google) {
 		if ($oauth_sync_sites != 'no') {
-			// Sync wikis enabled
-			add_menu(elgg_echo('googleapps:menu:wikis'), $CONFIG->wwwroot . 'pg/googleapps/wikis/' . $user->username);	
+			$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/' . $user->username);
+			elgg_register_menu_item('site', $item);	
 		}
 		if ($oauth_sync_docs != 'no') {
-			// Share docs enabled
-			add_menu(elgg_echo('googleapps:label:google_docs'), $CONFIG->wwwroot . 'pg/googleapps/docs/');
+			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/' . $user->username);
+			elgg_register_menu_item('site', $item);
 		}
 	}
 	
@@ -137,54 +137,112 @@ function googleapps_init() {
 	add_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 	
 	// Register actions
-	elgg_register_action('googleapps/oauth_update', $CONFIG->pluginspath . 'googleapps/actions/oauth_update.php', 'public');
-	elgg_register_action('googleapps/login', $CONFIG->pluginspath . 'googleapps/actions/login.php', 'public');
-	elgg_register_action('googleapps/connect', $CONFIG->pluginspath . 'googleapps/actions/connect.php', 'public');
-	elgg_register_action('googleapps/disconnect', $CONFIG->pluginspath . 'googleapps/actions/disconnect.php', 'public');
-	elgg_register_action('googleapps/return', $CONFIG->pluginspath . 'googleapps/actions/return.php', 'public');
-	elgg_register_action('googleapps/return_with_connect', $CONFIG->pluginspath . 'googleapps/actions/return_with_connect.php', 'public');
-	elgg_register_action('googleapps/save_wiki_settings', $CONFIG->pluginspath . 'googleapps/actions/save_wiki_settings.php');
-	elgg_register_action('googleapps/save_user_sync_settings', $CONFIG->pluginspath . 'googleapps/actions/save_user_sync_settings.php');
-	elgg_register_action('googleapps/share_doc', $CONFIG->pluginspath . 'googleapps/actions/share_document.php');
-	elgg_register_action('googleapps/change_doc_permissions', $CONFIG->pluginspath . 'googleapps/actions/change_document_permissions.php');
-	elgg_register_action('googleapps/sites_reset', $CONFIG->pluginspath . 'googleapps/actions/sites_reset.php', 'admin');
-	elgg_register_action('googleapps/delete_shared_document', $CONFIG->pluginspath . 'googleapps/actions/delete_shared_document.php');
+	
+	// Login Related (auth)
+	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/auth";
+	elgg_register_action('google/auth/oauth_update', "$action_base/oauth_update.php", 'public');
+	elgg_register_action('google/auth/login', "$action_base/login.php", 'public');
+	elgg_register_action('google/auth/connect', "$action_base/connect.php", 'public');
+	elgg_register_action('google/auth/disconnect', "$action_base/disconnect.php", 'public');
+	elgg_register_action('google/auth/return', "$action_base/return.php", 'public');
+	elgg_register_action('google/auth/return_with_connect', "$action_base/return_with_connect.php", 'public');
+	elgg_register_action('google/auth/save_user_sync_settings', "$action_base/save_user_sync_settings.php");
+
+	// Wiki related (wiki)
+	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/wikis";
+	elgg_register_action('google/wikis/save_wiki_settings', "$action_base/save_wiki_settings.php");
+	elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
+
+	// Shared Doc related (docs)
+	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/docs";
+	elgg_register_action('google/docs/share', "$action_base/share.php");
+	elgg_register_action('google/docs/update_permissions', "$action_base/update_permissions.php");	
+	elgg_register_action('google/docs/delete', "$action_base/delete.php");
 }
 
 function googleapps_pagesetup() {
-	global $CONFIG;
+	
+	$menuitems = array();
 	
 	// Settings items
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wiki_settings'), 
-								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/wikiactivity"), 'settings', 'z');
-
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:google_sync_settings'), 
-								'href' => $CONFIG->wwwroot . "pg/googleapps/settings/account"), 'settings', 'z');	
-
-	// Wikis
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wikisyour'), 
-								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis/' . get_loggedin_user()->username), 'wikis');
-
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:wikiseveryone'), 
-								'href' => $CONFIG->wwwroot . 'pg/googleapps/wikis'), 'wikis');
-														
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:create_new_wiki'), 
-								'href' => $GLOBALS['link_to_add_site']), 'wikis');
+	$menuitems[] = array(
+		'name' => 'wiki_settings',
+		'text' => elgg_echo('googleapps:menu:wiki_settings'),
+		'href' =>  'googleapps/settings/wikiactivity',
+		'contexts' => array('settings'),
+		'priority' => 99999,
+	);
 	
-	// Docs 
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:yourshareddocs'), 
-								'href' => elgg_get_site_url() . 'pg/googleapps/docs/' . get_loggedin_user()->username), 'docs');
-								
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:friendsshareddocs'), 
-								'href' => elgg_get_site_url() . 'pg/googleapps/docs/friends' ), 'docs');
+	
+	$menuitems[] = array(
+		'name' => 'sync_settings',
+		'text' => elgg_echo('googleapps:menu:google_sync_settings'),
+		'href' =>  'googleapps/settings/account',
+		'contexts' => array('settings'),
+		'priority' => 99999,
+	);
+	
+	
+	// Wikis
+	$menuitems[] = array(
+		'name' => 'wikis_your',
+		'text' => elgg_echo('googleapps:menu:wikisyour'),
+		'href' =>  'googleapps/wikis/' . elgg_get_logged_in_user_entity()->username,
+		'contexts' => array('wikis'),
+		'priority' => 99997,
+	);
+	
+	$menuitems[] = array(
+		'name' => 'wikis_everyone',
+		'text' => elgg_echo('googleapps:menu:wikiseveryone'),
+		'href' =>  'googleapps/wikis',
+		'contexts' => array('wikis'),
+		'priority' => 99998,
+	);
+	
+	$menuitems[] = array(
+		'name' => 'create_wiki',
+		'text' => elgg_echo('googleapps:menu:create_new_wiki'),
+		'href' =>  $GLOBALS['link_to_add_site'],
+		'contexts' => array('wikis'),
+		'priority' => 99999,
+	);
+	
+	// Docs
+	$menuitems[] = array(
+		'name' => 'docs_your',
+		'text' => elgg_echo('googleapps:menu:yourshareddocs'),
+		'href' =>  'googleapps/docs/' . elgg_get_logged_in_user_entity()->username,
+		'contexts' => array('docs'),
+		'priority' => 99997,
+	);
+	
+	$menuitems[] = array(
+		'name' => 'docs_friends',
+		'text' => elgg_echo('googleapps:menu:friendsshareddocs'),
+		'href' =>  'googleapps/docs/friends',
+		'contexts' => array('docs'),
+		'priority' => 99998,
+	);
+	
+	$menuitems[] = array(
+		'name' => 'docs_all',
+		'text' => elgg_echo('googleapps:menu:allshareddocs'),
+		'href' =>  'googleapps/docs',
+		'contexts' => array('docs'),
+		'priority' => 99998,
+	);
+	
 
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:menu:allshareddocs'), 
-								'href' => elgg_get_site_url() . 'pg/googleapps/docs/' ), 'docs');
-
-	// Admin
-	elgg_add_submenu_item(array('text' => elgg_echo('googleapps:admin:debug_title'),
-								'href'=> $CONFIG->url . "pg/googleapps/settings/debug",
-								'id'=>'googlesitesdebug'),'admin', 'zzz'); // zzz puts the debug at the bottom (alphabetically)
+	// Register menus
+	foreach($menuitems as $menuitem) {
+		elgg_register_menu_item('page', ElggMenuItem::factory($menuitem));
+	}
+	
+	// Admin wiki debug
+	if (elgg_in_context('admin')) {
+		elgg_register_admin_menu_item('administer', 'debug_sites', 'utilities');
+	}
 }	
 
 /**
@@ -204,17 +262,11 @@ function googleapps_page_handler($page) {
 				// Google apps settings pages
 				switch ($page[1]) {
 					case 'wikiactivity':
-						$content_info = googleapps_get_page_content_settings_wikiactivity();
-					break;
-					case 'debug':
-						admin_gatekeeper();
-						elgg_admin_add_plugin_settings_sidemenu();
-						set_context('admin');
-						$content_info = googleapps_get_page_content_settings_debug($page[2]);
+						$params = googleapps_get_page_content_settings_wikiactivity();
 					break;
 					default:
 					case 'account':
-						$content_info = googleapps_get_page_content_settings_account();
+						$params = googleapps_get_page_content_settings_account();
 					break;
 				}
 			break;
@@ -229,13 +281,13 @@ function googleapps_page_handler($page) {
 						case 'share':
 							// Page owner fun
 							if ($container = (int) get_input('container_guid')) {
-								set_page_owner($container);
+								elgg_set_page_owner_guid($container);
 							}
 							$page_owner = page_owner_entity();
 							if (!$page_owner) {
 								$page_owner_guid = get_loggedin_userid();
 								if ($page_owner_guid)
-									set_page_owner($page_owner_guid);
+									elgg_set_page_owner_guid($page_owner_guid);
 							}
 							$content_info = googleapps_get_page_content_docs_sharebox();
 						break;
@@ -251,9 +303,9 @@ function googleapps_page_handler($page) {
 								set_input('username', $owner_name);
 
 								// grab the page owner
-								$owner = elgg_get_page_owner();
+								$owner = elgg_get_page_owner_entity();
 							} else {
-								set_page_owner(get_loggedin_userid());
+								elgg_set_page_owner_guid(get_loggedin_userid());
 							}
 							$content_info = googleapps_get_page_content_docs($owner->getGUID());
 							
@@ -273,15 +325,15 @@ function googleapps_page_handler($page) {
 		$content_info = googleapps_get_page_content_wikis($page[1]);
 	}
 	
-	$sidebar = isset($content_info['sidebar']) ? $content_info['sidebar'] : '';
 
-	$params = array(
-		'content' => elgg_view('navigation/breadcrumbs') . $content_info['content'],
-		'sidebar' => $sidebar,
-	);
-	$body = elgg_view_layout($content_info['layout'], $params);
+	//$body = elgg_view_layout($content_info['layout'], $params);
 
-	echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'admin' : 'default');
+	//echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'admin' : 'default');
+	
+	
+	$body = elgg_view_layout($params['layout'], $params);
+
+	echo elgg_view_page($params['title'], $body);
 }
 
 
@@ -440,7 +492,7 @@ function googleapps_docs_profile_menu($hook, $entity_type, $return_value, $param
 
 	$return_value[] = array(
 		'text' => elgg_echo('googleapps:label:google_docs'),
-		'href' => "pg/googleapps/docs/{$params['owner']->username}",
+		'href' => "googleapps/docs/{$params['owner']->username}",
 	);
 
 	return $return_value;

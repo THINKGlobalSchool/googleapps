@@ -9,7 +9,7 @@
  */
 
 $owner = get_entity($vars['container_guid']);
-$forward_url = elgg_get_site_url() . 'pg/googleapps/docs/' . $owner->username;
+$forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
 
 ?>
 

@@ -70,7 +70,7 @@ $browse_content .= '<div id="googleapps">
 			</div>';
 
 // For ajax
-$form_url = elgg_get_site_url() . 'pg/googleapps/docs/list_form';
+$form_url = elgg_get_site_url() . 'googleapps/docs/list_form';
 
 // Build Form Body
 $form_body = <<<EOT

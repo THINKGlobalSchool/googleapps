@@ -36,7 +36,7 @@ $icon = elgg_view("profile/icon", array('entity' => $owner,'size' => 'tiny',));
 //delete
 if($vars['entity']->canEdit()){
 	$delete .= "<span class='delete_button'>" . elgg_view('output/confirmlink',array(
-				'href' => "action/googleapps/delete_shared_document?guid=" . $vars['entity']->guid,
+				'href' => "action/google/docs/delete?guid=" . $vars['entity']->guid,
 				'text' => elgg_echo("delete"),
 				'confirm' => elgg_echo("googleapps:label:deleteconfirm"),
 				)) . "</span>";
@@ -59,7 +59,7 @@ if($vars['entity']->canEdit()){
 $info .= "</div>";
 
 $info .= "<p class='entity_title'><a href=\"{$address}\" target=\"_blank\">{$title}</a></p>";
-$info .= "<p class='entity_subtext'>" . elgg_echo('googleapps:label:shared_by', array("<a href=\"".elgg_get_site_url()."pg/googleapps/docs/{$owner->username}\">{$owner->name}</a>")) . " {$friendlytime} {$view_desc}</p>";
+$info .= "<p class='entity_subtext'>" . elgg_echo('googleapps:label:shared_by', array("<a href=\"".elgg_get_site_url()."googleapps/docs/{$owner->username}\">{$owner->name}</a>")) . " {$friendlytime} {$view_desc}</p>";
 
 $tags = elgg_view('output/tags', array('tags' => $vars['entity']->tags));
 if (!empty($tags)) {

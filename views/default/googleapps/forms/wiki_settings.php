@@ -65,7 +65,7 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 				echo elgg_view('input/form',array(
 				'body' => $body,
 				'method' => 'post',
-				'action' => $vars['url'] . 'action/googleapps/save_wiki_settings',
+				'action' => $vars['url'] . 'action/google/wikis/save_wiki_settings',
 				));
 			}
 		}

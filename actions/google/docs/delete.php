@@ -15,7 +15,7 @@ if (elgg_instanceof($document, 'object', 'shared_doc') && $document->canEdit()) 
 	$container = get_entity($document->container_guid);
 	if ($document->delete()) {
 		system_message(elgg_echo('googleapps:success:delete'));
-		forward("pg/googleapps/docs/$container->username");
+		forward("googleapps/docs/$container->username");
 	} else {
 		register_error(elgg_echo('googleapps:error:delete'));
 	}

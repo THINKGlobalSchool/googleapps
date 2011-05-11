@@ -39,7 +39,7 @@ foreach ($user_sync_settings as $setting => $v) {
 					echo elgg_view('input/form',array(
 						'body' => $body,
 						'method' => 'post',
-						'action' => elgg_get_site_url() . 'action/googleapps/save_user_sync_settings',
+						'action' => elgg_get_site_url() . 'action/google/auth/save_user_sync_settings',
 					));
 
 					echo elgg_view('googleapps/disconnect');

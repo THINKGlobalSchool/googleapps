@@ -436,19 +436,19 @@
 		foreach ($response_list as $site) {
 			$found = false;
 
-                        // search for site in elgg entities
+			// search for site in elgg entities
 			foreach ($all_site_entities as $site_entity) {
 				if ($site['site_id'] == $site_entity->site_id) {
-          $users_site_entities[]=$site_entity;
-          save_site_to_user_list($site_entity, $site, $merged);
+					$users_site_entities[]=$site_entity;
+					save_site_to_user_list($site_entity, $site, $merged);
 					$found = true;
 					break;
 				}
 			}
 
-                        // create new site entity
+            // create new site entity
 			if (!$found) {
-//                                echo "<b> CREATED SITE ENTITY </b><br />";
+				echo "<b> CREATED SITE ENTITY </b><br />";
 				$new_site = new ElggObject();
 				$new_site->owner_guid = $user->guid;
 				$new_site->site_id = $site['site_id'];
@@ -456,11 +456,11 @@
 				$new_site->subtype = "site";
 				$new_site->url = $site['url'];
 				$new_site->modified = $site['modified'];
-        $new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
+				$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
 				$new_site->site_access_id = ACCESS_PRIVATE ; // for site
 				$new_site->save();
-        $users_site_entities[]=$new_site;
-        save_site_to_user_list($new_site, $site, $merged);
+				$users_site_entities[]=$new_site;
+				save_site_to_user_list($new_site, $site, $merged);
 			}
 		}
 

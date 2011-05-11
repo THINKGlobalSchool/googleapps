@@ -10,10 +10,10 @@
 
 session_start();
 
-require_once (dirname(dirname(__FILE__)) . '/lib/Http.php');
-require_once (dirname(dirname(__FILE__)) . '/lib/Google_OpenID.php');
-require_once (dirname(dirname(__FILE__)) . '/lib/OAuth.php');
-require_once (dirname(dirname(__FILE__)) . '/lib/client.inc');
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/Http.php');
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/Google_OpenID.php');
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/OAuth.php');
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/client.inc');
 
 //print_r($GLOBALS);
 $user = $_SESSION['user'];
@@ -53,7 +53,7 @@ if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oa
 
 if (!empty($_SESSION['oauth_connect'])) {
 	unset($_SESSION['oauth_connect']);
-	forward('pg/googleapps/settings/account');
+	forward('googleapps/settings/account');
 }
 
 $google = Google_OpenID::create_from_response($_REQUEST);

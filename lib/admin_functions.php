@@ -12,13 +12,26 @@
 function list_googlesite_entities() {
 	$output = "";
 	
-	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>999));
-	$site_count = count($site_entities);
+	$options = array(
+		'type'=>'object', 
+		'subtype'=>'site', 
+		'limit'=> 0,
+		'count' => TRUE,
+ 	);
+	
+	$site_count = elgg_get_entities($options);
+	
+	$options['count'] = FALSE;
+	
+	$site_entities = elgg_get_entities($options);
+	
 	
 	$output .= "<p>Site entities found: {$site_count}</p>";
-	foreach($site_entities as $site_entity) {
-		$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
-		$output .= "<br/>";
+	if ($site_entities) {
+		foreach($site_entities as $site_entity) {
+			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
+			$output .= "<br/>";
+		}
 	}
 	
 	return $output;

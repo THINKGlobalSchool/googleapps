@@ -55,7 +55,7 @@
 		foreach ($owners as $owner) {
 
 
-			$owners_string .= '<a href="/pg/profile/' . $owner->username . '">' . $owner->name . '</a>';
+			$owners_string .= '<a href="/profile/' . $owner->username . '">' . $owner->name . '</a>';
 			if ($c + 1 < count($owners)) {
 				$owners_string .= ', ';
 			}
@@ -66,7 +66,7 @@
 			<div class="search_listing">
 				<div class="search_listing_icon">
 					<div class="icon">
-						<img border="0" src="' . $CONFIG->wwwroot . 'mod/googleapps/graphics/icon_site.jpg">
+						<img border="0" src="' . elgg_get_site_url() . 'mod/googleapps/graphics/icon_site.jpg">
 					</div>
 				</div>
 				<div>

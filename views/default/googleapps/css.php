@@ -9,11 +9,6 @@
  */
 ?>
 
-#googleapps-icon {
-	padding: 10px 10px 10px 10px;
-	display: block;
-	text-align: center;
-}
 
 .toolbarimages .user_mini_avatar {
 	width:16px;

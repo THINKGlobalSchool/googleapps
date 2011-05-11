@@ -8,9 +8,9 @@
  * @link http://www.thinkglobalschool.org
  */
 
-require_once (dirname(dirname(__FILE__)) . "/lib/Http.php");
-require_once (dirname(dirname(__FILE__)) . "/lib/OAuth.php");
-require_once (dirname(dirname(__FILE__)) . "/lib/Google_OpenID.php");
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Http.php");
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/OAuth.php");
+require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Google_OpenID.php");
 
 global $CONFIG;
 
@@ -19,7 +19,7 @@ $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {
 	register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:notauthorized')));
-	forward('pg/googleapps/settings/account');
+	forward('googleapps/settings/account');
 } else {
 	
 	if (!$user) {
@@ -34,7 +34,7 @@ if (!$google->is_authorized()) {
 	
 	if (!empty($entities) && $entities[0]->username !== $user->username) {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), sprintf(elgg_echo('googleapps:error:emailexists'), $email)));
-		forward('pg/googleapps/settings/account');
+		forward('googleapps/settings/account');
 	}
 	
 	$is_sync = $user->sync == '1';
@@ -57,15 +57,15 @@ if (!$google->is_authorized()) {
 		$user->save();
 		
 		$_SESSION['oauth_connect'] = 1;
-		$googleapps_return = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/googleapps/return', FALSE);
+		$googleapps_return = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/return', FALSE);
 		forward($googleapps_return);
 		
 	} else {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:usernotready')));
-		forward('pg/googleapps/settings/account');
+		forward('googleapps/settings/account');
 	}
 }
 
-forward('pg/googleapps/settings/account');
+forward('googleapps/settings/account');
 exit;
 ?>

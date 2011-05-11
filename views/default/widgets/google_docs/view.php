@@ -88,7 +88,7 @@
 			}
 			
 			$("#widgetcontent" + id).html('<div align=\"center\" class=\"ajax_loader\"></div>');
-			$("#widgetcontent" + id).load("/pg/view/" + id + "?shell=no&username=" + username + "&context=dashboard&callback=true");
+			$("#widgetcontent" + id).load("/view/" + id + "?shell=no&username=" + username + "&context=dashboard&callback=true");
 			
 			return true;
 			
