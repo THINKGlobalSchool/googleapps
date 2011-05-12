@@ -16,7 +16,7 @@ $document_id = $data['doc_id'];
 $container_guid = get_input('container_guid');
 
 // Make sure user can write to the container (group)
-if (!can_write_to_container(get_loggedin_userid(), $container_guid)) {
+if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
 	echo elgg_echo('googleapps:error:nopermission');
 }
 

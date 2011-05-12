@@ -39,18 +39,18 @@ function googleapps_init() {
 	$GLOBALS['oauth_update_url'] = $oauth_update_url;
 	$GLOBALS['share_doc_url'] = $share_doc_url;
 	$GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
-	$GLOBALS['oauth_update_interval'] = get_plugin_setting('oauth_update_interval', 'googleapps');
+	$GLOBALS['oauth_update_interval'] = elgg_get_plugin_setting('oauth_update_interval', 'googleapps');
 	
 	// Constants
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
 	// Get plugin settings
-	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleapps');
+	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
+	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
+	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 
 	// Get google apps domain
-	$domain = get_plugin_setting('googleapps_domain', 'googleapps');
+	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
 
 	// Extend login view google login button
@@ -79,7 +79,7 @@ function googleapps_init() {
 	elgg_register_event_handler('login', 'user', 'googleapps_login');
 	
 	// Register a handler for creating shared docs
-	register_elgg_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
+	elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
 
 	elgg_register_plugin_hook_handler('permissions_check','user','googleapps_can_edit');
 	
@@ -110,7 +110,7 @@ function googleapps_init() {
 	elgg_register_entity_url_handler('object', 'shared_doc', 'googleapps_shared_doc_url_handler');
 	
 	// add group profile and tool entries
-	if (get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
+	if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
 		elgg_extend_view('groups/tool_latest', 'googleapps/group_shared_documents');
 		add_group_tool_option('shared_doc', elgg_echo('googleapps:label:enableshareddoc'), true);
 	}
@@ -253,7 +253,7 @@ function googleapps_page_handler($page) {
 	if (isset($page[0])) {
 		switch ($page[0]) {
 			case 'settings':
-				set_context('settings');
+				elgg_set_context('settings');
 				// Google apps settings pages
 				switch ($page[1]) {
 					case 'wikiactivity':
@@ -266,21 +266,21 @@ function googleapps_page_handler($page) {
 				}
 			break;
 			case 'docs':
-				set_context('docs');
+				elgg_set_context('docs');
 				// Google Docs pages
 				if (isset($page[1]) && !empty($page[1])) {
 					switch ($page[1]) {
 						case 'friends': 
-							$content_info = googleapps_get_page_content_docs_friends(get_loggedin_userid());
+							$content_info = googleapps_get_page_content_docs_friends(elgg_get_logged_in_user_guid());
 						break;
 						case 'share':
 							// Page owner fun
 							if ($container = (int) get_input('container_guid')) {
 								elgg_set_page_owner_guid($container);
 							}
-							$page_owner = page_owner_entity();
+							$page_owner = elgg_get_page_owner_entity();
 							if (!$page_owner) {
-								$page_owner_guid = get_loggedin_userid();
+								$page_owner_guid = elgg_get_logged_in_user_guid();
 								if ($page_owner_guid)
 									elgg_set_page_owner_guid($page_owner_guid);
 							}
@@ -298,9 +298,9 @@ function googleapps_page_handler($page) {
 								set_input('username', $owner_name);
 
 								// grab the page owner
-								$owner = elgg_get_page_owner_entity();
+								$owner = elgg_get_elgg_get_page_owner_entity();
 							} else {
-								elgg_set_page_owner_guid(get_loggedin_userid());
+								elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
 							}
 							$content_info = googleapps_get_page_content_docs($owner->getGUID());
 							
@@ -311,12 +311,12 @@ function googleapps_page_handler($page) {
 				}
 			break;
 			case 'wikis':
-				set_context('wikis');
+				elgg_set_context('wikis');
 				$content_info = googleapps_get_page_content_wikis($page[1]);
 			break;
 		}
 	} else {
-		set_context('wikis');
+		elgg_set_context('wikis');
 		$content_info = googleapps_get_page_content_wikis($page[1]);
 	}
 	
@@ -337,13 +337,13 @@ function googleapps_page_handler($page) {
  */ 
 function googleapps_login() {
 	//ignore if this is an api call
-	if (elgg_get_context()=='api') return;
+	if (elgg_elgg_get_context()=='api') return;
 	
-	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleapps');
+	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
+	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
+	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 
-	$user = get_loggedin_user();
+	$user = elgg_get_logged_in_user_entity();
 	if (!empty($user) && 
 		$user->google &&
 		($oauth_sync_email != 'no' || $oauth_sync_sites != 'no' || $oauth_sync_docs != 'no')) 
@@ -358,7 +358,7 @@ function googleapps_login() {
  */
 function googleapps_doc_group_plugin_hook($hook, $entity_type, $returnvalue, $params) {
 	// get all groups if logged in
-	if (($loggedin = get_loggedin_user()) && (get_context() == 'googleapps_share_doc')) {
+	if (($loggedin = elgg_get_logged_in_user_entity()) && (elgg_get_context() == 'googleapps_share_doc')) {
 		$groups = elgg_get_entities_from_relationship(array('relationship' => 'member', 'relationship_guid' => $loggedin->getGUID(), 'inverse_relationship' => FALSE, 'limit' => 999));
 		if (is_array($groups)) {
 			$group_access = array();
@@ -377,7 +377,7 @@ function googleapps_doc_group_plugin_hook($hook, $entity_type, $returnvalue, $pa
  */
 function googleapps_can_edit($hook_name, $entity_type, $return_value, $parameters) {
 	$entity = $parameters['entity'];
-	$context = get_context();
+	$context = elgg_get_context();
 	if ($context == 'googleapps' && $entity->google == 1) {
 		// should be able to do anything with googleapps user data
 		return true;
@@ -430,14 +430,14 @@ function google_apps_shared_doc_create_event_listener($event, $object_type, $obj
 			$shared_doc_acl = create_access_collection(elgg_echo('item:object:shared_doc') . ": " . $object->title, $object->getGUID());
 			if ($shared_doc_acl) {
 				$object->shared_acl = $shared_doc_acl;
-				$context = get_context();
-				set_context('shared_doc_acl');
+				$context = elgg_get_context();
+				elgg_set_context('shared_doc_acl');
 				foreach ($object->collaborators as $collaborator) {
 					if ($user = get_user_by_email($collaborator)) {
 						$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
 					}
 				}
-				set_context($context);
+				elgg_set_context($context);
 				$object->access_id = $shared_doc_acl;
 				$object->save();
 			} else {
@@ -465,9 +465,9 @@ function google_apps_shared_doc_create_event_listener($event, $object_type, $obj
  */
 function googleapps_shared_doc_write_acl_plugin_hook($hook, $entity_type, $returnvalue, $params) {
 	// Only include the shared doc acl if in this context, used for the create event handler
-	if (get_context() == 'shared_doc_acl') {
+	if (elgg_get_context() == 'shared_doc_acl') {
 		// get all shared docs if logged in
-		if ($loggedin = get_loggedin_user()) {
+		if ($loggedin = elgg_get_logged_in_user_entity()) {
 			$shared_docs = elgg_get_entities(array('types' => 'object', 'subtypes' => 'shared_doc', 'limit' => 9999));
 			if (is_array($shared_docs)) {
 				foreach ($shared_docs as $doc) {

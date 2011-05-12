@@ -51,9 +51,9 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 							$access = 1;
 						}
 
-						//$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('internalname' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
+						//$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('name' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
 						$access_input = elgg_view('input/access', array(
-							'internalname' => 'googleapps_sites_settings['.$site_id.']',
+							'name' => 'googleapps_sites_settings['.$site_id.']',
 							'value' => $access
 						));
 						$body .= '<tr><td>'.$title.'</td><td class="access_col">'.$access_input.'</td></tr>';

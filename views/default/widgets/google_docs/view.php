@@ -8,7 +8,7 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
 $google_folder = !empty($vars['entity']->google_folder) ? $vars['entity']->google_folder : '';
 $max_entry = !empty($vars['entity']->max_entry) ? (int) $vars['entity']->max_entry : 15;

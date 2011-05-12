@@ -61,7 +61,7 @@ function googleapps_get_page_content_docs($user_guid = null) {
 		'context' => $header_context,
 		'type' => 'shared_doc',
 		'all_link' => elgg_get_site_url() . "googleapps/docs",
-		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . get_loggedin_user()->username,
+		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . elgg_get_logged_in_user_entity()->username,
 		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
 		'new_link' => elgg_get_site_url() . "googleapps/docs/share/" . $container_guid,
 	));
@@ -83,7 +83,7 @@ function googleapps_get_page_content_docs_friends($user_guid) {
 		'context' => 'friends',
 		'type' => 'shared_doc',
 		'all_link' => elgg_get_site_url() . "googleapps/docs",
-		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . get_loggedin_user()->username,
+		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . elgg_get_logged_in_user_entity()->username,
 		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
 		'new_link' => elgg_get_site_url() . "googleapps/docs/share"
 	));
@@ -149,8 +149,8 @@ function googleapps_get_page_content_wikis($username = null) {
 }
 
 function googleapps_update_site_entity_access($entity_id, $access) {
-    $context = get_context();
-    set_context('googleapps_cron_job');
+    $context = elgg_get_context();
+    elgg_set_context('googleapps_cron_job');
 
     $user_site_entities = unserialize($_SESSION['user_site_entities']);
 
@@ -160,7 +160,7 @@ function googleapps_update_site_entity_access($entity_id, $access) {
             $entity->save();
         }
     }
-    set_context($context); 
+    elgg_set_context($context); 
 }
 
 function googleapps_santize_google_doc_input($string) {
@@ -285,8 +285,8 @@ function calc_access($access) {
  * @return object
  */
 function get_client($user) {
-	$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
-	$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
+	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
 
 	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 	$client->access_token = $user->access_token;
@@ -302,12 +302,12 @@ function get_client($user) {
  */
 function googleapps_cron_fetch_data() {
 
-       	$context = get_context();
-				set_context('googleapps_cron_job');
+       	$context = elgg_get_context();
+				elgg_set_context('googleapps_cron_job');
 
 
            /* need to sync sites ? */
-           $oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
+           $oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
            if ($oauth_sync_sites == 'no') return;
 
            set_time_limit(0);
@@ -473,7 +473,7 @@ function googleapps_cron_fetch_data() {
                echo "\n".($b_time-$a_time)." sec";
                flush();
 
-               set_context($context);
+               elgg_set_context($context);
 }
 
 /**
@@ -483,8 +483,8 @@ function googleapps_cron_fetch_data() {
  * @return object|false
  */
 function authorized_client($ajax = false) {
-	$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
-	$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
+	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
 
 	$user = $_SESSION['user'];
 	if (!empty($user->access_token)) {
@@ -555,9 +555,9 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 		$all = false;
 	}
 
-	$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = get_plugin_setting('oauth_sync_docs', 'googleapps');
+	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
+	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
+	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 
 	$count = 0;
 	$is_new_docs = false;
@@ -608,7 +608,7 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
  */
 function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 	// 0. Check settings
-	if (get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
+	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
 		return false;
 	}
 
@@ -802,7 +802,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 		        <gAcl:role value='reader'/> ";
 
 		if ($access_type == "domain") {
-		   $domain = get_plugin_setting('googleapps_domain', 'googleapps');
+		   $domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 		   $data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
 		} else {
 		   $data .= "<gAcl:scope type=\"default\"/>";
@@ -1143,7 +1143,7 @@ function share_document($document, $description, $tags, $access_id, $container_g
 	}
 
 	// Add to river
-	add_to_river('river/object/shared_doc/create', 'create', get_loggedin_userid(), $shared_doc->guid);
+	add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
 	return true;
 }
 

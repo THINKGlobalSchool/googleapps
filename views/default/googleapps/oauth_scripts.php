@@ -12,8 +12,8 @@ $interval = $GLOBALS['oauth_update_interval'] ? $GLOBALS['oauth_update_interval'
 $url = $GLOBALS['oauth_update_url'];
 $user = $_SESSION['user'];
 
-$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
-$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
+$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
+$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
 
 if ($url && $user && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no' || $oauth_sync_docs != 'no')) {
 	

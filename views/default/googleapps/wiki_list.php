@@ -9,7 +9,7 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$user = get_loggedin_user();
+$user = elgg_get_logged_in_user_entity();
 $sites = $vars['wikis'];
 
 $site_list = array();

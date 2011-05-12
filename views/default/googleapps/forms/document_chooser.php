@@ -10,7 +10,7 @@
  * 
  */
 
-$user = get_loggedin_user();
+$user = elgg_get_logged_in_user_entity();
 googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
@@ -51,7 +51,7 @@ $share_url_label = elgg_echo('googleapps:tab:share_url');
 $share_browse_label = elgg_echo('googleapps:tab:share_browse');
 
 // Inputs
-$url_input = elgg_view("input/text", array('internalname' => 'document_url', 'value' => $url));
+$url_input = elgg_view("input/text", array('name' => 'document_url', 'value' => $url));
 
 echo <<<HTML
 	<div class="elgg_horizontal_tabbed_nav">

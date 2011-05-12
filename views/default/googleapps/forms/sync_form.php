@@ -32,7 +32,7 @@ foreach ($user_sync_settings as $setting => $v) {
 			
 			<p><?php echo elgg_echo('googleapps:usersettings:sync_description'); ?></p>
 					<?php
-					$body = "<p>" . elgg_view('input/checkboxes', array('internalname' => "sync_settings", 'value' =>$enabled,  'options' => array('Syncing name upon login'=>'sync_name')) );
+					$body = "<p>" . elgg_view('input/checkboxes', array('name' => "sync_settings", 'value' =>$enabled,  'options' => array('Syncing name upon login'=>'sync_name')) );
 					$body .= '</p>';
 					$body .= elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button'));
 

@@ -13,11 +13,11 @@ session_start();
 //print_r($GLOBALS);
 $user = $_SESSION['user'];
 
-$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
-$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
+$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
 
-$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
-$oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
+$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
+$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
 
 $oauth_verifier = get_input('oauth_verifier');
 

@@ -11,7 +11,7 @@
 
 $home_url = elgg_get_site_url();
 
-$user = page_owner_entity();
+$user = elgg_get_page_owner_entity();
 
 //echo '<pre>';print_r($user->googleapps_controlled_profile);exit;
 if (!$user) {    	

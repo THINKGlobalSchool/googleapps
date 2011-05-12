@@ -10,11 +10,11 @@
 
 $user = $_SESSION['user'];
 
-$oauth_sync_email = get_plugin_setting('oauth_sync_email', 'googleapps');
+$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
 
 if (isset($_SESSION['new_google_mess']) && !empty($user) && ($oauth_sync_email != 'no')) {
 	$count = $_SESSION['new_google_mess'];
-	$domain = get_plugin_setting('googleapps_domain', 'googleapps');
+	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	if ($count > 0) {
 		$title = 'You have ' . $count . ' unread message' . (($count > 1) ? 's' : '');
 		$class = 'emailnotifier new';
