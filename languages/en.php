@@ -9,14 +9,13 @@
  */
 
 $english = array(
-	
 	// Entity/Object labels
 	'item:object:site_activity' => 'Wiki activity',
    	'item:object:shared_doc' => 'Google Shared Document',
 	'item:user:googleapps' => 'googleapps users',
 	'shared_doc' => 'Google Docs',
 	'shared_doc:new' => 'Share New Google Doc',
-	
+
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
 	'googleapps:menu:google_sync_settings' => 'Google Apps Settings',
@@ -27,7 +26,7 @@ $english = array(
 	'googleapps:menu:yourshareddocs' => 'Your Shared Google Docs',
 	'googleapps:menu:allshareddocs' => 'All Shared Google Docs', 
 	'googleapps:menu:friendsshareddocs' => 'Friend\'s Shared Google Docs',
-	
+
 	// Admin Settings
 	'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
 	'googleapps:admin:secret' => 'Secret Key (to use with OAuth)',
@@ -66,12 +65,12 @@ $english = array(
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 	'googleapps:error:notfound' => 'Document not found',
 	'googleapps:error:nopermission' => 'You do not have permission to share this document to the group',
-	
+
 	// Success messages
 	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 	'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
-	
+
 	// General labels
 	'googleapps:label:google_docs' => 'Google Docs',
 	'googleapps:label:google_docs_description' => '',
@@ -91,19 +90,19 @@ $english = array(
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
 	'googleapps:label:viewdocument' => 'View Document',
-	
+
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',
-	
+
 	// Tabs
 	'googleapps:tab:share_url' => 'Enter URL',
 	'googleapps:tab:share_browse' => 'Browse Documents',
-	
+
 	// Permissions submit buttons
 	'googleapps:submit:grant' => 'Grant view permissons',
 	'googleapps:submit:ignore' => 'Ignore and continue',
 	'googleapps:submit:cancel' => 'Cancel',
-	
+
 	// River
 	'googleapps:river:shared_doc:create' => '%s shared a Google Document titled ',
 );

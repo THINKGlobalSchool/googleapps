@@ -22,7 +22,7 @@ foreach ($sites as $number => $site) {
 			} else {
 				$other_owners = unserialize($actual_site->other_owners);
 			}
-			
+				
 			$other_owners[$site->owner_guid] = $site->owner_guid;
 			$actual_site->other_owners = serialize(array_unique($other_owners));
 			unset($sites[$number]);
@@ -35,12 +35,12 @@ foreach ($sites as $number => $site) {
 $content .= '<div id="googleapps">';
 $content .= '<div class="contentWrapper singleview">';
 
-foreach ($site_list as $number => $site) {            
+foreach ($site_list as $number => $site) {
 
 	$owner = get_entity($site->owner_guid);
 	$owners = array();
 	$owners[] = $owner;
-	
+
 	$other_owners = array();
 	if (!empty($site->other_owners)) {
 		$other_owners = unserialize($site->other_owners);
@@ -59,7 +59,7 @@ foreach ($site_list as $number => $site) {
 		}
 		$c++;
 	}
-	
+
 	$content .= '
 		<div class="search_listing">
 			<div class="search_listing_icon">

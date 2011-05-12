@@ -1,13 +1,13 @@
 <?php
 /**
  * Googleapps document share url/browse form
- * 
+ *
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
  * @copyright THINK Global School 2010
  * @link http://www.thinkglobalschool.com/
- * 
+ *
  */
 
 $user = elgg_get_logged_in_user_entity();
@@ -28,10 +28,10 @@ $docs_list = '<div id="googleapps_browse_table">
 $documents_collaborators = array();
 foreach ($google_docs as $id => $doc) {
 
-    $collaborators = $doc['collaborators'];
-    $permission_str = get_permission_str($collaborators);
+	$collaborators = $doc['collaborators'];
+	$permission_str = get_permission_str($collaborators);
 
-    $docs_list .= '
+	$docs_list .= '
     <tr>
 		<td class="doc_select"><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
 		<td class="doc_name">
@@ -65,12 +65,12 @@ echo <<<HTML
 		</ul>
 	</div>
 	<div id='share_browse' class='tab_content'>
-		$docs_list
+	$docs_list
 		<br />
 	</div>
 	<div id='share_url' class='tab_content hidden'>
 		<br />
-	        $url_input
+		$url_input
 		<br /><br />
 	</div>
 	<script type='text/javascript'>

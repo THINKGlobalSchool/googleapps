@@ -28,7 +28,7 @@ $string .= "</span>";
 $string .= '<div class="river_content_display">';
 $string .= '<div class="river_object_blog_create"></div>';
 if (strlen($contents) > 200) {
-		$string .= substr($contents, 0, strpos($contents, ' ', 200)) . '&hellip;';
+	$string .= substr($contents, 0, strpos($contents, ' ', 200)) . '&hellip;';
 } else {
 	$string .= $contents;
 }

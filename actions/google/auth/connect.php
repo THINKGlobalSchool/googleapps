@@ -14,31 +14,31 @@ $home_url = elgg_get_site_url();
 $user = elgg_get_page_owner_entity();
 
 //echo '<pre>';print_r($user->googleapps_controlled_profile);exit;
-if (!$user) {    	
+if (!$user) {
 	$user = $_SESSION['user'];
 }
 
 $subtype = $user->getSubtype();
 
-if (!$user->google) {	
+if (!$user->google) {
 	$user->sync = '1';
 	$user->googleapps_controlled_profile = 'no';
-	
+
 	$user->save();
 
 	$google = new GoogleOpenID();
 	$google->use_oauth();
 	$google->set_home_url($home_url);
 	$google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/google/auth/return_with_connect', FALSE));
-	
+
 	$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-	
+
 	if ($googleapps_domain) {
 		$google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
 	} else {
 		$google->set_start_url("https://www.google.com/accounts/o8/id");
 	}
-	
+
 	try {
 		$url = $google->get_authorization_url();
 		forward($url);

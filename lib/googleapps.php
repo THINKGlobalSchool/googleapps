@@ -1,27 +1,33 @@
 <?php
 /**
  * Googleapps helper functions
- * 
+ *
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
  * @copyright THINK Global School 2010
  * @link http://www.thinkglobalschool.com/
- * 
+ *
  */
 
 // Throwing this in here now
 require_once(elgg_get_plugins_path() . 'googleapps/lib/OAuth.php');
 
-/* Get wiki activity settings content */
+/**
+ * Get wiki activity settings content
+ *
+ * @return array
+ */
 function googleapps_get_page_content_settings_wikiactivity() {
-	$params['title'] = elgg_echo('googleapps:menu:wiki_settings');		
+	$params['title'] = elgg_echo('googleapps:menu:wiki_settings');
 	$params['content'] = elgg_view('googleapps/forms/wiki_settings');
 	$params['layout'] = 'one_sidebar';
 	return $params;
 }
 
-/* Get account settings content */ 
+/**
+ * Get account settings content
+ */
 function googleapps_get_page_content_settings_account() {
 	$params['title'] = elgg_echo('googleapps:menu:google_sync_settings');
 	$params['content'] = elgg_view('googleapps/forms/sync_form');
@@ -29,7 +35,9 @@ function googleapps_get_page_content_settings_account() {
 	return $params;
 }
 
-/* Get google docs listing content */
+/**
+ * Get google docs listing content
+ */
 function googleapps_get_page_content_docs($user_guid = null) {
 	if ($user_guid) {
 		$user = get_entity($user_guid);
@@ -47,16 +55,16 @@ function googleapps_get_page_content_docs($user_guid = null) {
 		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'container_guid' => $user_guid));
 		$content_info['title'] = elgg_echo('googleapps:menu:yourshareddocs');
 	} else {
-	 	$header_context = 'everyone';
+		$header_context = 'everyone';
 		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc'));
 		$content_info['title'] = elgg_echo('googleapps:menu:allshareddocs');
 	}
-	
+
 	// If theres no content, display a nice message
 	if (!$content) {
 		$content = elgg_view('googleapps/noresults');
 	}
-		
+
 	$header = elgg_view('page_elements/content_header', array(
 		'context' => $header_context,
 		'type' => 'shared_doc',
@@ -65,20 +73,22 @@ function googleapps_get_page_content_docs($user_guid = null) {
 		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
 		'new_link' => elgg_get_site_url() . "googleapps/docs/share/" . $container_guid,
 	));
-	
-	
+
+
 	$content_info['content'] = $header . $content;
 	$content_info['layout'] = 'one_column_with_sidebar';
 	return $content_info;
 }
 
-/* Get friends docs */
+/**
+ * Get friends docs
+ */
 function googleapps_get_page_content_docs_friends($user_guid) {
 	$user = get_entity($user_guid);
 	elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'googleapps/docs');
 	elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'googleapps/docs/' . $user->username);
 	elgg_push_breadcrumb(elgg_echo('friends'));
-	
+
 	$content = elgg_view('page_elements/content_header', array(
 		'context' => 'friends',
 		'type' => 'shared_doc',
@@ -86,45 +96,49 @@ function googleapps_get_page_content_docs_friends($user_guid) {
 		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . elgg_get_logged_in_user_entity()->username,
 		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
 		'new_link' => elgg_get_site_url() . "googleapps/docs/share"
-	));
+		));
 
-	if (!$friends = get_user_friends($user_guid, ELGG_ENTITIES_ANY_VALUE, 0)) {
-		$content .= elgg_echo('friends:none:you');
-	} else {
-		$options = array(
+		if (!$friends = get_user_friends($user_guid, ELGG_ENTITIES_ANY_VALUE, 0)) {
+			$content .= elgg_echo('friends:none:you');
+		} else {
+			$options = array(
 			'type' => 'object',
 			'subtype' => 'shared_doc',
 			'full_view' => FALSE,
-		);
+			);
 
-		foreach ($friends as $friend) {
-			$options['container_guids'][] = $friend->getGUID();
+			foreach ($friends as $friend) {
+				$options['container_guids'][] = $friend->getGUID();
+			}
+
+			$content_info['title'] = elgg_echo('googleapps:menu:friendsshareddocs');
+
+			$list = elgg_list_entities($options);
+			if (!$list) {
+				$content .= elgg_view('googleapps/noresults');
+			} else {
+				$content .= $list;
+			}
 		}
-		
-		$content_info['title'] = elgg_echo('googleapps:menu:friendsshareddocs');
-		
-		$list = elgg_list_entities($options);
-		if (!$list) {
-			$content .= elgg_view('googleapps/noresults');
-		} else {
-			$content .= $list;
-		}
-	}
-	$content_info['content'] = $content;
-	$content_info['layout'] = 'one_column_with_sidebar';
-	
-	return $content_info;
+		$content_info['content'] = $content;
+		$content_info['layout'] = 'one_column_with_sidebar';
+
+		return $content_info;
 }
 
-/* Get google docs share content */
+/**
+ * Get google docs share content
+ */
 function googleapps_get_page_content_docs_sharebox() {
 	$content_info['title'] = elgg_echo('googleapps:label:google_docs');
-	$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');	
+	$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');
 	$content_info['layout'] = 'one_column_with_sidebar';
 	return $content_info;
 }
 
-/* Get google sites/wiki content */
+/**
+ * Get google sites/wiki content
+ */
 function googleapps_get_page_content_wikis($username = null) {
 	// Google sites pages
 	if (!$username) {
@@ -137,51 +151,52 @@ function googleapps_get_page_content_wikis($username = null) {
 		$sites = elgg_get_entities(array('type' => 'object', 'subtype' => 'site'));
 	} else {
 		// get list of logged in users sites
-        $res = googleapps_sync_sites(true, $user);
+		$res = googleapps_sync_sites(true, $user);
 		$sites = $res['site_entities'];
 	}
-	
+
 	$content_info['title'] = elgg_echo('googleapps:menu:wikis' . $postfix);
 	$content_info['content']  = elgg_view_title($content_info['title']) . elgg_view('googleapps/wiki_list', array('wikis' => $sites));
 	$content_info['layout'] = 'one_column_with_sidebar';
 	return $content_info;
-	
+
 }
 
+/**
+ * Update site entity access access
+ */
 function googleapps_update_site_entity_access($entity_id, $access) {
-    $context = elgg_get_context();
-    elgg_set_context('googleapps_cron_job');
+	$context = elgg_get_context();
+	elgg_set_context('googleapps_cron_job');
 
-    $user_site_entities = unserialize($_SESSION['user_site_entities']);
+	$user_site_entities = unserialize($_SESSION['user_site_entities']);
 
-    foreach ($user_site_entities as $entity) {
-        if ($entity->guid == $entity_id ) {
-            $entity->site_access_id = $access;
-            $entity->save();
-        }
-    }
-    elgg_set_context($context); 
+	foreach ($user_site_entities as $entity) {
+		if ($entity->guid == $entity_id ) {
+			$entity->site_access_id = $access;
+			$entity->save();
+		}
+	}
+	elgg_set_context($context);
 }
 
+/**
+ * Sanitize/normalize the google doc url
+ * When you load up a google doc in the browser, sometimes you'll get:
+ * docs1.google.com/... or spreadsheets2.google.com/...
+ *
+ * Need to normalize the url to be just plain docs or spreadsheets.. or whatever
+ */
 function googleapps_santize_google_doc_input($string) {
-	// Strip out http:// and https://, trim whitespace and '#'s 
+	// Strip out http:// and https://, trim whitespace and '#'s
 	$string = str_replace(array('http://','https://'), '', trim(strtolower($string), " #"));
-	
-	/* 
-		When you load up a google doc in the browser, sometimes you'll get:
-	
-			docs1.google.com/...
-			spreadsheets2.google.com/...
-			
-	   	Need to normalize the url to be just plain docs or spreadsheets.. or whatever
-	*/
-	
+
 	$prefix = substr($string, 0, strpos($string, '.'));
 	$new_prefix = trim($prefix, '1234567890');
-	
+
 	$string = str_replace($prefix, $new_prefix, $string);
 	return $string;
-	
+
 }
 
 /**
@@ -189,21 +204,21 @@ function googleapps_santize_google_doc_input($string) {
  */
 function googleapps_list_sites() {
 	$output = "";
-	
+
 	$options = array(
 		'type'=>'object', 
 		'subtype'=>'site', 
 		'limit'=> 0,
 		'count' => TRUE,
- 	);
-	
+	);
+
 	$site_count = elgg_get_entities($options);
-	
+
 	$options['count'] = FALSE;
-	
+
 	$site_entities = elgg_get_entities($options);
-	
-	
+
+
 	$output .= "<p>Site entities found: {$site_count}</p>";
 	if ($site_entities) {
 		foreach($site_entities as $site_entity) {
@@ -211,28 +226,28 @@ function googleapps_list_sites() {
 			$output .= "<br/>";
 		}
 	}
-	
+
 	return $output;
 }
 
-/** 
+/**
  * List site entities by user
  */
 function googleapps_list_sites_by_user() {
 	$output = "";
-	
+
 	$googleusers =find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
 	foreach($googleusers as $googleuser) {
 		$user = get_user($googleuser->owner_guid);
 		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
 		$site_count = count($site_list);
-		
+
 		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
 		foreach($site_list as $key => $site) {
 			$site_entity = get_entity($site['entity_id']);
 			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
 		}
-		$output .= "<hr />";	 
+		$output .= "<hr />";
 	}
 	return $output;
 }
@@ -269,8 +284,8 @@ function googleapps_reset_sites() {
 }
 
 /**
-* Functions for use OAuth
-*/
+ * Functions for use OAuth
+ */
 
 function calc_access($access) {
 	if ($access == 22) return 2; // public
@@ -302,178 +317,178 @@ function get_client($user) {
  */
 function googleapps_cron_fetch_data() {
 
-       	$context = elgg_get_context();
-				elgg_set_context('googleapps_cron_job');
+	$context = elgg_get_context();
+	elgg_set_context('googleapps_cron_job');
 
 
-           /* need to sync sites ? */
-           $oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-           if ($oauth_sync_sites == 'no') return;
+	/* need to sync sites ? */
+	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
+	if ($oauth_sync_sites == 'no') return;
 
-           set_time_limit(0);
-           $a_time=time();
+	set_time_limit(0);
+	$a_time=time();
 
-           /* find all users with googleapps controlled profile */
-           $result = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
-           if (empty($result)) {
-                   return;
-           }
+	/* find all users with googleapps controlled profile */
+	$result = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	if (empty($result)) {
+		return;
+	}
 
-           foreach ($result as $gapps_user) {
-                   $user = get_user($gapps_user->owner_guid);
-                   if (empty($user->access_token) || empty($user->token_secret)) {
-                           echo 'No access token for ' . $user->username . '\n';
-                           continue;
-                   }
+	foreach ($result as $gapps_user) {
+		$user = get_user($gapps_user->owner_guid);
+		if (empty($user->access_token) || empty($user->token_secret)) {
+			echo 'No access token for ' . $user->username . '\n';
+			continue;
+		}
 
-                   $_SESSION['user'] = $user;
-                   $client = get_client($user);
-                   $all = true;
+		$_SESSION['user'] = $user;
+		$client = get_client($user);
+		$all = true;
 
-                   $count = 0;
+		$count = 0;
 
-                   $is_new_activity = false;
-                   $is_new_docs = false;
+		$is_new_activity = false;
+		$is_new_docs = false;
 
-                   $res=googleapps_sync_sites(true, $user);
+		$res=googleapps_sync_sites(true, $user);
 
-                   $response_list = $res['response_list']; //sites xml list
-                   $site_entities =$res['site_entities']; // sites objects
-                   $all_site_entities_count =count($res['all_site_entities']); // sites objects
-                   $all_site_entities =$res['all_site_entities'];
+		$response_list = $res['response_list']; //sites xml list
+		$site_entities =$res['site_entities']; // sites objects
+		$all_site_entities_count =count($res['all_site_entities']); // sites objects
+		$all_site_entities =$res['all_site_entities'];
 
-                   echo "========== Processing user ".$user->name." ==========";
+		echo "========== Processing user ".$user->name." ==========";
 
-                       $max_time = null;
-                       $times = array();
+		$max_time = null;
+		$times = array();
 
-                       $site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
+		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
 
-                       if (empty($user->last_site_activity)) {
-                               $user->last_site_activity = '0';
-                       }
+		if (empty($user->last_site_activity)) {
+			$user->last_site_activity = '0';
+		}
 
-                       // Parse server response for google sites activity stream
-                       foreach ($response_list as $site) {
+		// Parse server response for google sites activity stream
+		foreach ($response_list as $site) {
 
-                               // found current site entity obj
-                               $site_entity=null;
-                               foreach ($site_entities as $site_obj) {
-                                   if ($site_obj->site_id == $site['site_id']) {
-                                       $site_entity =  $site_obj;
-                                       break; // found
-                                   }
-                               }
-
-
-                               $last_time_site_updated = $site_entity->modified;
-
-                               $title = $site['title'];
-                               $feed = $site['feed'];
-                               $site_exist = null;
-
-                               // update access settings for site in user site list
-                               save_site_to_user_list($site_entity, $site, $site_list);
-
-                               // Get google sites activity stream
-                               $activity_xml = $client->execute($feed, '1.1');
-                               $rss = simplexml_load_string($activity_xml);
-                               $times[] = strtotime($rss->updated);
-
-                               $site_title = $title;
-                               $title = 'Changes on ' . $title . ' site';
+			// found current site entity obj
+			$site_entity=null;
+			foreach ($site_entities as $site_obj) {
+				if ($site_obj->site_id == $site['site_id']) {
+					$site_entity =  $site_obj;
+					break; // found
+				}
+			}
 
 
-                               // Parse entries for each google site
-                               echo "site entity id=".$site_entity->guid." site title= ".$site_entity->title." ( ".$site_entity->site_id." )\n";
-                               if ($site_entity->site_access_id == ACCESS_PRIVATE) { echo "site access is private\n"; }
+			$last_time_site_updated = $site_entity->modified;
 
-                               foreach ($rss->entry as $item) {
-                                       // Get entry data
-                                       $text = $item->summary->div->asXML();
-                                       $author_email = @$item->author->email[0];
-                                       $date = $item->updated;
+			$title = $site['title'];
+			$feed = $site['feed'];
+			$site_exist = null;
 
-                                        if (strtotime($date)>$last_time_site_updated) $last_time_site_updated=strtotime($date); // update site time
+			// update access settings for site in user site list
+			save_site_to_user_list($site_entity, $site, $site_list);
 
-                                       $time = strtotime($date);
-                                       $site_access = $site_entity->site_access_id;
-                                       $access = calc_access($site_access);
-                                       $times[] = $time; // all user's sites time
+			// Get google sites activity stream
+			$activity_xml = $client->execute($feed, '1.1');
+			$rss = simplexml_load_string($activity_xml);
+			$times[] = strtotime($rss->updated);
 
-                                       // if sit is public
-                                       if ($site_entity->site_access_id != ACCESS_PRIVATE) {
-                                           if ( $user->last_site_activity <= $time // not publish already
-                                                           && $author_email == $user->email // edited by this user
-                                                           /* &&  $site['isPublic'] == true */ )
-                                                   {
-                                                       // Initialise a new ElggObject (entity)
-                                                       $site_activity = new ElggObject();
-                                                       $site_activity->subtype = "site_activity";
-                                                       $site_activity->owner_guid = $user->guid;
-                                                       $site_activity->container_guid = $user->guid;
-
-                                                       $site_activity->access_id = $access;
-                                                       $site_activity->title = $title;
-
-                                                       $site_activity->updated = $date;
-
-                                                       $site_activity->text = str_replace('<a href', '<a target="_blank" href', $text) . ' on the <a target="_blank" href="' . $site['url'] . '">' . $site_title . '</a> site';
-                                                       $site_activity->site_name = $site_title;
-
-                                                       // Now save the object
-                                                       if (!$site_activity->save()) {
-                                                               register_error('Site activity has not saved.');
-                                                               //forward(REFERER);
-                                                       }
-
-                                                       if (add_to_river('river/object/site_activity/create', 'create', $user->guid, $site_activity->guid, "", strtotime($date))) {
-                                                           $is_new_activity = true;
-                                                           echo "\nPublished activity for this site</b>. Site is access is ".$access."\n";
-                                                       } else {
-                                                           echo "error adding activity to river\n";
-                                                       }
-
-                                               } // need to add activite
-                                       } // public activity
-
-                               } // rss in site
-
-                               // change site time
-                               if( $last_time_site_updated > $site_entity->modified ) {
-                                   $site_entity->modified = $last_time_site_updated;
-                                   $site_entity->save();
-                                   echo "\nupdated last updated time.\n";
-                               };
-                       } // all sites
-
-                       if($response_list) {
-                               $max_time = max($times);
-                               $user->last_site_activity = $max_time;
-                               $user->save();
-                       }
-
-                       if (!empty($site_list)) {
-                               $user->site_list = serialize($site_list);
-                               $user->save();
-                       }
-
-                       if ($is_new_activity) {
-                               echo 'New activity added for ' . $user->username . '\n';
-                       } else {
-                               echo 'No new activity for ' . $user->username . '\n';
-                       }
-
-               echo "\n\n";
-           } // each user
+			$site_title = $title;
+			$title = 'Changes on ' . $title . ' site';
 
 
-               echo "\n\nAll finished\n";
-               $b_time=time();
-               echo "\n".($b_time-$a_time)." sec";
-               flush();
+			// Parse entries for each google site
+			echo "site entity id=".$site_entity->guid." site title= ".$site_entity->title." ( ".$site_entity->site_id." )\n";
+			if ($site_entity->site_access_id == ACCESS_PRIVATE) { echo "site access is private\n"; }
 
-               elgg_set_context($context);
+			foreach ($rss->entry as $item) {
+				// Get entry data
+				$text = $item->summary->div->asXML();
+				$author_email = @$item->author->email[0];
+				$date = $item->updated;
+
+				if (strtotime($date)>$last_time_site_updated) $last_time_site_updated=strtotime($date); // update site time
+
+				$time = strtotime($date);
+				$site_access = $site_entity->site_access_id;
+				$access = calc_access($site_access);
+				$times[] = $time; // all user's sites time
+
+				// if sit is public
+				if ($site_entity->site_access_id != ACCESS_PRIVATE) {
+					if ( $user->last_site_activity <= $time // not publish already
+					&& $author_email == $user->email // edited by this user
+					/* &&  $site['isPublic'] == true */ )
+					{
+						// Initialise a new ElggObject (entity)
+						$site_activity = new ElggObject();
+						$site_activity->subtype = "site_activity";
+						$site_activity->owner_guid = $user->guid;
+						$site_activity->container_guid = $user->guid;
+
+						$site_activity->access_id = $access;
+						$site_activity->title = $title;
+
+						$site_activity->updated = $date;
+
+						$site_activity->text = str_replace('<a href', '<a target="_blank" href', $text) . ' on the <a target="_blank" href="' . $site['url'] . '">' . $site_title . '</a> site';
+						$site_activity->site_name = $site_title;
+
+						// Now save the object
+						if (!$site_activity->save()) {
+							register_error('Site activity has not saved.');
+							//forward(REFERER);
+						}
+
+						if (add_to_river('river/object/site_activity/create', 'create', $user->guid, $site_activity->guid, "", strtotime($date))) {
+							$is_new_activity = true;
+							echo "\nPublished activity for this site</b>. Site is access is ".$access."\n";
+						} else {
+							echo "error adding activity to river\n";
+						}
+
+					} // need to add activite
+				} // public activity
+
+			} // rss in site
+
+			// change site time
+			if( $last_time_site_updated > $site_entity->modified ) {
+				$site_entity->modified = $last_time_site_updated;
+				$site_entity->save();
+				echo "\nupdated last updated time.\n";
+			};
+		} // all sites
+
+		if($response_list) {
+			$max_time = max($times);
+			$user->last_site_activity = $max_time;
+			$user->save();
+		}
+
+		if (!empty($site_list)) {
+			$user->site_list = serialize($site_list);
+			$user->save();
+		}
+
+		if ($is_new_activity) {
+			echo 'New activity added for ' . $user->username . '\n';
+		} else {
+			echo 'No new activity for ' . $user->username . '\n';
+		}
+
+		echo "\n\n";
+	} // each user
+
+
+	echo "\n\nAll finished\n";
+	$b_time=time();
+	echo "\n".($b_time-$a_time)." sec";
+	flush();
+
+	elgg_set_context($context);
 }
 
 /**
@@ -563,7 +578,7 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 	$is_new_docs = false;
 	$user = $_SESSION['user'];
 	if ($oauth_sync_email != 'no' &&
-			((!$all && in_array('mail', $scope)) || $all)) {
+	((!$all && in_array('mail', $scope)) || $all)) {
 		// Get count unread messages of gmail
 		$count = $client->unread_messages();
 		$_SESSION['new_google_mess'] = $count;
@@ -626,7 +641,7 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 	$result = $client->execute('https://sites.google.com/feeds/site/' . $client->key . '/', '1.1');
 	$response_list = $client->fetch_sites($result); // Site list
 
-   $all_site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999)); // Get all site entities
+	$all_site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999)); // Get all site entities
 
 
 	// 2. Get local site list
@@ -635,54 +650,54 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 	}
 
 	// 3. Save
-               //$user_site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
+	//$user_site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
 
-               // user's site list
+	// user's site list
 	$merged = array();
 
-//	// 4.1 Update normalized sites: destroy deleted sites
-//	if($normalized_sites) {
-//		foreach ($normalized_sites as $site_entity) {
-//
-//			$found = false; // User's google site list
-//			foreach ($response_list as $site) {
-//
-//				if (empty($site_entity->site_id)) {
-//					continue;
-//				}
-//				if ($site['site_id'] == $site_entity->site_id) {
-//					$found = $site;
-//					break;
-//				}
-//			}
-//
-//			if (!$found) {
-//				/* $site_entity->delete(); */
-//			} else {
-//				$modified = false;
-//				if ($site['url'] != $site_entity->url) {
-//					$site_entity->url = $found['url'];
-//					$modified = true;
-//				}
-//				if ($site['title'] != $site_entity->title) {
-//					$site_entity->title = $found['title'];
-//					$modified = true;
-//				}
-//				if ($site['modified'] > $site_entity->modified) {
-//					$site_entity->modified = $found['modified'];
-//					$modified = true;
-//				}
-//				if ($modified) {
-//					$site_entity->save();
-//                                                echo "<h3>global site ". $site_entity->title." updated</h3>";
-//				}
-//			}
-//
-//		}
-//	}
+	//	// 4.1 Update normalized sites: destroy deleted sites
+	//	if($normalized_sites) {
+	//		foreach ($normalized_sites as $site_entity) {
+	//
+	//			$found = false; // User's google site list
+	//			foreach ($response_list as $site) {
+	//
+	//				if (empty($site_entity->site_id)) {
+	//					continue;
+	//				}
+	//				if ($site['site_id'] == $site_entity->site_id) {
+	//					$found = $site;
+	//					break;
+	//				}
+	//			}
+	//
+	//			if (!$found) {
+	//				/* $site_entity->delete(); */
+	//			} else {
+	//				$modified = false;
+	//				if ($site['url'] != $site_entity->url) {
+	//					$site_entity->url = $found['url'];
+	//					$modified = true;
+	//				}
+	//				if ($site['title'] != $site_entity->title) {
+	//					$site_entity->title = $found['title'];
+	//					$modified = true;
+	//				}
+	//				if ($site['modified'] > $site_entity->modified) {
+	//					$site_entity->modified = $found['modified'];
+	//					$modified = true;
+	//				}
+	//				if ($modified) {
+	//					$site_entity->save();
+	//                                                echo "<h3>global site ". $site_entity->title." updated</h3>";
+	//				}
+	//			}
+	//
+	//		}
+	//	}
 
-               // site entities what have user
-               $users_site_entities=array(); 
+	// site entities what have user
+	$users_site_entities=array();
 
 	// 4.2 Update normalized sites: create new sites
 	foreach ($response_list as $site) {
@@ -698,7 +713,7 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 			}
 		}
 
-           // create new site entity
+		// create new site entity
 		if (!$found) {
 			echo "<b> CREATED SITE ENTITY </b><br />";
 			$new_site = new ElggObject();
@@ -716,7 +731,7 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 		}
 	}
 
-   // 4. Update user
+	// 4. Update user
 	$user->site_list = serialize($merged);
 	$user->save();
 
@@ -755,29 +770,29 @@ function googleapps_google_docs_get_collaborators($client, $doc_id) {
 	$result = $client->execute($feed, '2.0');
 	$rss = simplexml_load_string($result);
 
-               $shared_with_users=array();
+	$shared_with_users=array();
 
-               // Parse for each permission entity
+	// Parse for each permission entity
 	foreach ($rss->entry as $item) {
-                   $user = str_replace('Document Permission - ', '', $item->title);
-                   $shared_with_users[]=$user;
+		$user = str_replace('Document Permission - ', '', $item->title);
+		$shared_with_users[]=$user;
 	}
 
-               if  (in_array('default', $shared_with_users)) {
-                   return 'public'; // Public document
-               }
+	if  (in_array('default', $shared_with_users)) {
+		return 'public'; // Public document
+	}
 
-               if  (in_array('everyone', $shared_with_users)) {
-                   return 'everyone_in_domain'; // Shared with domain
-               }                        
+	if  (in_array('everyone', $shared_with_users)) {
+		return 'everyone_in_domain'; // Shared with domain
+	}
 
-               return $shared_with_users;
+	return $shared_with_users;
 }
 
 
 /**
  * Change the google docs permissions based on chosen elgg permissions
- *  
+ *
  * @param OAuthClient 	$client 	OAUTH client
  * @param string 		$doc_id 	Document id
  * @param mixed 		$access		Either an access_id, or an array of user's emails
@@ -786,12 +801,12 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 	// If we have a single access id
 	if (!is_array($access) )  {
 		switch ($access) {
-			case ACCESS_PUBLIC: 
-				$access_type='default'; 
-			break;
-		    case ACCESS_LOGGED_IN: 
-				$access_type='domain'; 
-			break;
+			case ACCESS_PUBLIC:
+				$access_type='default';
+				break;
+			case ACCESS_LOGGED_IN:
+				$access_type='domain';
+				break;
 		}
 
 		$feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
@@ -802,10 +817,10 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 		        <gAcl:role value='reader'/> ";
 
 		if ($access_type == "domain") {
-		   $domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-		   $data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
+			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+			$data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
 		} else {
-		   $data .= "<gAcl:scope type=\"default\"/>";
+			$data .= "<gAcl:scope type=\"default\"/>";
 		}
 
 		$data .= "</entry>";
@@ -819,7 +834,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 		$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
 					xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
 					<category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>';
-					
+			
 		$data .= '<entry>
 					<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.$user->email.'</id>
 					<batch:operation type="query"/>
@@ -835,7 +850,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 					</entry>';
 			$i++;
 		}
-		$result = $client->execute_post($feed, '3.0', null, 'POST', $data);				
+		$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
 	}
 }
 
@@ -850,7 +865,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 function googleapps_google_docs($client, $folder = null) {
 	// Get google docs feeds list
 	if (empty($folder)) {
-		$feed = 'http://docs.google.com/feeds/default/private/full/-/mine';	
+		$feed = 'http://docs.google.com/feeds/default/private/full/-/mine';
 	} else {
 		$feed = 'http://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
 	}
@@ -866,11 +881,11 @@ function googleapps_google_docs($client, $folder = null) {
 			//break;
 		}
 
-           $id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
+		$id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 		$title = $item['title'];
 
-           $collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
-                       
+		$collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
+		
 
 		$links = $item->link;
 		$src = '';
@@ -901,13 +916,13 @@ function googleapps_google_docs($client, $folder = null) {
 		}
 
 		if (!empty($src)) {
-                               $doc['id']=$id;
+			$doc['id']=$id;
 			$doc['title'] = preg_replace('/\<title\>(.*)\<\/title\>/', '$1', $item->title->asXML());
 			$doc['trunc_title'] = trunc_name($doc['title']);
 			$doc['href'] = preg_replace('/href=\"(.*)\"/', '$1', $src->asXML());
 			$doc['type'] = $type;
 			$doc['updated'] = strtotime($item->updated);
-                               $doc['collaborators'] = $collaborators;
+			$doc['collaborators'] = $collaborators;
 			$documents[] = $doc;
 		}
 	}
@@ -1096,27 +1111,27 @@ function get_permission_str($collaborators) {
 	if(is_array($collaborators)) {
 		$collaborators = count($collaborators);
 	}
-		
+
 	$str = '';
-	
+
 	switch ($collaborators) {
 		case 'everyone_in_domain' :
-		$str = 'Everyone in domain';
-		break;
-	case 'public':
-		$str = 'Public';
-		break;
-	default:
-		if($collaborators > 1) $str = ($collaborators -1) . ' collaborators'; // minus owner
-		else $str='me';
-		break;
+			$str = 'Everyone in domain';
+			break;
+		case 'public':
+			$str = 'Public';
+			break;
+		default:
+			if($collaborators > 1) $str = ($collaborators -1) . ' collaborators'; // minus owner
+			else $str='me';
+			break;
 	}
 	return $str;
 }
 
 /**
- * Create the shared google document 
- * 
+ * Create the shared google document
+ *
  * @param array 	$document 		Array reprentation of the google document
  * @param string 	$description 	Description to add
  * @param array 	$tags			Elgg tag array to add to document
@@ -1147,14 +1162,14 @@ function share_document($document, $description, $tags, $access_id, $container_g
 	return true;
 }
 
-/** 
+/**
  * Determine if the google doc's permissions need to be updated
  *
  * @param mixed	$collaborators	either everyone_in_domain, public, or array of email addresses
  * @param mixed $access_level	access level contants, or 'match'
  */
 function check_document_permission($collaborators, $access_level) {
-	if ($collaborators == 'public') { 
+	if ($collaborators == 'public') {
 		return true;	// Document is public on Google, don't need to make any changes
 	} else if ($collaborators == 'everyone_in_domain' && $access_level != ACCESS_PUBLIC) {
 		return true; 	// Document is available to domain, as long as the elgg access isn't public, we're good
@@ -1201,7 +1216,7 @@ function get_members_not_shared($members, $doc) {
 
 	foreach ($members as $member) {
 		if (is_null($collaborators[$member])) {
-			$members_not_shared[]=$member; 
+			$members_not_shared[]=$member;
 		}
 	}
 	return $members_not_shared;

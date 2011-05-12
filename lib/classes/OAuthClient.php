@@ -24,7 +24,7 @@ class OAuthClient {
 	var $scope = 'https://mail.google.com/mail/feed/atom/ https://sites.google.com/feeds';
 
 	public function OAuthClient($consumer_key, $consumer_secret,
-			$signature_method_name = SIG_METHOD_HMAC, $priv_key = '') {
+	$signature_method_name = SIG_METHOD_HMAC, $priv_key = '') {
 
 		$this->callback_url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$this->key = $consumer_key;
@@ -38,15 +38,15 @@ class OAuthClient {
 
 		$user = $_SESSION['user'];
 		$scopes = array();
-//if (isset($user->googleapps_sync_email) && $user->googleapps_sync_email != 'no') {
+		//if (isset($user->googleapps_sync_email) && $user->googleapps_sync_email != 'no') {
 		$scopes[] = 'https://mail.google.com/mail/feed/atom/';
-//}
-//if (isset($user->googleapps_sync_sites) && $user->googleapps_sync_sites != 'no') {
+		//}
+		//if (isset($user->googleapps_sync_sites) && $user->googleapps_sync_sites != 'no') {
 		$scopes[] = 'https://sites.google.com/feeds';
 
 		$scopes[] = 'http://docs.google.com/feeds/';
 		$scopes[] = 'http://spreadsheets.google.com/feeds/';
-//}
+		//}
 		if ($scopes) {
 			$this->scope = implode(' ', $scopes);
 		}
@@ -69,13 +69,13 @@ class OAuthClient {
 
 		$endpoint = 'https://www.google.com/accounts/OAuthGetRequestToken';
 
-// Handle certain Google Data scopes that have their own approval pages.
+		// Handle certain Google Data scopes that have their own approval pages.
 		if ($this->scope) {
-// Health still uses OAuth v1.0
+			// Health still uses OAuth v1.0
 			if (preg_match('/health/', $this->scope) || preg_match('/h9/', $this->scope)) {
 				$params = array('scope' => $this->scope);
 			} else {
-// Use the OAuth v1.0a flow (callback in the request token step)
+				// Use the OAuth v1.0a flow (callback in the request token step)
 				$params = array('scope' => $this->scope, 'oauth_callback' => $this->callback_url);
 			}
 			$url = $endpoint . '?scope=' . urlencode($this->scope);
@@ -106,13 +106,13 @@ class OAuthClient {
 
 		$endpoint = 'https://www.google.com/accounts/OAuthAuthorizeToken';
 		$rt = $this->oauth_fetch_request_token();
-//$url = $endpoint . '?oauth_callback=' . urlencode(($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/?action=callback') . '&oauth_token=' . urlencode($rt->key);
+		//$url = $endpoint . '?oauth_callback=' . urlencode(($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/?action=callback') . '&oauth_token=' . urlencode($rt->key);
 		$url = $endpoint . '?oauth_token=' . $rt->key . '&hd=' . urlencode($this->key);
 
-// Cover special cases for Google Health and YouTube approval pages
+		// Cover special cases for Google Health and YouTube approval pages
 		if (preg_match('/health/', $this->scope) || preg_match('/h9/', $this->scope)) {
-// Google Health - append permission=1 parameter to read profiles
-// and callback URL for v1.0 flow.
+			// Google Health - append permission=1 parameter to read profiles
+			// and callback URL for v1.0 flow.
 			$url .= '&permission=1&oauth_callback=' . urlencode($this->callback_url);
 		}
 
@@ -123,12 +123,12 @@ class OAuthClient {
 	public function authorized() {
 
 		if (!empty($_SESSION['access_token']) && !empty($_SESSION['access_secret'])) {
-//empty($this->access_token) && empty($this->access_secret)) {
+			//empty($this->access_token) && empty($this->access_secret)) {
 			$this->access_token = $_SESSION['access_token'];
 			$this->access_secret = $_SESSION['access_secret'];
 		}
 
-//return !empty($this->access_token) && !empty($this->access_secret);
+		//return !empty($this->access_token) && !empty($this->access_secret);
 
 		return (!empty($_SESSION['access_token']) && !empty($_SESSION['access_secret']));
 
@@ -151,7 +151,7 @@ class OAuthClient {
 
 		$acc_req = OAuthRequest::from_consumer_and_token($this->consumer, $request_token,
 				'GET', $endpoint,
-				array('oauth_verifier' => $verifier));
+		array('oauth_verifier' => $verifier));
 		$acc_req->sign_request($this->signature_method, $this->consumer, $request_token);
 		$url = $endpoint;
 
@@ -185,8 +185,8 @@ class OAuthClient {
 		$gdataVersion = 'GData-Version: ' . $version;
 
 		return $this->send_signed_request('GET', $endpoint,
-				array($echo_req->to_header(), $content_type, $gdataVersion),
-				null, false);
+		array($echo_req->to_header(), $content_type, $gdataVersion),
+		null, false);
 
 	}
 
@@ -199,24 +199,24 @@ class OAuthClient {
 		if (empty($params)) {
 			$params = array();
 		}
-		$access_token = new OAuthToken($this->access_token, $this->access_secret);                          
+		$access_token = new OAuthToken($this->access_token, $this->access_secret);
 		$echo_req = OAuthRequest::from_consumer_and_token($this->consumer, $access_token,
-				$method, $endpoint, $params);
+		$method, $endpoint, $params);
 
-               
+		 
 		$echo_req->sign_request($this->signature_method, $this->consumer, $access_token);
 
-                
+
 
 		$content_type = 'Content-Type: application/atom+xml';
-		$gdataVersion = 'GData-Version: ' . $version;                
+		$gdataVersion = 'GData-Version: ' . $version;
 
 		return $this->send_signed_request($method, $endpoint,
-				array($echo_req->to_header(), $content_type, $gdataVersion),
-				$data, false);
-	}        
+		array($echo_req->to_header(), $content_type, $gdataVersion),
+		$data, false);
+	}
 
-	public function fetch_sites($xml) {            
+	public function fetch_sites($xml) {
 
 		$rss = simplexml_load_string($xml);
 
@@ -305,28 +305,28 @@ class OAuthClient {
 	 * @return string Response body from the server
 	 */
 	private function send_signed_request($http_method, $url, $extraHeaders=null,
-			$postData=null, $returnResponseHeaders=true) {
+	$postData=null, $returnResponseHeaders=true) {
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_FAILONERROR, false);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
-// Return request headers in the reponse
+		// Return request headers in the reponse
 		curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 
-// Return response headers ni the response?
+		// Return response headers ni the response?
 		if ($returnResponseHeaders) {
 			curl_setopt($curl, CURLOPT_HEADER, true);
 		}
 
 		$headers = array();
-//$headers[] = 'GData-Version: 2.0';  // use GData v2 by default
+		//$headers[] = 'GData-Version: 2.0';  // use GData v2 by default
 		if (is_array($extraHeaders)) {
 			$headers = array_merge($headers, $extraHeaders);
 		}
 
-// Setup default curl options for each type of HTTP request.
-// This is also a great place to add additional headers for each request.
+		// Setup default curl options for each type of HTTP request.
+		// This is also a great place to add additional headers for each request.
 		switch($http_method) {
 			case 'GET':
 				curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
@@ -351,14 +351,14 @@ class OAuthClient {
 				curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		}
 
-// Execute the request.  If an error occures, fill the response body with it.
+		// Execute the request.  If an error occures, fill the response body with it.
 		$response = curl_exec($curl);
 		if (!$response) {
 			$response = curl_error($curl);
 		}
 
 		if ($returnResponseHeaders) {
-// Add server's response headers to our response body
+			// Add server's response headers to our response body
 			$response = curl_getinfo($curl, CURLINFO_HEADER_OUT) . $response;
 		}
 

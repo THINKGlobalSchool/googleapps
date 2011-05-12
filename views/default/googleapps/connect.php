@@ -8,4 +8,8 @@
  * @link http://www.thinkglobalschool.org
  */
 ?>
-<div id="googleapps-box" style="margin-left: 10px;"><input type="button" value="Connect with Google OpenID account" onclick="location.href='<?php echo $GLOBALS['googleappsconnect_url'];?>'" class="cancel_button" /></div>
+<div id="googleapps-box" style="margin-left: 10px;">
+	<input type="button" value="Connect with Google OpenID account"
+		onclick="location.href='<?php echo $GLOBALS['googleappsconnect_url'];?>'"
+		class="cancel_button" />
+</div>

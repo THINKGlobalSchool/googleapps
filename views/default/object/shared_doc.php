@@ -25,10 +25,11 @@ if (!$object_acl) {
 	$object_acl = $acl->name;
 }
 
-if($vars['entity']->description != '')
+if ($vars['entity']->description != '') {
 	$view_desc = "| <a class='link' onclick=\"elgg_slide_toggle(this,'.entity_listing','.note');\">" . elgg_echo('description') . "</a>";
-else
-	$view_desc = '';
+} else {
+$view_desc = '';
+}
 
 
 $icon = elgg_view("profile/icon", array('entity' => $owner,'size' => 'tiny',));
@@ -39,7 +40,7 @@ if($vars['entity']->canEdit()){
 				'href' => "action/google/docs/delete?guid=" . $vars['entity']->guid,
 				'text' => elgg_echo("delete"),
 				'confirm' => elgg_echo("googleapps:label:deleteconfirm"),
-				)) . "</span>";
+	)) . "</span>";
 }
 
 $info = "<div class='entity_metadata'><span {$access_level}>{$object_acl}</span>";

@@ -34,21 +34,21 @@ foreach ($google_docs as $doc) {
 $client = authorized_client(true);
 
 switch (get_input('answer')) {
-    case elgg_echo('googleapps:submit:grant'):
+	case elgg_echo('googleapps:submit:grant'):
 		if ($members = get_members_of_access_collection($access_id)) {
 			// We've got a group ACL
 			$members_email = get_members_emails($members);
 			$share_to = get_members_not_shared($members_email, $document);
 			googleapps_change_doc_sharing($client, $document['id'], $share_to) ; // change permissions
-            share_document($document, $description, $tags, $access_id, $container_guid);
-            break;
+			share_document($document, $description, $tags, $access_id, $container_guid);
+			break;
 		}
-        googleapps_change_doc_sharing($client, $document['id'], $access_id) ;
-        share_document($document, $description, $tags, $access_id, $container_guid);
-	break;
-    case elgg_echo('googleapps:submit:ignore'):
-        share_document($document, $description, $tags, $access_id, $container_guid);
-    break;
+		googleapps_change_doc_sharing($client, $document['id'], $access_id) ;
+		share_document($document, $description, $tags, $access_id, $container_guid);
+		break;
+	case elgg_echo('googleapps:submit:ignore'):
+		share_document($document, $description, $tags, $access_id, $container_guid);
+		break;
 }
-     die (elgg_view('googleapps/success', array('container_guid' => $container_guid)));
-     exit;
+die (elgg_view('googleapps/success', array('container_guid' => $container_guid)));
+exit;

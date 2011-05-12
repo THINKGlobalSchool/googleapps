@@ -30,46 +30,46 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 ?>
 <div class="contentWrapper">
 	<div class="notification_methods">
-		<?php
+	<?php
 
-		if ($user->google == 1 || $subtype == 'googleapps') {
-			$site_list = unserialize($user->site_list);
-			//var_dump($site_list); die;
+	if ($user->google == 1 || $subtype == 'googleapps') {
+		$site_list = unserialize($user->site_list);
+		//var_dump($site_list); die;
 			
-			if (!empty($site_list)) {
-				
-				echo '<p>'.elgg_echo('googleapps:usersettings:sites_description').'</p>';
-				
-				$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:label:site').'</th><th>'.elgg_echo('googleapps:label:access_level').'</th></tr>';
-				foreach ($site_list as $site_id => $site_obj) {
+		if (!empty($site_list)) {
 
-          			$title = $site_obj['title'];
-          			$access = $site_obj['access'];
+			echo '<p>'.elgg_echo('googleapps:usersettings:sites_description').'</p>';
 
-					if (!empty($title)) {
-						if (is_null($access)) {
-							$access = 1;
-						}
+			$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:label:site').'</th><th>'.elgg_echo('googleapps:label:access_level').'</th></tr>';
+			foreach ($site_list as $site_id => $site_obj) {
 
-						//$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('name' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
-						$access_input = elgg_view('input/access', array(
+				$title = $site_obj['title'];
+				$access = $site_obj['access'];
+
+				if (!empty($title)) {
+					if (is_null($access)) {
+						$access = 1;
+					}
+
+					//$body .= '<p><b>'. $title . '</b><br />' . elgg_view('input/radio',array('name' => "googleapps_sites_settings[" . $site_id . "]", 'options' => $access_types, 'value' => $access)) . '</p>';
+					$access_input = elgg_view('input/access', array(
 							'name' => 'googleapps_sites_settings['.$site_id.']',
 							'value' => $access
-						));
-						$body .= '<tr><td>'.$title.'</td><td class="access_col">'.$access_input.'</td></tr>';
-						
-					}
+					));
+					$body .= '<tr><td>'.$title.'</td><td class="access_col">'.$access_input.'</td></tr>';
+
 				}
-				$body .= '<tr class="submit_row"><td colspan=2 class="submit_cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
-				$body .= '</table>';
-				echo elgg_view('input/form',array(
+			}
+			$body .= '<tr class="submit_row"><td colspan=2 class="submit_cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
+			$body .= '</table>';
+			echo elgg_view('input/form',array(
 				'body' => $body,
 				'method' => 'post',
 				'action' => $vars['url'] . 'action/google/wikis/save_wiki_settings',
-				));
-			}
+			));
 		}
+	}
 
-		?>
+	?>
 	</div>
 </div>

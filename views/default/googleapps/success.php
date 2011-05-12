@@ -13,17 +13,20 @@ $forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
 
 ?>
 
-<h2>Success!</h2><p class="googleappsdialog_message">Document shared</p>
-<input name='Ok' type='submit' value='Ok' id='ok_close' onclick="javascript:window.location.replace('<?php echo $forward_url ?>');" /> 
+<h2>Success!</h2>
+<p class="googleappsdialog_message">Document shared</p>
+<input
+	name='Ok' type='submit' value='Ok' id='ok_close'
+	onclick="javascript:window.location.replace('<?php echo $forward_url ?>');" />
 <style>
-	/* Hide the close button here */
-	button.ui-corner-all {
-		display: none;
-	}
-	
-	#ok_close {
-		display: block;
-		margin-left: auto;
-		margin-right: auto;
-	}
+/* Hide the close button here */
+button.ui-corner-all {
+	display: none;
+}
+
+#ok_close {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
 </style>

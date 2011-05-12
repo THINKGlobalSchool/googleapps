@@ -9,7 +9,7 @@
  */
 ?>
 <div id="googleapps-icon">
-	<a href="<?php echo $GLOBALS['googleapps_url'];?>">
-		<img src="<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/login_with_google_apps.gif" alt="googleapps" />
-	</a>
+	<a href="<?php echo $GLOBALS['googleapps_url'];?>"> <img
+		src="<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/login_with_google_apps.gif"
+		alt="googleapps" /> </a>
 </div>

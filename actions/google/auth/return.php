@@ -24,26 +24,26 @@ $oauth_verifier = get_input('oauth_verifier');
 $client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 
 if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no')) {
-	
-	if (empty($oauth_verifier)) {	
+
+	if (empty($oauth_verifier)) {
 		$result = $client->oauth_authorize();
 		header('Location: ' . $result);
-		exit;		
+		exit;
 	} else {
-		
+
 		$token = $client->oauth_fetch_access_token($oauth_verifier, $_SESSION['request_key'], $_SESSION['request_secret']);
 
-		
+
 		$_SESSION['access_token'] = $token->key;
 		$_SESSION['access_secret'] = $token->secret;
-		
+
 		$user->access_token = $token->key;
 		$user->token_secret = $token->secret;
 		$user->save();
-		
-		googleapps_fetch_oauth_data($client);		
+
+		googleapps_fetch_oauth_data($client);
 	}
-	
+
 };
 
 if (!empty($_SESSION['oauth_connect'])) {
@@ -74,19 +74,19 @@ if (!$google->is_authorized()) {
 	$lastname = $google->get_lastname();
 	$_SESSION['logged_with_openid'] = 1;
 	//echo "user is authorized\n<br>";
-	
+
 	$do_login = false;
 	$duplicate_account = false;
-	
+
 	if (empty($email)) {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:noemail')));
 		forward();
 	}
-	
+
 	$entities = get_user_by_email($email);
 
-    if (!$entities) {
-		
+	if (!$entities) {
+
 		$username = $email;
 		$username = preg_replace("/\@[a-zA-Z\.0-9\-]+$/", "", $username);
 
@@ -98,29 +98,29 @@ if (!$google->is_authorized()) {
 			$duplicate_account = true;
 			register_error(sprintf(elgg_echo("googleapps:error:account_duplicate"), $username));
 		}
-		
+
 		if (!$duplicate_account) {
 			$firstname = $google->get_firstname();
 			$lastname = $google->get_lastname();
-			
+				
 			$user = new ElggUser();
 			$user->email = $email;
 			$user->name = (!empty($firstname) || !empty($firstname)) ? ($google->get_firstname() . ' ' . $google->get_lastname()) : $email;
 			$user->access_id = 2;
 			$user->subtype = 'googleapps';
 			$user->username = $username;
-			
+				
 			$user->google = 1;
 			$user->sync = 1;
 			$user->googleapps_controlled_profile = 'yes';
-			
+				
 			if ($user->save()) {
 				//automatically validate user
 				elgg_set_user_validation_status($user->guid,true);
 
 				$new_account = true;
 				$do_login = true;
-				
+
 				// need to keep track of subtype because getSubtype does not work
 				// for newly created users in Elgg 1.5
 				$subtype = 'googleapps';
@@ -130,11 +130,11 @@ if (!$google->is_authorized()) {
 			}
 		}
 	} elseif ($entities[0]->active == 'no') {
-		// this is an inactive account		
+		// this is an inactive account
 		register_error(elgg_echo("googleapps:error:account_inactive"));
 	} else {
 		$user = $entities[0];
-		
+
 		$subtype = $user->getSubtype();
 
 		// account is active, check to see if this user has been banned
@@ -144,10 +144,8 @@ if (!$google->is_authorized()) {
 			$do_login = true;
 			$new_account = false;
 		}
+	}
 
-		
-    }
-	
 	if ($do_login) {
 		$rememberme = true;
 

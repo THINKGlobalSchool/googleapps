@@ -7,7 +7,7 @@
  * @author Jeff Tilson
  * @copyright THINK Global School 2010
  * @link http://www.thinkglobalschool.com/
- * 
+ *
  */
 
 echo "<div class='entity_subtext timeline-entity-subtext'>

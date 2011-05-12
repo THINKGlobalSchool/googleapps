@@ -18,17 +18,17 @@ $google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/google
 $googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
 if ($googleapps_domain) {
-    $google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
+	$google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
 } else {
-    $google->set_start_url("https://www.google.com/accounts/o8/id");
+	$google->set_start_url("https://www.google.com/accounts/o8/id");
 }
 
 try {
-    $url = $google->get_authorization_url();
-    forward($url);
+	$url = $google->get_authorization_url();
+	forward($url);
 } catch(Exception $e) {
-    register_error(sprintf(elgg_echo("googleapps:error:wrongdomain"), $username));
-    forward();
+	register_error(sprintf(elgg_echo("googleapps:error:wrongdomain"), $username));
+	forward();
 }
 
 exit;

@@ -31,7 +31,7 @@ $_SESSION['oauth_google_folder'] = $google_folder->id;
 ?>
 
 <div id="google_docs_widget" class="google_docs_widget">
-<script type="text/javascript">
+	<script type="text/javascript">
 	
 	/**
 	 * function for search elgg widget id
@@ -99,7 +99,7 @@ $_SESSION['oauth_google_folder'] = $google_folder->id;
 	if (!empty($google_folder)) {
 		echo '<div><b>' . $google_folder->title . '</b></div>';
 	}
-    if (!empty($oauth_google_docs)) {
+	if (!empty($oauth_google_docs)) {
 		?>
 		<div class="river_item_list">
 		<?
@@ -108,41 +108,42 @@ $_SESSION['oauth_google_folder'] = $google_folder->id;
 			if ($i >= $max_entry) {
 				break;
 			}
-			
-//    			if (!empty($doc['type'])) {
-//				switch ($doc['type']) {
-//
-//					case 'folder':
-//						$doc['type'] = 'folder';
-//						// folder links should link to parent folder
-//						$doc['href'] = preg_replace('/(.*)folder\.0\.(.*)/', '$1folder.0.' . substr($google_folder->id, 9), $doc['href']);
-//						break;
-//
-//					case 'spreadsheet':
-//						$doc['type'] = 'spread';
-//						break;
-//
-//					case 'presentation':
-//						$doc['type'] = 'pres';
-//						break;
-//
-//					case 'document':
-//						$doc['type'] = 'doc';
-//						break;
-//
-//					default:
-//						$doc['type'] = 'doc';
-//						break;
-//				}
-//			} else {
-//				$doc['type'] = 'doc';
-//			}
+
+			//    			if (!empty($doc['type'])) {
+			//				switch ($doc['type']) {
+			//
+			//					case 'folder':
+			//						$doc['type'] = 'folder';
+			//						// folder links should link to parent folder
+			//						$doc['href'] = preg_replace('/(.*)folder\.0\.(.*)/', '$1folder.0.' . substr($google_folder->id, 9), $doc['href']);
+			//						break;
+			//
+			//					case 'spreadsheet':
+			//						$doc['type'] = 'spread';
+			//						break;
+			//
+			//					case 'presentation':
+			//						$doc['type'] = 'pres';
+			//						break;
+			//
+			//					case 'document':
+			//						$doc['type'] = 'doc';
+			//						break;
+			//
+			//					default:
+			//						$doc['type'] = 'doc';
+			//						break;
+			//				}
+			//			} else {
+			//				$doc['type'] = 'doc';
+			//			}
 
 
 			?>
 			<div class="river_item">
-				<span class="document-icon <?= $doc['type'] ?>"></span>
-				<a href="<?= $doc['href'] ?>" target="_blank" title="<?= $doc['title'] ?>"><?= $doc['trunc_title'] ?></a>
+				<span class="document-icon <?= $doc['type'] ?>"></span> <a
+					href="<?= $doc['href'] ?>" target="_blank"
+					title="<?= $doc['title'] ?>"><?= $doc['trunc_title'] ?> </a>
 			</div>
 			<?
 			$i++;
@@ -150,16 +151,17 @@ $_SESSION['oauth_google_folder'] = $google_folder->id;
 		?>
 		</div>
 		<?
-    } else {
-		
+	} else {
+
 		echo "You Do not have a Google Document.";
-		
+
 	}
-	
+
 	?>
-			<div class="view-all">
-				<a href="https://docs.google.com/a/<?= $CONSUMER_KEY ?>/#all" target="_blank">All docs &raquo;</a>
-			</div>
+		<div class="view-all">
+			<a href="https://docs.google.com/a/<?= $CONSUMER_KEY ?>/#all"
+				target="_blank">All docs &raquo;</a>
 		</div>
 	</div>
+</div>
 </div>
