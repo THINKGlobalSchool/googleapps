@@ -29,11 +29,11 @@ $subtype = $user->getSubtype();
 if ($user->google == 1) {
 	if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passwordstop')));
-		forward($_SERVER['HTTP_REFERER']);
+		forward(REFERER);
 	}
 	if (elgg_strlen($googleapps_controlled_profile) > 50) {
 		register_error(elgg_echo('admin:configuration:fail'));
-		forward($_SERVER['HTTP_REFERER']);
+		forward(REFERER);
 	}
 	if (($user) && ($user->canEdit())) {
 		if ($googleapps_controlled_profile != $user->googleapps_controlled_profile) {
@@ -62,4 +62,4 @@ if ($user->google == 1) {
 	}
 }
 
-forward($_SERVER['HTTP_REFERER']);
+forward(REFERER);

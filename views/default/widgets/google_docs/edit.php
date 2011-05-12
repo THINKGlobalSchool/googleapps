@@ -34,9 +34,5 @@ $vars['entity']->title = '';
 	Choose folder:<br />
 	<select id="google_folders" name="params[google_folder]">
 		<option value="">All folders</option>
-		
-		
-	</select>
-	
+	</select>	
 </p>
-

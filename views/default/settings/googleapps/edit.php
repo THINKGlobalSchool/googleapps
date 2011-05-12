@@ -58,5 +58,3 @@ $body .= elgg_view('input/radio', array('internalname' => 'params[oauth_sync_doc
  
 
 echo $body;
- 
-?>

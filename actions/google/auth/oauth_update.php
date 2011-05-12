@@ -10,8 +10,6 @@
  */
 
 require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/functions.php');
-global $CONFIG;
 $result = googleapps_get_oauth_data(true);
 echo $result;
 exit;
-?>

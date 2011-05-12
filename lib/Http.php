@@ -14,8 +14,7 @@
  * @since       Version 0.1
  */
 
-class Http
-{
+class Http {
     /**
      * Contains the target URL
      *
@@ -1183,5 +1182,3 @@ class Http
         }
     }
 }
-
-?>

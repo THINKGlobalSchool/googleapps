@@ -68,4 +68,3 @@ if (!$google->is_authorized()) {
 
 forward('googleapps/settings/account');
 exit;
-?>

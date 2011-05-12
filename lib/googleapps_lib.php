@@ -71,7 +71,6 @@ function googleapps_get_page_content_docs($user_guid = null) {
 
 /* Get friends docs */
 function googleapps_get_page_content_docs_friends($user_guid) {
-	global $CONFIG;
 	$user = get_entity($user_guid);
 	elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'googleapps/docs');
 	elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'googleapps/docs/' . $user->username);

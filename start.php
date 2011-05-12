@@ -9,6 +9,8 @@
  * @link http://www.thinkglobalschool.org
  */
 
+elgg_register_event_handler('init','system','googleapps_init');
+
 /**
  * googleapps initialisation
  *
@@ -68,7 +70,7 @@ function googleapps_init() {
 	elgg_extend_view('css/elgg','googleapps/css');
 		
 	// Include tablesorter
-	elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
+	//elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
 	
 	// Extend topbar view to add new mail icon
 	elgg_extend_view('elgg_topbar/extend','googleapps/new_mail');
@@ -488,8 +490,6 @@ function googleapps_shared_doc_write_acl_plugin_hook($hook, $entity_type, $retur
  * Add google docs to the owner block
  */
 function googleapps_docs_profile_menu($hook, $entity_type, $return_value, $params) {
-	global $CONFIG;
-
 	$return_value[] = array(
 		'text' => elgg_echo('googleapps:label:google_docs'),
 		'href' => "googleapps/docs/{$params['owner']->username}",
@@ -510,5 +510,3 @@ function googleapps_shared_doc_url_handler($entity) {
 	
 	return $entity->href;
 }
-
-register_elgg_event_handler('init','system','googleapps_init');

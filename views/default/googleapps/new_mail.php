@@ -37,4 +37,4 @@ if (isset($_SESSION['new_google_mess']) && !empty($user) && ($oauth_sync_email !
 	</a>
 <?php
 }
-?>
+

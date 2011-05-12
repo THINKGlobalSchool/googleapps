@@ -8,93 +8,93 @@
  * @link http://www.thinkglobalschool.org
  */
 
-	$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/OAuth.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/client.inc';
+
+$google_folder = !empty($vars['entity']->google_folder) ? $vars['entity']->google_folder : '';
+$max_entry = !empty($vars['entity']->max_entry) ? (int) $vars['entity']->max_entry : 15;
+
+$_SESSION['oauth_google_folder'] = $google_folder;
+
+$client = authorized_client(true);
+googleapps_fetch_oauth_data($client, false, 'folders docs');
+//print_r($_SESSION);exit;
+
+
+// Get google docs folders
+$folders = unserialize($_SESSION['oauth_google_folders']);
+//print_r($google_folder);exit;
+$google_folder = $folders[$google_folder];
+$main_folders = child_folders('', $folders);
+
+$oauth_google_docs = unserialize($_SESSION['oauth_google_docs']);
+$_SESSION['oauth_google_folder'] = $google_folder->id;
+?>
+
+<div id="google_docs_widget" class="google_docs_widget">
+<script type="text/javascript">
 	
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/OAuth.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/client.inc';
-	
-	$google_folder = !empty($vars['entity']->google_folder) ? $vars['entity']->google_folder : '';
-	$max_entry = !empty($vars['entity']->max_entry) ? (int) $vars['entity']->max_entry : 15;
-	
-	$_SESSION['oauth_google_folder'] = $google_folder;
-	
-	$client = authorized_client(true);
-	googleapps_fetch_oauth_data($client, false, 'folders docs');
-	//print_r($_SESSION);exit;
-	
-	
-	// Get google docs folders
-	$folders = unserialize($_SESSION['oauth_google_folders']);
-	//print_r($google_folder);exit;
-	$google_folder = $folders[$google_folder];
-	$main_folders = child_folders('', $folders);
-	
-	$oauth_google_docs = unserialize($_SESSION['oauth_google_docs']);
-	$_SESSION['oauth_google_folder'] = $google_folder->id;
-	?>
-	
-	<div id="google_docs_widget" class="google_docs_widget">
-	<script type="text/javascript">
+	/**
+	 * function for search elgg widget id
+	 * 
+	 * @param object $this jquery object
+	 * @return object
+	 */
+	function search_widget_id($this) {
 		
-		/**
-		 * function for search elgg widget id
-		 * 
-		 * @param object $this jquery object
-		 * @return object
-		 */
-		function search_widget_id($this) {
-			
-			if (!$this) {
-				return false;
-			}
-			
-			if (!$this[0]) {
-				return false;
-			}
-			
-			// DOM object
-			var current = $this[0];
-			
-			var reg = /^widgetcontent(\d+)$/;
-			var arr = Array();
-			
-			if (reg.test(current.id)) {
-				arr = reg.exec(current.id);
-				if (arr[1]) {
-					return arr[1];
-				}
-			} else {
-				return search_widget_id($this.parent());
-			}
-			
+		if (!$this) {
+			return false;
 		}
 		
-		function update_select() {
-			
-			var select = $('select#google_folders');
-			
-			select.empty();
-			select.append('<option value="">All folders</option>');
-			select.append('<?= walk_folders($main_folders, $folders, $vars['entity']->google_folder, true); ?>');
-			
-			return true;
-			
+		if (!$this[0]) {
+			return false;
 		}
 		
-		function update_widget(id, username) {
-			
-			if (!id || !username) {
-				return false;
+		// DOM object
+		var current = $this[0];
+		
+		var reg = /^widgetcontent(\d+)$/;
+		var arr = Array();
+		
+		if (reg.test(current.id)) {
+			arr = reg.exec(current.id);
+			if (arr[1]) {
+				return arr[1];
 			}
-			
-			$("#widgetcontent" + id).html('<div align=\"center\" class=\"ajax_loader\"></div>');
-			$("#widgetcontent" + id).load("/view/" + id + "?shell=no&username=" + username + "&context=dashboard&callback=true");
-			
-			return true;
-			
+		} else {
+			return search_widget_id($this.parent());
 		}
 		
-		update_select();
+	}
+	
+	function update_select() {
+		
+		var select = $('select#google_folders');
+		
+		select.empty();
+		select.append('<option value="">All folders</option>');
+		select.append('<?= walk_folders($main_folders, $folders, $vars['entity']->google_folder, true); ?>');
+		
+		return true;
+		
+	}
+	
+	function update_widget(id, username) {
+		
+		if (!id || !username) {
+			return false;
+		}
+		
+		$("#widgetcontent" + id).html('<div align=\"center\" class=\"ajax_loader\"></div>');
+		$("#widgetcontent" + id).load("/view/" + id + "?shell=no&username=" + username + "&context=dashboard&callback=true");
+		
+		return true;
+		
+	}
+	
+	update_select();
 		
 	</script>
 	<div class="contentWrapper">

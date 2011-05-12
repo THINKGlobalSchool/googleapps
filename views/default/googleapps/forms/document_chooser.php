@@ -53,8 +53,8 @@ $share_browse_label = elgg_echo('googleapps:tab:share_browse');
 // Inputs
 $url_input = elgg_view("input/text", array('internalname' => 'document_url', 'value' => $url));
 
-echo <<<EOT
-	<div class="elgg_horizontal_tabbed_nav margin_top">
+echo <<<HTML
+	<div class="elgg_horizontal_tabbed_nav">
 		<ul>
 			<li id='share_browse' class='edt_tab_nav'>
 				<a style='cursor: pointer;' onclick="javascript:googleShareFormSwitchTab('share_browse')">$share_browse_label</a>
@@ -101,5 +101,5 @@ echo <<<EOT
 			$(tab_name + ' input').removeAttr('disabled');
 		}
 	</script>
-EOT;
-
+HTML;
+?>

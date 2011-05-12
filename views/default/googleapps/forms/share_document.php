@@ -73,9 +73,9 @@ $browse_content .= '<div id="googleapps">
 $form_url = elgg_get_site_url() . 'googleapps/docs/list_form';
 
 // Build Form Body
-$form_body = <<<EOT
+$form_body = <<<HTML
 <form action="$action" method="post" onsubmit="return ajax_submit(this)" >
-	<div class='margin_top'>
+	<div>
 		$browse_content
 		<div>
 			<label>$description_label</label><br />
@@ -101,9 +101,9 @@ $form_body = <<<EOT
 		</div>
 	</div>
 </form>
-EOT;
+HTML;
 
-$script = <<<EOT
+$script = <<<HTML
 	<script type="text/javascript">
 		
 	$('#match_permissions').change(function() {
@@ -152,9 +152,8 @@ $script = <<<EOT
 	$(load_docs);
 	</script>
 
-EOT;
+HTML;
 //$groups = elgg_get_entities_from_relationship(array('relationship' => 'member', 'relationship_guid' => get_loggedin_userid(), 'inverse_relationship' => FALSE, 'limit' => 999));
 //print_r_html($groups);
 
 echo $form_body . $script;
-?>

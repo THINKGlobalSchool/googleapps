@@ -8,6 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 ?>
-	<p class="user_menu_googleapps">
-		<a href="<?php echo elgg_get_site_url(); ?>wikis/"><?php echo elgg_echo("googleapps:menu:wikis"); ?></a>	
-	</p>
+<p class="user_menu_googleapps">
+	<a href="<?php echo elgg_get_site_url(); ?>wikis/"><?php echo elgg_echo("googleapps:menu:wikis"); ?></a>	
+</p>

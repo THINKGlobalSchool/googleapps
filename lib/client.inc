@@ -391,6 +391,3 @@ class OAuth_Client {
 	}
 
 }
-
-
-?>

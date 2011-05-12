@@ -1,12 +1,10 @@
 <?php
-
 /**
  * Description of GoogleOpenID
  *
  * @author andreyp
  */
-class Google_OpenID
-{
+class Google_OpenID {
     private $_http;
     private $_start_url;
     private $_endpoint_url;
@@ -242,4 +240,3 @@ class Google_OpenID
         $this->_response = $value;
     }
 }
-?>

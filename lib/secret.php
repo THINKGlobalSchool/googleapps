@@ -12,5 +12,3 @@ $login_key = $googleapps_domain;
 $consumer_key = $googleapps_domain;
 $consumer_secret = $login_secret;
 */
-
-?>

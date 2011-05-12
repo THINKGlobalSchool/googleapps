@@ -174,4 +174,3 @@ if (!$google->is_authorized()) {
 
 forward();
 exit;
-?>

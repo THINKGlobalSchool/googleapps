@@ -15,8 +15,6 @@ require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/secret.php");
 require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/OAuth.php");
 require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/client.inc");
 
-global $CONFIG;
-
 $home_url = elgg_get_site_url();
 
 $user = page_owner_entity();
@@ -30,7 +28,7 @@ if ($user->google) {
 	
 	if (empty($user->password)) {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passworddisconnect')));
-		forward($_SERVER['HTTP_REFERER']);
+		forward(REFERER);
 	}
 	
 	$user->sync = '0';
@@ -53,4 +51,3 @@ if ($user->google) {
 forward('googleapps/settings/account');
 
 exit;
-

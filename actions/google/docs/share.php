@@ -82,4 +82,3 @@ if (!check_document_permission($collaborators, $access_level) ) {
 	echo elgg_view('googleapps/success', array('container_guid' => $document_container_guid));
 	exit;
  }
-?>

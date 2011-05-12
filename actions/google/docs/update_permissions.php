@@ -52,5 +52,3 @@ switch (get_input('answer')) {
 }
      die (elgg_view('googleapps/success', array('container_guid' => $container_guid)));
      exit;
-
-?>

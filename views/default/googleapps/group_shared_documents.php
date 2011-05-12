@@ -9,7 +9,7 @@
  */
 
 //check to make sure this groups Documents has been activated
-if($vars['entity']->shared_doc_enable != 'no'){
+if($vars['entity']->shared_doc_enable != 'no') {
 
 ?>
 <div class="group_tool_widget google_shared_doc">
@@ -41,7 +41,7 @@ if($vars['entity']->shared_doc_enable != 'no'){
 	} else {
 
 		$share_document = $vars['url'] . "googleapps/docs/share?container_guid=" . page_owner_entity()->getGUID();
-		echo "<p class='margin_top'><a href=\"{$share_document}\">" . elgg_echo("googleapps:label:shareadoc") . "</a></p>";
+		echo "<p><a href=\"{$share_document}\">" . elgg_echo("googleapps:label:shareadoc") . "</a></p>";
 
 	}
 
@@ -49,5 +49,4 @@ if($vars['entity']->shared_doc_enable != 'no'){
 </div>
 
 <?php
-	}//end of activate check statement
-?>
+}//end of activate check statement

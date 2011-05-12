@@ -10,12 +10,12 @@
 	 * 
 	 */
 ?>
-<div class="margin_top">
-		<center>
+<div>
+	<center>
 		<b>
-		<?php 
-			echo elgg_echo("todo:label:noresults");
-		?>
+			<?php 
+				echo elgg_echo("todo:label:noresults");
+			?>
 		</b>
-		</center>
+	</center>
 </div>

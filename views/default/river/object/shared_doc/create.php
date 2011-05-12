@@ -34,4 +34,3 @@ if (strlen($contents) > 200) {
 }
 $string .= '</div>';
 echo $string;
-
