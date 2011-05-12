@@ -8,16 +8,14 @@
  * @link http://www.thinkglobalschool.org
  */
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Http.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Google_OpenID.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/secret.php");
-
 $home_url = elgg_get_site_url();
 
-$google = new Google_OpenID();
+$google = new GoogleOpenID();
 $google->use_oauth();
 $google->set_home_url($home_url);
 $google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/google/auth/return', FALSE));
+
+$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
 if ($googleapps_domain) {
     $google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);

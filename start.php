@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Elgg googlelogin plugin
  *
@@ -11,23 +10,17 @@
 
 elgg_register_event_handler('init','system','googleapps_init');
 
-/**
- * googleapps initialisation
- *
- * These parameters are required for the event API, but we won't use them:
- *
- * @param unknown_type $event
- * @param unknown_type $object_type
- * @param unknown_type $object
- */
+/* Init event handler */
 function googleapps_init() {
 	global $CONFIG;
+		
+	// Libraries
+	elgg_register_library('elgg:googleapps:helpers', elgg_get_plugins_path() . 'googleapps/lib/googleapps.php');
+	elgg_load_library('elgg:googleapps:helpers');
 	
-	// Includes
-	require_once 'lib/functions.php';
-	require_once 'lib/admin_functions.php';
-	require_once 'lib/googleapps_lib.php';
-	
+	// Register classes
+	elgg_register_classes(elgg_get_plugins_path() . 'googleapps/lib/classes');
+		
 	// Need to use SSL for google urls
 	$CONFIG->sslroot = str_replace('http://','https://', elgg_get_site_url());
 

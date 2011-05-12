@@ -8,7 +8,7 @@
  * @link http://www.thinkglobalschool.org
  */
 
-reset_googlesites();
+googleapps_reset_sites();
 
 system_message(elgg_echo('googleapps:success:sites_reset'));
 forward(REFERER);

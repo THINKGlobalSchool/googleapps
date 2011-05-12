@@ -15,7 +15,6 @@ $options = array(elgg_echo('googleapps:admin:yes') => 'yes',
 );
  
 $googleapps_domain = get_plugin_setting('googleapps_domain', 'googleapps');
-$login_key = get_plugin_setting('login_key', 'googleapps');
 $login_secret = get_plugin_setting('login_secret', 'googleapps');
 $private_key = get_plugin_setting('private_key', 'googleapps');
 $oauth_update_interval = get_plugin_setting('oauth_update_interval', 'googleapps');

@@ -1,12 +1,275 @@
 <?php
 /**
+ * Googleapps helper functions
+ * 
+ * @package Googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010
+ * @link http://www.thinkglobalschool.com/
+ * 
+ */
+
+// Throwing this in here now
+require_once(elgg_get_plugins_path() . 'googleapps/lib/OAuth.php');
+
+/* Get wiki activity settings content */
+function googleapps_get_page_content_settings_wikiactivity() {
+	$params['title'] = elgg_echo('googleapps:menu:wiki_settings');		
+	$params['content'] = elgg_view('googleapps/forms/wiki_settings');
+	$params['layout'] = 'one_sidebar';
+	return $params;
+}
+
+/* Get account settings content */ 
+function googleapps_get_page_content_settings_account() {
+	$params['title'] = elgg_echo('googleapps:menu:google_sync_settings');
+	$params['content'] = elgg_view('googleapps/forms/sync_form');
+	$params['layout'] = 'one_sidebar';
+	return $params;
+}
+
+/* Get google docs listing content */
+function googleapps_get_page_content_docs($user_guid = null) {
+	if ($user_guid) {
+		$user = get_entity($user_guid);
+		if ($user instanceof ElggGroup) {
+			// Got a group
+			elgg_push_breadcrumb(elgg_echo('groups'), elgg_get_site_url() . 'googleapps/docs');
+			elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'googleapps/docs/' . $user->username);
+			elgg_push_breadcrumb(elgg_echo('googleapps:label:groupdocs'));
+			$container_guid = "?container_guid=" .$user->getGUID();
+		} else {
+			elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'googleapps/docs');
+			elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'googleapps/docs/' . $user->username);
+		}
+		$header_context = 'mine';
+		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'container_guid' => $user_guid));
+		$content_info['title'] = elgg_echo('googleapps:menu:yourshareddocs');
+	} else {
+	 	$header_context = 'everyone';
+		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc'));
+		$content_info['title'] = elgg_echo('googleapps:menu:allshareddocs');
+	}
+	
+	// If theres no content, display a nice message
+	if (!$content) {
+		$content = elgg_view('googleapps/noresults');
+	}
+		
+	$header = elgg_view('page_elements/content_header', array(
+		'context' => $header_context,
+		'type' => 'shared_doc',
+		'all_link' => elgg_get_site_url() . "googleapps/docs",
+		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . get_loggedin_user()->username,
+		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
+		'new_link' => elgg_get_site_url() . "googleapps/docs/share/" . $container_guid,
+	));
+	
+	
+	$content_info['content'] = $header . $content;
+	$content_info['layout'] = 'one_column_with_sidebar';
+	return $content_info;
+}
+
+/* Get friends docs */
+function googleapps_get_page_content_docs_friends($user_guid) {
+	$user = get_entity($user_guid);
+	elgg_push_breadcrumb(elgg_echo('googleapps:menu:allshareddocs'), elgg_get_site_url() . 'googleapps/docs');
+	elgg_push_breadcrumb($user->name, elgg_get_site_url() . 'googleapps/docs/' . $user->username);
+	elgg_push_breadcrumb(elgg_echo('friends'));
+	
+	$content = elgg_view('page_elements/content_header', array(
+		'context' => 'friends',
+		'type' => 'shared_doc',
+		'all_link' => elgg_get_site_url() . "googleapps/docs",
+		'mine_link' => elgg_get_site_url() . "googleapps/docs/" . get_loggedin_user()->username,
+		'friend_link' => elgg_get_site_url() . "googleapps/docs/friends",
+		'new_link' => elgg_get_site_url() . "googleapps/docs/share"
+	));
+
+	if (!$friends = get_user_friends($user_guid, ELGG_ENTITIES_ANY_VALUE, 0)) {
+		$content .= elgg_echo('friends:none:you');
+	} else {
+		$options = array(
+			'type' => 'object',
+			'subtype' => 'shared_doc',
+			'full_view' => FALSE,
+		);
+
+		foreach ($friends as $friend) {
+			$options['container_guids'][] = $friend->getGUID();
+		}
+		
+		$content_info['title'] = elgg_echo('googleapps:menu:friendsshareddocs');
+		
+		$list = elgg_list_entities($options);
+		if (!$list) {
+			$content .= elgg_view('googleapps/noresults');
+		} else {
+			$content .= $list;
+		}
+	}
+	$content_info['content'] = $content;
+	$content_info['layout'] = 'one_column_with_sidebar';
+	
+	return $content_info;
+}
+
+/* Get google docs share content */
+function googleapps_get_page_content_docs_sharebox() {
+	$content_info['title'] = elgg_echo('googleapps:label:google_docs');
+	$content_info['content'] = elgg_view_title($content_info['title']) . elgg_view('googleapps/forms/share_document');	
+	$content_info['layout'] = 'one_column_with_sidebar';
+	return $content_info;
+}
+
+/* Get google sites/wiki content */
+function googleapps_get_page_content_wikis($username = null) {
+	// Google sites pages
+	if (!$username) {
+		// Check if we were supplied a username
+		$all = true;
+	}
+	$postfix = $all ? 'everyone' : 'your';
+	if ($all) {
+		// list of all sites
+		$sites = elgg_get_entities(array('type' => 'object', 'subtype' => 'site'));
+	} else {
+		// get list of logged in users sites
+        $res = googleapps_sync_sites(true, $user);
+		$sites = $res['site_entities'];
+	}
+	
+	$content_info['title'] = elgg_echo('googleapps:menu:wikis' . $postfix);
+	$content_info['content']  = elgg_view_title($content_info['title']) . elgg_view('googleapps/wiki_list', array('wikis' => $sites));
+	$content_info['layout'] = 'one_column_with_sidebar';
+	return $content_info;
+	
+}
+
+function googleapps_update_site_entity_access($entity_id, $access) {
+    $context = get_context();
+    set_context('googleapps_cron_job');
+
+    $user_site_entities = unserialize($_SESSION['user_site_entities']);
+
+    foreach ($user_site_entities as $entity) {
+        if ($entity->guid == $entity_id ) {
+            $entity->site_access_id = $access;
+            $entity->save();
+        }
+    }
+    set_context($context); 
+}
+
+function googleapps_santize_google_doc_input($string) {
+	// Strip out http:// and https://, trim whitespace and '#'s 
+	$string = str_replace(array('http://','https://'), '', trim(strtolower($string), " #"));
+	
+	/* 
+		When you load up a google doc in the browser, sometimes you'll get:
+	
+			docs1.google.com/...
+			spreadsheets2.google.com/...
+			
+	   	Need to normalize the url to be just plain docs or spreadsheets.. or whatever
+	*/
+	
+	$prefix = substr($string, 0, strpos($string, '.'));
+	$new_prefix = trim($prefix, '1234567890');
+	
+	$string = str_replace($prefix, $new_prefix, $string);
+	return $string;
+	
+}
+
+/**
+ * List site entities
+ */
+function googleapps_list_sites() {
+	$output = "";
+	
+	$options = array(
+		'type'=>'object', 
+		'subtype'=>'site', 
+		'limit'=> 0,
+		'count' => TRUE,
+ 	);
+	
+	$site_count = elgg_get_entities($options);
+	
+	$options['count'] = FALSE;
+	
+	$site_entities = elgg_get_entities($options);
+	
+	
+	$output .= "<p>Site entities found: {$site_count}</p>";
+	if ($site_entities) {
+		foreach($site_entities as $site_entity) {
+			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
+			$output .= "<br/>";
+		}
+	}
+	
+	return $output;
+}
+
+/** 
+ * List site entities by user
+ */
+function googleapps_list_sites_by_user() {
+	$output = "";
+	
+	$googleusers =find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	foreach($googleusers as $googleuser) {
+		$user = get_user($googleuser->owner_guid);
+		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
+		$site_count = count($site_list);
+		
+		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
+		foreach($site_list as $key => $site) {
+			$site_entity = get_entity($site['entity_id']);
+			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
+		}
+		$output .= "<hr />";	 
+	}
+	return $output;
+}
+
+/**
+ * Delete all site entities
+ */
+function googleapps_delete_all_site_entities() {
+	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>99999));
+	foreach($site_entities as $site_entity) {
+		$site_entity->delete();
+	}
+	return;
+}
+
+/**
+ * Reset all user sites
+ */
+function googleapps_reset_user_sites() {
+	$googleusers = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	foreach($googleusers as $googleuser) {
+		$user = get_user($googleuser->owner_guid);
+		$user->site_list = NULL;
+	}
+	return;
+}
+
+/**
+ * Reset sites and user sites
+ */
+function googleapps_reset_sites() {
+	googleapps_delete_all_site_entities();
+	googleapps_reset_user_sites();
+}
+
+/**
 * Functions for use OAuth
-*
-* @package googleapps
-* @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
-* @author Alexander Ulitin <alexander.ulitin@flatsoft.com>
-* @copyright FlatSourcing 2010
-* @link http://www.thinkglobalschool.org
 */
 
 function calc_access($access) {
@@ -22,19 +285,14 @@ function calc_access($access) {
  * @return object
  */
 function get_client($user) {
-
-	require_once 'OAuth.php';
-	require_once 'client.inc';
-
 	$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
 	$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
 
-	$client = new OAuth_Client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 	$client->access_token = $user->access_token;
 	$client->access_secret = $user->token_secret;
 
 	return $client;
-
 }
 
 /**
@@ -225,10 +483,6 @@ function googleapps_cron_fetch_data() {
  * @return object|false
  */
 function authorized_client($ajax = false) {
-
-	require_once 'OAuth.php';
-	require_once 'client.inc';
-
 	$CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
 	$CONSUMER_SECRET = get_plugin_setting('login_secret', 'googleapps');
 
@@ -240,7 +494,7 @@ function authorized_client($ajax = false) {
 		$_SESSION['token_secret'] = $user->token_secret;
 	}
 
-	$client = new OAuth_Client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 
 	if (!empty($client->access_token)) {
 		$_SESSION['access_token'] = $client->access_token;
@@ -524,7 +778,7 @@ function googleapps_google_docs_get_collaborators($client, $doc_id) {
 /**
  * Change the google docs permissions based on chosen elgg permissions
  *  
- * @param Oauth_client 	$client 	OAUTH client
+ * @param OAuthClient 	$client 	OAUTH client
  * @param string 		$doc_id 	Document id
  * @param mixed 		$access		Either an access_id, or an array of user's emails
  */

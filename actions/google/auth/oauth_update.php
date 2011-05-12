@@ -9,7 +9,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/functions.php');
 $result = googleapps_get_oauth_data(true);
 echo $result;
 exit;

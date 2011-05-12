@@ -10,11 +10,6 @@
 
 session_start();
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/Http.php');
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/Google_OpenID.php');
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/OAuth.php');
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/lib/client.inc');
-
 //print_r($GLOBALS);
 $user = $_SESSION['user'];
 
@@ -26,7 +21,7 @@ $oauth_sync_sites = get_plugin_setting('oauth_sync_sites', 'googleapps');
 
 $oauth_verifier = get_input('oauth_verifier');
 
-$client = new OAuth_Client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 
 if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no')) {
 	
@@ -56,7 +51,9 @@ if (!empty($_SESSION['oauth_connect'])) {
 	forward('googleapps/settings/account');
 }
 
-$google = Google_OpenID::create_from_response($_REQUEST);
+$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+
+$google = GoogleOpenID::create_from_response($_REQUEST);
 
 $google->set_home_url($googleapps_domain);
 $response = $google->get_response();

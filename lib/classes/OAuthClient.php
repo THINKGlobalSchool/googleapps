@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class for use OAuth
  *
@@ -14,7 +13,7 @@ DEFINE('SIG_METHOD_PLAINTEXT', 'plaintext');
 DEFINE('SIG_METHOD_HMAC', 'hmac_sha1');
 DEFINE('SIG_METHOD_RSA', 'rsa');
 
-class OAuth_Client {
+class OAuthClient {
 	var $key = null;
 	var $secret = null;
 	var $consumer = null;
@@ -24,7 +23,7 @@ class OAuth_Client {
 	var $access_secret = null;
 	var $scope = 'https://mail.google.com/mail/feed/atom/ https://sites.google.com/feeds';
 
-	public function OAuth_Client($consumer_key, $consumer_secret,
+	public function OAuthClient($consumer_key, $consumer_secret,
 			$signature_method_name = SIG_METHOD_HMAC, $priv_key = '') {
 
 		$this->callback_url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];

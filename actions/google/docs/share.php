@@ -38,7 +38,7 @@ $google_docs = unserialize($_SESSION['oauth_google_docs']);
 // If we have a URL find it in the list
 if ($document_url && !empty($document_url)) {
 	// Sanitize our input url, trims out trailing '#'s as well 
-	$document_url = santize_google_doc_input($document_url);
+	$document_url = googleapps_santize_google_doc_input($document_url);
 		
 	foreach ($google_docs as $doc) {
 		// Clean up doc url

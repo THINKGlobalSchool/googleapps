@@ -27,13 +27,13 @@ echo elgg_view('navigation/tabs', array(
 
 switch ($selected) {
 	case "byuser" :
-		$content .= list_googlesite_entities_byuser();
+		$content .= googleapps_list_sites_by_user();
 	break;
 	case "reset":
 		$content .= elgg_view('googleapps/admin/reset');
 	break;
 	default:
-		$content .= list_googlesite_entities();
+		$content .= googleapps_list_sites();
 	break;
 }
 

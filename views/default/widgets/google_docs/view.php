@@ -10,9 +10,6 @@
 
 $CONSUMER_KEY = get_plugin_setting('googleapps_domain', 'googleapps');
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/OAuth.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/mod/googleapps/lib/client.inc';
-
 $google_folder = !empty($vars['entity']->google_folder) ? $vars['entity']->google_folder : '';
 $max_entry = !empty($vars['entity']->max_entry) ? (int) $vars['entity']->max_entry : 15;
 

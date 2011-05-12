@@ -8,13 +8,11 @@
  * @link http://www.thinkglobalschool.org
  */
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Http.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/OAuth.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Google_OpenID.php");
-
 global $CONFIG;
 
-$google = Google_OpenID::create_from_response($_REQUEST);
+$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+
+$google = GoogleOpenID::create_from_response($_REQUEST);
 $google->set_home_url($googleapps_domain);
 
 if (!$google->is_authorized()) {

@@ -9,12 +9,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Http.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/Google_OpenID.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/secret.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/OAuth.php");
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . "/lib/client.inc");
-
 $home_url = elgg_get_site_url();
 
 $user = page_owner_entity();

@@ -4,7 +4,7 @@
  *
  * @author andreyp
  */
-class Google_OpenID {
+class GoogleOpenID {
     private $_http;
     private $_start_url;
     private $_endpoint_url;
