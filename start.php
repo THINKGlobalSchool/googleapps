@@ -32,7 +32,6 @@ function googleapps_init() {
 	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
 	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/connect', FALSE);
 	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/disconnect', FALSE);
-	$oauth_update_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/oauth_update', FALSE);
 	$share_doc_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/share', FALSE);
 	$change_doc_permissions_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/update_permissions', FALSE);
 
@@ -40,10 +39,8 @@ function googleapps_init() {
 	$GLOBALS['googleapps_url'] = $googleapps_url;
 	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;
 	$GLOBALS['googleappsdisconnect_url'] = $googleappsdisconnect_url;
-	$GLOBALS['oauth_update_url'] = $oauth_update_url;
 	$GLOBALS['share_doc_url'] = $share_doc_url;
 	$GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
-	$GLOBALS['oauth_update_interval'] = elgg_get_plugin_setting('oauth_update_interval', 'googleapps');
 
 	// Constants
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
@@ -57,11 +54,15 @@ function googleapps_init() {
 	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
 
+	// Register JS
+	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
+	elgg_register_js('elgg.google', $googleapps_js);
+	
+	// Load JS lib, we'll need this globally
+	elgg_load_js('elgg.google');
+
 	// Extend login view google login button
 	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
-
-	// Include oauth update scripts
-	elgg_extend_view('html_head/extend', 'googleapps/oauth_scripts');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css/elgg','css/googleapps/css');
@@ -534,6 +535,7 @@ function googleapps_topbar_menu_setup($hook, $type, $return, $params) {
 				'text' => $text,
 				'href' =>  'todo',
 				'priority' => 999,
+				'item_class' => 'google-email-container',
 			);
 			$return[] = ElggMenuItem::factory($options);
 		}	
