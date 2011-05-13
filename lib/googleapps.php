@@ -38,7 +38,7 @@ function googleapps_get_page_content_settings_account() {
 /**
  * Get google docs listing content
  */
-function googleapps_get_page_content_docs($container_guid = NULL) {
+function googleapps_get_page_content_docs_list($container_guid = NULL) {
 	$params['filter_context'] = $container_guid ? 'mine' : 'all';
 	
 	if ($container_guid) {
@@ -48,6 +48,10 @@ function googleapps_get_page_content_docs($container_guid = NULL) {
 		if (!elgg_instanceof($container, 'user') && !elgg_instanceof($container, 'group')) {
 			// Scram..
 			forward('googleapps/docs/all');
+		}
+		
+		if ($container != elgg_get_logged_in_user_entity()) {
+			$params['filter_context'] = FALSE;
 		}
 		
 		if (elgg_instanceof($container, 'group')) {
@@ -129,27 +133,88 @@ function googleapps_get_page_content_docs_share() {
 /**
  * Get google sites/wiki content
  */
-function googleapps_get_page_content_wikis($username = null) {
-	// Google sites pages
-	if (!$username) {
-		// Check if we were supplied a username
-		$all = true;
-	}
-	$postfix = $all ? 'everyone' : 'your';
-	if ($all) {
-		// list of all sites
-		$sites = elgg_get_entities(array('type' => 'object', 'subtype' => 'site'));
+function googleapps_get_page_content_wikis_list($container_guid = NULL) {
+	elgg_push_breadcrumb(elgg_echo('googleapps:menu:wikis'), elgg_get_site_url() . 'googleapps/wikis/all');
+	$params['context'] = 'googleapps/wikis';
+	$params['title'] = elgg_echo('googleapps:menu:wikis');
+	$params['filter_context'] = $container_guid ? 'mine' : 'all';
+	
+	// Default options (for 'ALL')
+	$options = array(
+		'type' => 'object', 
+		'subtype' => 'site',
+		'full_view' => FALSE,
+		'limit' => 10,
+	);
+	
+	
+	$container = get_entity($container_guid);
+	if (elgg_instanceof($container, 'user')) {
+		$params['title'] = elgg_echo('googleapps:label:user_wikis', array($container->name));
+		elgg_push_breadcrumb($container->name);
+		/* 
+			This use to work like this:
+			
+			$res = googleapps_sync_sites(true, $container);
+			$sites = $res['site_entities'];
+			$params['content'] = elgg_view('googleapps/wiki_list', array('wikis' => $sites));
+			
+			* Note: that wiki_list view was god-awful, its long gone. 
+			  It was just a weird way of listing wikis with an icon. I've remedied 
+			  the issue with a proper site object view
+		*/
+		
+		// Now we'll do the same (update sites) then list it the elggy way
+		googleapps_sync_sites(true, $container);
+		
+		if ($container != elgg_get_logged_in_user_entity()) {
+			$params['filter_context'] = FALSE;
+		}
+		
+		// Should be enough to set the container guid here.. otherwise see above
+		$options['container_guid'] = $container_guid;
+	} 
+	
+	$list = elgg_list_entities($options);
+	if (!$list) {
+		$content .= elgg_view('googleapps/noresults');
 	} else {
-		// get list of logged in users sites
-		$res = googleapps_sync_sites(true, $user);
-		$sites = $res['site_entities'];
+		$content .= $list;
 	}
+	
+	$params['content'] = $content;
+	
+	// Build custom tabs
+	if (elgg_is_logged_in()) {
+		$username = elgg_get_logged_in_user_entity()->username;
+		$tabs = array(
+			'all' => array(
+				'text' => elgg_echo('all'),
+				'href' => (isset($vars['all_link'])) ? $vars['all_link'] : "{$params['context']}/all",
+				'selected' => ($params['filter_context'] == 'all'),
+				'priority' => 200,
+			),
+			'mine' => array(
+				'text' => elgg_echo('mine'),
+				'href' => (isset($vars['mine_link'])) ? $vars['mine_link'] : "{$params['context']}/owner/$username",
+				'selected' => ($params['filter_context'] == 'mine'),
+				'priority' => 300,
+			)
+		);
 
-	$content_info['title'] = elgg_echo('googleapps:menu:wikis' . $postfix);
-	$content_info['content']  = elgg_view_title($content_info['title']) . elgg_view('googleapps/wiki_list', array('wikis' => $sites));
-	$content_info['layout'] = 'one_column_with_sidebar';
-	return $content_info;
-
+		foreach ($tabs as $name => $tab) {
+			$tab['name'] = $name;
+			elgg_register_menu_item('wiki_filter', $tab);
+		}
+	}
+	
+	$params['buttons'] = FALSE;
+	$params['filter'] = elgg_view_menu('wiki_filter', array(
+		'sort_by' => 'priority',
+		// recycle the menu filter css
+		'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default'
+	));
+	return $params;
 }
 
 /**

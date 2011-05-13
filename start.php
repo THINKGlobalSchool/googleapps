@@ -124,11 +124,11 @@ function googleapps_init() {
 	$user = elgg_get_logged_in_user_entity();
 	if (!empty($user) && $user->google) {
 		if ($oauth_sync_sites != 'no') {
-			$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/' . $user->username);
+			$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
 			elgg_register_menu_item('site', $item);
 		}
 		if ($oauth_sync_docs != 'no') {
-			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/' . $user->username);
+			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 			elgg_register_menu_item('site', $item);
 		}
 	}
@@ -187,7 +187,7 @@ function googleapps_pagesetup() {
 		'priority' => 99999,
 	);
 
-
+	/* Oldschool and redundant 
 	// Wikis
 	$menuitems[] = array(
 		'name' => 'wikis_your',
@@ -214,7 +214,6 @@ function googleapps_pagesetup() {
 	);
 
 	// Docs
-	/* Oldschool and redundant 
 	$menuitems[] = array(
 		'name' => 'docs_your',
 		'text' => elgg_echo('googleapps:menu:yourshareddocs'),
@@ -255,7 +254,7 @@ function googleapps_pagesetup() {
 /**
  * googleapps page handler
  * 
- * - Now with 200% more awesome
+ * - Now with 300% more awesome
  *
  * Dispatches various google apps related pages
  * 
@@ -271,7 +270,7 @@ function googleapps_pagesetup() {
  * Friends docs:	googleapps/docs/friends/<username>
  * Share doc:		googleapps/docs/add/<guid>
  * Group docs		googleapps/docs/group/<guid>/owner @TODO
- * List form: 		googleapps/docs/list_form (ajax)
+ * List form:		googleapps/docs/list_form (ajax)
  * 
  * Wikis:
  * ------
@@ -285,68 +284,87 @@ function googleapps_pagesetup() {
  */
 function googleapps_page_handler($page) {	
 	gatekeeper();
-	if (isset($page[0])) {
-		switch ($page[0]) {
-			// Settings subhandler
-			case 'settings':
-				elgg_set_context('settings');
-				// Google apps settings pages
-				switch ($page[1]) {
-					case 'wikiactivity':
-						$params = googleapps_get_page_content_settings_wikiactivity();
-						break;
-					default:
-					case 'account':
-						$params = googleapps_get_page_content_settings_account();
-						break;
-				}
-				break;
-			// Docs subhandler
-			case 'docs':
-				elgg_push_context('docs');
-				// Google Docs pages
-				switch ($page[1]) {
-					case 'list_form':
-						echo elgg_view('googleapps/forms/document_chooser');
-						// Need to break out of the page handler for this one (ajax)
-						return true;
-						break;
-					case 'friends':
-						$user = get_user_by_username($page[2]);
-						$params = googleapps_get_page_content_docs_friends($user->getGUID());
-						break;
-					case 'add':
-						if ($page[2]) {
-							elgg_set_page_owner_guid($page[2]);
-						} else {
-							elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
-						}
-						$params = googleapps_get_page_content_docs_share();
-						break;
-					case 'owner':
-						$user = get_user_by_username($page[2]);
-						elgg_set_page_owner_guid($user->guid);
-						$params = googleapps_get_page_content_docs($user->guid);
-						break;
-					case 'group':
+	
+	// One of three: settings/docs/wikis
+	$sub_handler = $page[0];
+	
+	$page_type = $page[1];
+	
+	switch ($sub_handler) {
+		// Settings subhandler
+		case 'settings':
+			elgg_set_context('settings');
+			switch ($page_type) {
+				case 'wikiactivity':
+					$params = googleapps_get_page_content_settings_wikiactivity();
+					break;
+				default:
+				case 'account':
+					$params = googleapps_get_page_content_settings_account();
+					break;
+			}
+			break;
+		// Docs subhandler
+		case 'docs':
+			elgg_push_context('docs');
+			switch ($page_type) {
+				case 'list_form':
+					echo elgg_view('googleapps/forms/document_chooser');
+					// Need to break out of the page handler for this one (ajax)
+					return true;
+					break;
+				case 'add':
+					if ($page[2]) {
 						elgg_set_page_owner_guid($page[2]);
-						$params = googleapps_get_page_content_docs($page[2]);
-						break;
-					case 'all':
-					default:
-						$params = googleapps_get_page_content_docs();
-						break;
-				}
-				break;
-			// Wikis subhandler
-			case 'wikis':
-				elgg_set_context('wikis');
-				$content_info = googleapps_get_page_content_wikis($page[1]);
-				break;
-		}
-	} else {
-		elgg_set_context('wikis');
-		$content_info = googleapps_get_page_content_wikis($page[1]);
+					} else {
+						elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
+					}
+					$params = googleapps_get_page_content_docs_share();
+					break;
+				case 'owner':
+					$user = get_user_by_username($page[2]);
+					elgg_set_page_owner_guid($user->guid);
+					$params = googleapps_get_page_content_docs_list($user->guid);
+					break;
+				case 'friends':
+					$user = get_user_by_username($page[2]);
+					$params = googleapps_get_page_content_docs_friends($user->getGUID());
+					break;
+				case 'group':
+					elgg_set_page_owner_guid($page[2]);
+					$params = googleapps_get_page_content_docs_list($page[2]);
+					break;
+				case 'all':
+				default:
+					$params = googleapps_get_page_content_docs_list();
+					break;
+			}
+			break;
+		// Wikis subhandler
+		case 'wikis':
+			elgg_push_context('wikis');
+			switch ($page_type) {
+				case 'owner':
+					$user = get_user_by_username($page[2]);
+					elgg_set_page_owner_guid($user->guid);
+					$params = googleapps_get_page_content_wikis_list($user->guid);
+					break;
+				/*
+				case 'friends':
+					$user = get_user_by_username($page[2]);
+					$params = googleapps_get_page_content_docs_friends($user->getGUID());
+					break;
+				*/
+				case 'all':
+				default:
+					$params = googleapps_get_page_content_wikis_list();
+					break;
+			}
+			break;
+		default:
+			// Nothing I guess?
+			forward();
+			break;	
 	}
 
 	$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);

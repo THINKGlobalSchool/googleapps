@@ -74,6 +74,7 @@ $english = array(
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
+	'googleapps:label:user_wikis' => '%s\'s Wikis',
 	'googleapps:label:google_docs' => 'Google Docs',
 	'googleapps:label:google_docs_description' => '',
 	'googleapps:label:site' => 'Wiki',
@@ -89,6 +90,8 @@ $english = array(
 	'googleapps:label:table_select' => 'Select',
 	'googleapps:label:table_name' => 'Name',
 	'googleapps:label:table_collaborators' => 'Collaborators',
+	'googleapps:label:owners' => 'Owners',
+	'googleapps:label:updated' => 'Updated',
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
 	'googleapps:label:viewdocument' => 'View Document',
