@@ -15,7 +15,7 @@ googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
 
-$docs_list = '<div id="googleapps_browse_table">
+$docs_list = '<div id="googleapps-docs-browse-table">
 				<table>
 					<tbody>
 						<tr>
@@ -33,13 +33,13 @@ foreach ($google_docs as $id => $doc) {
 
 	$docs_list .= '
     <tr>
-		<td class="doc_select"><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
-		<td class="doc_name">
+		<td class="doc-select"><input type="radio" name="document_id" value="' . $doc['id'] . '"></td>
+		<td class="doc-name">
 			<span class="document-icon ' . $doc["type"] . '"></span>
 		 	<a href="' . $doc["href"] . '" target="_blank">' . $doc["title"] . '</a>
 		</td>
-		<td class="doc_collaborators">' . $permission_str.'</td>
-		<td class="doc_updated">' . friendly_time($doc["updated"]) . '</td>
+		<td class="doc-collaborators">' . $permission_str.'</td>
+		<td class="doc-updated">' . friendly_time($doc["updated"]) . '</td>
     </tr>
     ';
 }

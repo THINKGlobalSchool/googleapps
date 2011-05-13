@@ -9,6 +9,6 @@
  */
 ?>
 <form action="<?php echo $vars['url']; ?>action/google/wikis/reset" method="" name="googlesites_reset">
-	<p>Reset all learned Google Sites: <input type="submit" class="action_button" value="Reset"></p>
+	<p>Reset all learned Google Sites: <input type="submit" class="elgg-action-button" value="Reset"></p>
 	<?php echo elgg_view('input/securitytoken'); ?>
 </form>

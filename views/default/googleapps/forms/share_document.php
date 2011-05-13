@@ -57,13 +57,13 @@ $match_input = elgg_view('input/dropdown', array(
 						)		
 ));
 													
-$match_tooltip = "<a class='gapps_tooltip' href='#'>" . elgg_echo('googleapps:label:tooltipname') . "<span>" . elgg_echo('googleapps:tooltip:match') . "</span></a>";
+$match_tooltip = "<a class='googleapps-tooltip' href='#'>" . elgg_echo('googleapps:label:tooltipname') . "<span>" . elgg_echo('googleapps:tooltip:match') . "</span></a>";
 
 $submit_input = elgg_view('input/submit', array('name' => 'submit', 'value' => elgg_echo('save')));	
 
 // Browse document container
 $browse_content .= '<div id="googleapps">
-				<div id="google_docs_loading">
+				<div id="googleapps-docs-loading">
 					<img src="' . elgg_get_site_url() . '_graphics/ajax_loader_bw.gif" />
 					<p>' . elgg_echo('googleapps:label:loading') . '</p>
 				</div>

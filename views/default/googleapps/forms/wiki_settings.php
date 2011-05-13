@@ -40,7 +40,7 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 
 			echo '<p>'.elgg_echo('googleapps:usersettings:sites_description').'</p>';
 
-			$body = '<table class="wiki_activity_settings"><tr><th>'.elgg_echo('googleapps:label:site').'</th><th>'.elgg_echo('googleapps:label:access_level').'</th></tr>';
+			$body = '<table class="googleapps-wiki-activity-settings"><tr><th>'.elgg_echo('googleapps:label:site').'</th><th>'.elgg_echo('googleapps:label:access_level').'</th></tr>';
 			foreach ($site_list as $site_id => $site_obj) {
 
 				$title = $site_obj['title'];
@@ -56,11 +56,11 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 							'name' => 'googleapps_sites_settings['.$site_id.']',
 							'value' => $access
 					));
-					$body .= '<tr><td>'.$title.'</td><td class="access_col">'.$access_input.'</td></tr>';
+					$body .= '<tr><td>'.$title.'</td><td class="wiki-access">'.$access_input.'</td></tr>';
 
 				}
 			}
-			$body .= '<tr class="submit_row"><td colspan=2 class="submit_cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
+			$body .= '<tr class="wiki-submit-row"><td colspan=2 class="wiki-submit-cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
 			$body .= '</table>';
 			echo elgg_view('input/form',array(
 				'body' => $body,

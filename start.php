@@ -64,7 +64,7 @@ function googleapps_init() {
 	elgg_extend_view('html_head/extend', 'googleapps/oauth_scripts');
 
 	// Extend system CSS with our own styles
-	elgg_extend_view('css/elgg','googleapps/css');
+	elgg_extend_view('css/elgg','css/googleapps/css');
 
 	// Include tablesorter
 	//elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
