@@ -14,7 +14,7 @@ if($vars['entity']->shared_doc_enable != 'no') {
 	?>
 <div class="group_tool_widget google_shared_doc">
 	<span class="group_widget_link"><a
-		href="<?php echo $vars['url'] . "googleapps/docs/" . elgg_get_page_owner_entity()->username; ?>"><?php echo elgg_echo('link:view:all')?>
+		href="<?php echo $vars['url'] . "googleapps/docs/group/" . elgg_get_page_owner_entity()->getGUID() . "/owner"; ?>"><?php echo elgg_echo('link:view:all')?>
 	</a> </span>
 	<h3>
 	<?php echo elgg_echo("googleapps:label:google_docs"); ?>
@@ -44,7 +44,7 @@ if($vars['entity']->shared_doc_enable != 'no') {
 		}
 	} else {
 
-		$share_document = $vars['url'] . "googleapps/docs/share?container_guid=" . elgg_get_page_owner_guid();
+		$share_document = $vars['url'] . "googleapps/docs/add/" . elgg_get_page_owner_guid();
 		echo "<p><a href=\"{$share_document}\">" . elgg_echo("googleapps:label:shareadoc") . "</a></p>";
 
 	}

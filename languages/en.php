@@ -14,7 +14,8 @@ $english = array(
    	'item:object:shared_doc' => 'Google Shared Document',
 	'item:user:googleapps' => 'googleapps users',
 	'shared_doc' => 'Google Docs',
-	'shared_doc:new' => 'Share New Google Doc',
+	'googleapps:googleshareddoc' => 'Google Shared Docs',
+	'googleapps/docs:add' => 'Share New Google Doc',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -24,8 +25,8 @@ $english = array(
 	'googleapps:menu:wikis' => 'Wikis',
 	'googleapps:menu:create_new_wiki' => 'Create New Wiki',
 	'googleapps:menu:yourshareddocs' => 'Your Shared Google Docs',
-	'googleapps:menu:allshareddocs' => 'All Shared Google Docs', 
-	'googleapps:menu:friendsshareddocs' => 'Friend\'s Shared Google Docs',
+	'googleapps:menu:allshareddocs' => 'All Site Google Shared Docs', 
+	'googleapps:menu:friendsshareddocs' => 'Friends\' Shared Google Docs',
 
 	// Admin Settings
 	'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
@@ -72,6 +73,7 @@ $english = array(
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 
 	// General labels
+	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
 	'googleapps:label:google_docs' => 'Google Docs',
 	'googleapps:label:google_docs_description' => '',
 	'googleapps:label:site' => 'Wiki',
@@ -83,7 +85,7 @@ $english = array(
 	'googleapps:label:deleteconfirm' => 'Remove Shared Doc? (This will not delete the document from Google Documents, only from Spot)',
 	'googleapps:label:enableshareddoc' => 'Enable group shared google docs',
 	'googleapps:label:shareadoc' => 'Share a Google Doc',
-	'googleapps:label:groupdocs' => 'Group Google Docs',
+	'googleapps:label:groupdocs' => 'Group google docs',
 	'googleapps:label:table_select' => 'Select',
 	'googleapps:label:table_name' => 'Name',
 	'googleapps:label:table_collaborators' => 'Collaborators',

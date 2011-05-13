@@ -106,7 +106,7 @@ function googleapps_init() {
 	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
 
 	// Register profile menu hook
-	elgg_register_plugin_hook_handler('profile_menu', 'profile', 'googleapps_docs_profile_menu');
+	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
 
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
@@ -214,6 +214,7 @@ function googleapps_pagesetup() {
 	);
 
 	// Docs
+	/* Oldschool and redundant 
 	$menuitems[] = array(
 		'name' => 'docs_your',
 		'text' => elgg_echo('googleapps:menu:yourshareddocs'),
@@ -237,6 +238,7 @@ function googleapps_pagesetup() {
 		'contexts' => array('docs'),
 		'priority' => 99998,
 	);
+	*/
 
 
 	// Register menus
@@ -252,16 +254,40 @@ function googleapps_pagesetup() {
 
 /**
  * googleapps page handler
+ * 
+ * - Now with 200% more awesome
  *
- * - Now with 100% more awesome
+ * Dispatches various google apps related pages
+ * 
+ * Settings:
+ * ---------
+ * Wiki Activity settings:	googleapps/settings/wikiactivity
+ * Google account settings:	googleapps/settings/account
  *
+ * Docs:
+ * -----
+ * All docs:		googleapps/docs/all
+ * User's docs		googleapps/docs/owner/<username>
+ * Friends docs:	googleapps/docs/friends/<username>
+ * Share doc:		googleapps/docs/add/<guid>
+ * Group docs		googleapps/docs/group/<guid>/owner @TODO
+ * List form: 		googleapps/docs/list_form (ajax)
+ * 
+ * Wikis:
+ * ------
+ * All wikis: 		googleapps/wikis/all
+ * User's wikis:	googleapps/wikis/owner/<username>
+ * Friends wikis: 	googleapps/wikis/friends/<username>
+ * 
+ * 
  * @param array $page From the page_handler function
  * @return true|false Depending on success
  */
-function googleapps_page_handler($page) {
+function googleapps_page_handler($page) {	
 	gatekeeper();
 	if (isset($page[0])) {
 		switch ($page[0]) {
+			// Settings subhandler
 			case 'settings':
 				elgg_set_context('settings');
 				// Google apps settings pages
@@ -275,51 +301,44 @@ function googleapps_page_handler($page) {
 						break;
 				}
 				break;
+			// Docs subhandler
 			case 'docs':
-				elgg_set_context('docs');
+				elgg_push_context('docs');
 				// Google Docs pages
-				if (isset($page[1]) && !empty($page[1])) {
-					switch ($page[1]) {
-						case 'friends':
-							$content_info = googleapps_get_page_content_docs_friends(elgg_get_logged_in_user_guid());
-							break;
-						case 'share':
-							// Page owner fun
-							if ($container = (int) get_input('container_guid')) {
-								elgg_set_page_owner_guid($container);
-							}
-							$page_owner = elgg_get_page_owner_entity();
-							if (!$page_owner) {
-								$page_owner_guid = elgg_get_logged_in_user_guid();
-								if ($page_owner_guid)
-								elgg_set_page_owner_guid($page_owner_guid);
-							}
-							$content_info = googleapps_get_page_content_docs_sharebox();
-							break;
-						case 'list_form':
-							echo elgg_view('googleapps/forms/document_chooser');
-							// Need to break out of the page handler for this one
-							return true;
-							break;
-						default:
-							// Should be a username if we're here.. so check, if not get outta here
-							if (isset($page[1])) {
-								$owner_name = $page[1];
-								set_input('username', $owner_name);
-
-								// grab the page owner
-								$owner = elgg_get_elgg_get_page_owner_entity();
-							} else {
-								elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
-							}
-							$content_info = googleapps_get_page_content_docs($owner->getGUID());
-								
-							break;
-					}
-				} else {
-					$content_info = googleapps_get_page_content_docs();
+				switch ($page[1]) {
+					case 'list_form':
+						echo elgg_view('googleapps/forms/document_chooser');
+						// Need to break out of the page handler for this one (ajax)
+						return true;
+						break;
+					case 'friends':
+						$user = get_user_by_username($page[2]);
+						$params = googleapps_get_page_content_docs_friends($user->getGUID());
+						break;
+					case 'add':
+						if ($page[2]) {
+							elgg_set_page_owner_guid($page[2]);
+						} else {
+							elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
+						}
+						$params = googleapps_get_page_content_docs_share();
+						break;
+					case 'owner':
+						$user = get_user_by_username($page[2]);
+						elgg_set_page_owner_guid($user->guid);
+						$params = googleapps_get_page_content_docs($user->guid);
+						break;
+					case 'group':
+						elgg_set_page_owner_guid($page[2]);
+						$params = googleapps_get_page_content_docs($page[2]);
+						break;
+					case 'all':
+					default:
+						$params = googleapps_get_page_content_docs();
+						break;
 				}
 				break;
+			// Wikis subhandler
 			case 'wikis':
 				elgg_set_context('wikis');
 				$content_info = googleapps_get_page_content_wikis($page[1]);
@@ -330,13 +349,7 @@ function googleapps_page_handler($page) {
 		$content_info = googleapps_get_page_content_wikis($page[1]);
 	}
 
-
-	//$body = elgg_view_layout($content_info['layout'], $params);
-
-	//echo elgg_view_page($content_info['title'], $body, $content_info['layout'] == 'administration' ? 'admin' : 'default');
-
-
-	$body = elgg_view_layout($params['layout'], $params);
+	$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);
 
 	echo elgg_view_page($params['title'], $body);
 }
@@ -570,7 +583,7 @@ function googleapps_shared_doc_write_acl_plugin_hook($hook, $type, $value, $para
 }
 
 /**
- * Add google docs to the owner block
+ * Add google docs to the owner block menu
  *
  * @param string $hook   Name of hook
  * @param string $type   Entity type
@@ -578,11 +591,18 @@ function googleapps_shared_doc_write_acl_plugin_hook($hook, $type, $value, $para
  * @param array  $params Parameters
  * @return mixed
  */
-function googleapps_docs_profile_menu($hook, $type, $value, $params) {
-	$value[] = array(
-		'text' => elgg_echo('googleapps:label:google_docs'),
-		'href' => "googleapps/docs/{$params['owner']->username}",
-	);
+function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
+	if (elgg_instanceof($params['entity'], 'user')) {
+		$url = "googleapps/docs/owner/{$params['entity']->username}";
+		$item = new ElggMenuItem('googledocs', elgg_echo('shared_doc'), $url);
+		$value[] = $item;
+	} else {
+		if ($params['entity']->shared_doc_enable != "no") {
+			$url = "googleapps/docs/group/{$params['entity']->guid}/owner";
+			$item = new ElggMenuItem('googledocs', elgg_echo('googleapps:label:groupdocs'), $url);
+			$value[] = $item;
+		}
+	}
 
 	return $value;
 }
