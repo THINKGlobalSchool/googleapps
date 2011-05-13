@@ -143,48 +143,12 @@ div#share_browse {
 	padding-bottom: 10px;
 }
 
-
-/* messages/new messages icon & counter in elgg_topbar */
-a.emailnotifier {
+/* Gmail Icon */
+span.google-email-notifier {
 	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
-	padding-left:16px;
-	margin:2px 15px 0 5px;
 	cursor:pointer;
+	margin-top: -5px;
 }
-a.emailnotifier:hover {
-	text-decoration: none;
-	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
-}
-a.emailnotifier.new {
-	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
-	padding-left:18px;
-	margin:2px 15px 0 5px;
-	color:white;
-}
-a.emailnotifier.new:hover {
-	text-decoration: none;
-	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
-}
-a.emailnotifier.new span {
-	background-color: red;
-	-webkit-border-radius: 10px; 
-	-moz-border-radius: 10px; 
-	-webkit-box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.50); /* safari v3+ */
-	-moz-box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.50); /* FF v3.5+ */
-	color:white;
-	display:block;
-	float:right;
-	padding:0;
-	position:relative;
-	text-align:center;
-	top:-1px;
-	right:5px;
-	min-width: 16px;
-	height:16px;
-	font-size:10px;
-	font-weight:bold;
-}
-
 
 table.wiki_activity_settings {
 	width: 500px;

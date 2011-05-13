@@ -581,7 +581,7 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 	((!$all && in_array('mail', $scope)) || $all)) {
 		// Get count unread messages of gmail
 		$count = $client->unread_messages();
-		$_SESSION['new_google_mess'] = $count;
+		$_SESSION['google_mail_count'] = $count;
 	}
 
 	if ($oauth_sync_docs != 'no') {

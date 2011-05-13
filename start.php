@@ -69,12 +69,9 @@ function googleapps_init() {
 	// Include tablesorter
 	//elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
 
-	// Extend topbar view to add new mail icon
-	elgg_extend_view('elgg_topbar/extend','googleapps/new_mail');
-
 	// Register subtypes
-	register_entity_type('object','site_activity', 'Site activity');
-	register_entity_type('object','shared_doc', 'Doc activity');
+	elgg_register_entity_type('object','site_activity', 'Site activity');
+	elgg_register_entity_type('object','shared_doc', 'Doc activity');
 
 	// Pagesetup event handler
 	elgg_register_event_handler('pagesetup','system','googleapps_pagesetup');
@@ -82,6 +79,9 @@ function googleapps_init() {
 	// Login handler
 	elgg_register_event_handler('login', 'user', 'googleapps_login');
 
+	// Hook for site menu
+	elgg_register_plugin_hook_handler('register', 'menu:topbar', 'googleapps_topbar_menu_setup', 9000);
+	
 	// Register a handler for creating shared docs
 	elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
 
@@ -508,6 +508,38 @@ function google_apps_shared_doc_create_event_listener($event, $object_type, $obj
 		}
 	}
 	return true;
+}
+
+/**
+ * Topbar menu hook handler
+ * - adds the new mail icon to the topbar
+ */
+function googleapps_topbar_menu_setup($hook, $type, $return, $params) {		
+	
+	if (elgg_get_plugin_setting('oauth_sync_email', 'googleapps') != 'no') {
+		$user = elgg_get_logged_in_user_entity();
+		if (isset($_SESSION['google_mail_count'])) {
+			$count = $_SESSION['google_mail_count'];
+			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+			
+			$class = "elgg-icon google-email-notifier";
+			$text = "<span class='$class'></span>";
+
+			if ($count != 0) {
+				$text .= "<span class=\"messages-new\">$count</span>";
+			}
+
+			$options = array(
+				'name' => 'google_email',
+				'text' => $text,
+				'href' =>  'todo',
+				'priority' => 999,
+			);
+			$return[] = ElggMenuItem::factory($options);
+		}	
+	}
+	
+	return $return;	
 }
 
 /**
