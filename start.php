@@ -113,6 +113,9 @@ function googleapps_init() {
 
 	// Setup url handler for google shared docs
 	elgg_register_entity_url_handler('object', 'shared_doc', 'googleapps_shared_doc_url_handler');
+	
+	// Setup url handler for google shared docs
+	elgg_register_entity_url_handler('object', 'site', 'googleapps_site_url_handler');
 
 	// add group profile and tool entries
 	if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
@@ -633,7 +636,15 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
  * @return string request url
  */
 function googleapps_shared_doc_url_handler($entity) {
-	global $CONFIG;
-
 	return $entity->href;
+}
+
+/**
+ * Populates the ->getUrl() method for google sites/wikis
+ *
+ * @param ElggEntity $entity The entity to return the URL for
+ * @return string request url
+ */
+function googleapps_site_url_handler($entity) {
+	return $entity->url;
 }

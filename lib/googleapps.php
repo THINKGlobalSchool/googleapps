@@ -291,7 +291,7 @@ function googleapps_list_sites() {
 function googleapps_list_sites_by_user() {
 	$output = "";
 
-	$googleusers =find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	$googleusers = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
 	foreach($googleusers as $googleuser) {
 		$user = get_user($googleuser->owner_guid);
 		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
