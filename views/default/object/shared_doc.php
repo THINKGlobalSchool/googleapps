@@ -2,73 +2,59 @@
 /**
  * Googleapps shared document object listing
  *
- * @package googleapps
+ * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @author Jeff Tilson
  * @copyright THINK Global School 2010
- * @link http://www.thinkglobalschool.org
+ * @link http://www.thinkglobalschool.com/
+ *
  */
 
+$full = elgg_extract('full_view', $vars, FALSE);
+$doc = elgg_extract('entity', $vars, FALSE);
 
-// Get entity info
-$owner = $vars['entity']->getOwnerEntity();
-$friendlytime = elgg_view_friendly_time($vars['entity']->time_created);
-$address = $vars['entity']->href;
-$title = $vars['entity']->title;
-$parsed_url = parse_url($address);
-
-//sort out the access level for display
-$object_acl = get_readable_access_level($vars['entity']->access_id);
-
-// Function above works sometimes.. its weird. So load ACL name if any
-if (!$object_acl) {
-	$acl = get_access_collection($vars['entity']->access_id);
-	$object_acl = $acl->name;
+if (!$doc) {
+	return TRUE;
 }
 
-if ($vars['entity']->description != '') {
-	$view_desc = "| <a class='link' onclick=\"elgg_slide_toggle(this,'.entity_listing','.note');\">" . elgg_echo('description') . "</a>";
-} else {
-$view_desc = '';
+$owner = $doc->getOwnerEntity();
+$container = $doc->getContainerEntity();
+$categories = elgg_view('output/categories', $vars);
+$excerpt = elgg_get_excerpt($doc->description);
+
+$owner_icon = elgg_view_entity_icon($owner, 'tiny');
+$owner_link = elgg_view('output/url', array(
+	'href' => "blog/owner/$owner->username",
+	'text' => $owner->name,
+));
+
+$author_text = elgg_echo('googleapps:label:shared_by', array($owner_link));
+$tags = elgg_view('output/tags', array('tags' => $doc->tags));
+$date = elgg_view_friendly_time($doc->time_created);
+
+$metadata = elgg_view_menu('entity', array(
+	'entity' => $vars['entity'],
+	'handler' => 'google/docs',
+	'sort_by' => 'priority',
+	'class' => 'elgg-menu-hz',
+));
+
+$subtitle = "<p>$author_text $date</p>";
+$subtitle .= $categories;
+
+// do not show the metadata and controls in widget view
+if (elgg_in_context('widgets')) {
+	$metadata = '';
 }
 
+// brief view
+$params = array(
+	'entity' => $doc,
+	'metadata' => $metadata,
+	'subtitle' => $subtitle,
+	'tags' => $tags,
+	'content' => $excerpt,
+);
+$list_body = elgg_view('page/components/summary', $params);
 
-$icon = elgg_view("profile/icon", array('entity' => $owner,'size' => 'tiny',));
-
-//delete
-if($vars['entity']->canEdit()){
-	$delete .= "<span class='delete_button'>" . elgg_view('output/confirmlink',array(
-				'href' => "action/google/docs/delete?guid=" . $vars['entity']->guid,
-				'text' => elgg_echo("delete"),
-				'confirm' => elgg_echo("googleapps:label:deleteconfirm"),
-	)) . "</span>";
-}
-
-$info = "<div class='entity_metadata'><span {$access_level}>{$object_acl}</span>";
-
-// include a view for plugins to extend
-$info .= elgg_view("googlapps/options",array('entity' => $vars['entity']));
-
-// Add favorites and likes
-$info .= elgg_view("favorites/form",array('entity' => $vars['entity']));
-$info .= elgg_view_likes($vars['entity']); // include likes
-
-// include delete
-if($vars['entity']->canEdit()){
-	$info .= $delete;
-}
-
-$info .= "</div>";
-
-$info .= "<p class='entity_title'><a href=\"{$address}\" target=\"_blank\">{$title}</a></p>";
-$info .= "<p class='entity_subtext'>" . elgg_echo('googleapps:label:shared_by', array("<a href=\"".elgg_get_site_url()."googleapps/docs/{$owner->username}\">{$owner->name}</a>")) . " {$friendlytime} {$view_desc}</p>";
-
-$tags = elgg_view('output/tags', array('tags' => $vars['entity']->tags));
-if (!empty($tags)) {
-	$info .= '<p class="tags">' . $tags . '</p>';
-}
-if($view_desc != ''){
-	$info .= "<div class='note hidden'>". $vars['entity']->description . "</div>";
-}
-
-//display
-echo elgg_view_listing($icon, $info);
+echo elgg_view_image_block($owner_icon, $list_body);

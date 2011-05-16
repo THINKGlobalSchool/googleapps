@@ -8,6 +8,20 @@
  * @link http://www.thinkglobalschool.org
  */
 
+/******************************* @TODO *********************************
+ *
+ * - Fix group modules
+ * - Test and make sure that we don't need to manually 
+ *   load the google docs list on the share form
+ *   if not, then things will be nice and snappy
+ * - Test the google docs sharing some more (ie, match permissions)
+ * - Try to get rid of some more of these $GLOBALS
+ * - Have another go at the CSS
+ * - Widgets??
+ * - Figure out why wiki data is out of date (cron maybe?)
+ * 
+ ***********************************************************************/
+
 elgg_register_event_handler('init','system','googleapps_init');
 
 /**
@@ -32,15 +46,11 @@ function googleapps_init() {
 	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
 	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/connect', FALSE);
 	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/disconnect', FALSE);
-	$share_doc_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/share', FALSE);
-	$change_doc_permissions_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/docs/update_permissions', FALSE);
 
 	// Set to globals
 	$GLOBALS['googleapps_url'] = $googleapps_url;
 	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;
 	$GLOBALS['googleappsdisconnect_url'] = $googleappsdisconnect_url;
-	$GLOBALS['share_doc_url'] = $share_doc_url;
-	$GLOBALS['change_doc_permissions_url'] = $change_doc_permissions_url;
 
 	// Constants
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
@@ -83,6 +93,9 @@ function googleapps_init() {
 	// Hook for site menu
 	elgg_register_plugin_hook_handler('register', 'menu:topbar', 'googleapps_topbar_menu_setup', 9000);
 	
+	// Remove the edit link from the shared doc entity menu
+	elgg_register_plugin_hook_handler('prepare', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
+	
 	// Register a handler for creating shared docs
 	elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
 
@@ -107,6 +120,9 @@ function googleapps_init() {
 
 	// Register profile menu hook
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
+	
+	// Interrupt output/access view
+	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
 
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
@@ -159,7 +175,7 @@ function googleapps_init() {
 	// Shared Doc related (docs)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/docs";
 	elgg_register_action('google/docs/share', "$action_base/share.php");
-	elgg_register_action('google/docs/update_permissions', "$action_base/update_permissions.php");
+	elgg_register_action('google/docs/permissions', "$action_base/permissions.php");
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
 }
 
@@ -273,7 +289,7 @@ function googleapps_pagesetup() {
  * Friends docs:	googleapps/docs/friends/<username>
  * Share doc:		googleapps/docs/add/<guid>
  * Group docs		googleapps/docs/group/<guid>/owner @TODO
- * List form:		googleapps/docs/list_form (ajax)
+ * Doc Chooser:		googleapps/docs/chooser (ajax)
  * 
  * Wikis:
  * ------
@@ -311,8 +327,8 @@ function googleapps_page_handler($page) {
 		case 'docs':
 			elgg_push_context('docs');
 			switch ($page_type) {
-				case 'list_form':
-					echo elgg_view('googleapps/forms/document_chooser');
+				case 'chooser':
+					echo elgg_view('forms/google/docs/chooser');
 					// Need to break out of the page handler for this one (ajax)
 					return true;
 					break;
@@ -549,7 +565,7 @@ function google_apps_shared_doc_create_event_listener($event, $object_type, $obj
  * Topbar menu hook handler
  * - adds the new mail icon to the topbar
  */
-function googleapps_topbar_menu_setup($hook, $type, $return, $params) {		
+function googleapps_topbar_menu_setup($hook, $type, $value, $params) {		
 	
 	if (elgg_get_plugin_setting('oauth_sync_email', 'googleapps') != 'no') {
 		$user = elgg_get_logged_in_user_entity();
@@ -571,11 +587,36 @@ function googleapps_topbar_menu_setup($hook, $type, $return, $params) {
 				'priority' => 999,
 				'item_class' => 'google-email-container',
 			);
-			$return[] = ElggMenuItem::factory($options);
+			$value[] = ElggMenuItem::factory($options);
 		}	
 	}
 	
-	return $return;	
+	return $value;	
+}
+
+/**
+ * Customize the entity menu for shared docs
+ * - Removes the edit link
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_shared_doc_entity_menu_setup($hook, $type, $value, $params) {
+	$entity = $params['entity'];
+
+	// don't display edit link for polls
+	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
+		foreach ($value['default'] as $i => $menu) {
+			if ($menu->getName() == 'edit') {
+				unset ($value['default'][$i]);
+			}
+		}
+	}
+
+	return $value;
 }
 
 /**
@@ -625,6 +666,35 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
 		}
 	}
 
+	return $value;
+}
+
+/**
+ * Hook to allow output/access to display a group name
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_shared_doc_output_access_handler($hook, $type, $value, $params) {
+	$entity = $params['vars']['entity'];
+	if ($entity->getSubtype() == 'shared_doc') {
+		$access_id = $entity->access_id;
+
+		// Try to get the regular string
+		$access_id_string = get_readable_access_level($access_id);	
+		
+		// If its nothing, then try to grab an acl
+		if (!$access_id_string) {
+			$acl = get_access_collection($access_id);
+			$access_id_string = $acl->name;
+		}
+		
+		// If we haven't got a string by now, it'll be empty..
+		$value = "<span class='elgg-access'>" . $access_id_string . "</span>";
+	}
 	return $value;
 }
 

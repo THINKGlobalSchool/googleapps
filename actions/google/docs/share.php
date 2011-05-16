@@ -19,7 +19,8 @@ $document_container_guid = get_input('container_guid');
 
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $document_container_guid)) {
-	echo elgg_echo('googleapps:error:nopermission');
+	register_error(elgg_echo('googleapps:error:nopermission'));
+	forward();
 }
 
 if ($document_match && $access_level === null) {
@@ -29,8 +30,8 @@ if ($document_match && $access_level === null) {
 
 // Check for a document url/id
 if (empty($document_id) && empty($document_url)) {
-	echo elgg_echo("googleapps:error:document_id_required");
-	exit;
+	register_error(elgg_echo("googleapps:error:document_id_required"));
+	forward();
 }
 
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
@@ -51,8 +52,8 @@ if ($document_url && !empty($document_url)) {
 		}
 	}
 	if (!$found) {
-		echo elgg_echo('googleapps:error:invalid_url');
-		exit;
+		register_error(elgg_echo('googleapps:error:invalid_url'));
+		forward();
 	}
 } else {
 	// Browsed to document, so match id
@@ -71,14 +72,20 @@ $document_info['access'] = $access_level;
 $document_info['tags'] = $document_tags;
 $_SESSION['google_docs_to_share_data'] = serialize($document_info); // remember data
 
-
 $collaborators = $document['collaborators'];
 
 if (!check_document_permission($collaborators, $access_level)) {
-	echo elgg_view('googleapps/forms/docs_permissions', array('container_guid' => $document_container_guid));
-	exit;
+	// Output permissions form	
+	$vars = array(
+		'id' => 'google-docs-update-permissions',
+		'name' => 'google_docs_update_permissions',
+	);
+	
+	echo elgg_view_form('google/docs/permissions', $vars, array('container_guid' => $document_container_guid));
+	forward();
 } else {
+	// Share document and output success
 	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid); // Share and public document activity
 	echo elgg_view('googleapps/success', array('container_guid' => $document_container_guid));
-	exit;
+	forward();
 }

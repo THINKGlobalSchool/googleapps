@@ -60,7 +60,7 @@ $english = array(
 	'googleapps:error:noemail' => 'No email', 
 	'googleapps:error:emailexists' => 'Email address: %s is already in use by another user.',
 	'googleapps:error:share_doc' => 'There was an error sharing the document.',
-	'googleapps:error:document_id_required' => '<h2>Uh oh..</h2><p class="googleappsdialog_message">You need to select a document first.</p>',
+	'googleapps:error:document_id_required' => 'You need to select a document first',
    	'googleapps:error:document_permissions_update' => 'Document permissions need to be updated',
 	'googleapps:error:invalid_url' => 'Invalid Google Document URL',
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
@@ -71,6 +71,7 @@ $english = array(
 	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 	'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
+	'googleapps:success' => 'Success!',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',

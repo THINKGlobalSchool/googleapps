@@ -28,6 +28,9 @@ elgg.google.SYNC_SITES = "<?php echo $oauth_sync_sites; ?>";
 elgg.google.SYNC_DOCS = "<?php echo $oauth_sync_docs; ?>";
 elgg.google.UPDATE_INTERVAL = "<?php echo $oauth_update_interval; ?>";
 
+// Ajax URL's
+elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
+
 elgg.google.init = function() {	
 	$(function() {	
 		// Do an initial update
@@ -37,11 +40,27 @@ elgg.google.init = function() {
 		setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
 		
 		// Google Docs Form Stuff (need to test this)
-		$('.permissions-update-input').live('click', function(el) {
-			// Probably need a this or something
-			alert('??');
-			el.form.answer.value = el.value;
+		$('.permissions-update-input').live('click', function(event) {
+			$(this).closest('form').find('#googleapps-docs-permissions-answer').val($(this).val());
 		})
+		
+		// Match permissions UI
+		$('#google-docs-match-permissions').change(function() {
+			if ($(this).val() == 0) {
+				$('#google-docs-access-id').removeAttr('disabled');
+				$('#google-docs-access-id-label').removeAttr('style');
+			} else {
+				$('#google-docs-access-id').attr('disabled', 'disabled');
+				$('#google-docs-access-id-label').attr('style', 'color: #999999');
+			}
+		});
+		
+		// Bind docsSubmit function to forms
+		$('#google-docs-update-permissions').live('submit', elgg.google.docsSubmit);
+		$('#google-docs-share-form').live('submit', elgg.google.docsSubmit);
+		
+		// Switch share form click event (makes tabs clickable)
+		$('.googleapps-docs-share-switch').live('click', elgg.google.showTab);
 
 	});
 }
@@ -81,6 +100,91 @@ elgg.google.updateGoogleApps = function() {
 			}
 		}
 	});	
+}
+
+// Load the document chooser
+elgg.google.loadDocumentChooser = function(id) {
+	// Load
+	elgg.get(elgg.google.CHOOSER_URL, {
+		success: function(html) {
+			$('#' + id).html(html);
+		},
+	});
+}
+
+// Submit handler
+elgg.google.docsSubmit = function(event) {	
+		
+	console.log('IN SUBMIT FUNCTION');
+		
+	var data = {};
+	
+	$($(this).serializeArray()).each(function (i, e) {
+		data[e.name] = e.value;
+		// TinyMCE does some voodoo magic.. need to account for that
+		if (e.name == 'description' && typeof(tinyMCE) !== 'undefined') {
+			var description = tinyMCE.get('description');
+			if (description) {
+				data[e.name] = description.getContent();
+			}
+		}
+	});
+
+	
+	elgg.action(this.action, {
+		data: data,
+		success: function(json) {
+			console.log(json);
+			
+			// Return false on error. The action should spit out some useful information
+			if (json.status == -1) {
+				return false;
+			}
+			
+			// Show dialog
+			var dlg = $("<div id='googleapps-dialog'></div>").html(json.output).dialog({
+				dialogClass: 'googleapps-dialog',
+				width: 450, 
+				modal: true,
+				closeOnEscape: false, 
+				open: function(event, ui) { 
+					$(".ui-dialog-titlebar-close").hide(); 	
+				},
+				buttons: {
+					"X": function() { 
+						$(this).dialog("close"); 
+					} 
+				}
+			});
+			
+			dlg.find('form').submit(function () {
+				dlg.parents('.ui-dialog').remove();
+			});
+				
+			if (json.output.toUpperCase() === 'OK') {
+				elgg.google.loadDocumentChooser('googleapps');
+			}	
+		}
+	});
+	
+	event.preventDefault();
+}
+
+// Tab click handler, shows the tab id supplied as HREF
+elgg.google.showTab = function(event) {
+	// Remove selected states
+	$(this).parent().parent().find('li').removeClass('elgg-state-selected');
+	
+	// Add selected state to this item
+	$(this).parent().addClass('elgg-state-selected');
+	
+	// Hide all the divs
+	$('.googleapps-docs-share-div').hide()
+	
+	// Show this HREF's div
+	$($(this).attr('href')).show();
+	
+	event.preventDefault();
 }
 
 elgg.register_hook_handler('init', 'system', elgg.google.init);

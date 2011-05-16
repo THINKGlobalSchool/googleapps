@@ -16,7 +16,7 @@
 
 .document-icon {
     background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/mimetypes.gif") no-repeat 0 0;
-	background-position:0 -170px;
+	background-position:0 -50px;
     width:10px;
     height:10px;
     display:block;
@@ -24,15 +24,11 @@
     margin:4px 5px; 
 }
 
-.document{
+.document, .rtf{
     background-position:0 -60px;
 }
 
-.rtf {
-    background-position:0 -60px;
-}
-
-.spreadsheet {
+.spreadsheet, .csv {
     background-position:0 -140px;
 }
 .presentation{
@@ -54,11 +50,7 @@
     background-position:0 -90px;
 }
 
-.excel {
-    background-position:0 -30px;
-}
-
-.csv {
+.excel, .xls, .xlsx {
     background-position:0 -30px;
 }
 
@@ -74,7 +66,7 @@
     background-position:0 -40px;
 }
 
-.word {
+.word, .msword  {
     background-position:0 -80px;
 }
 
@@ -170,45 +162,6 @@ table.googleapps-wiki-activity-settings td.wiki-submit-cell {
 	width: 100%
 }
 
-#googleapps-docs-browse-table table {
-	width: 100%;
-}
-
-#googleapps-docs-browse-table table td {
-	padding: 4px;
-	border-right: 1px solid #aaa;
-}
-
-#googleapps-docs-browse-table table th {
-	text-align: center;
-	border-top: 0;
-	border-left: 0;
-	border-right: 1px solid #aaa;
-	border-bottom: 1px solid #aaa;
-	color: #666;
-	font-weight: bold;
-}
-
-#googleapps-docs-browse-table table tr:nth-child(odd) {
-	background: #ddd;
-}
-
-#googleapps-docs-browse-table table td.doc-select {
-	width: 10px;
-}
-
-#googleapps-docs-browse-table table td.doc-name {
-	width: 40%;
-}
-
-#googleapps-docs-browse-table table td.doc-collaborators {
-	width: 25%;
-}
-
-#googleapps-docs-browse-table table td.doc-updated {
-	width: 25%;
-}
-
 a.googleapps-tooltip {
 	padding-left: 5px;
 	font-size: 11px;
@@ -243,9 +196,18 @@ a.googleapps-tooltip:hover span {
 	width: 200px;		
 }
 
-/* SUPER CUSTOM DIALOG */
+/** jQuery Custom Dialog **/
+.ui-widget-overlay
+{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+    background-color: #000000 !important;
+    opacity: 0.5;
+	-moz-opacity: 0.5; 
+}
 
-#googleappsdialog  {
+#googleapps-dialog  {
 	padding: 10px;
 	border: 8px solid #555555;
 	background: #ffffff;
@@ -253,9 +215,33 @@ a.googleapps-tooltip:hover span {
 	-webkit-border-radius: 5px 5px 5px 5px;
 }
 
-p.googleappsdialog_message {
-	margin-top: 5px;
-	margin-bottom: 5px;
-	font-weight: bold;
-	color: #333333;
+.googleapps-dialog.ui-dialog .ui-dialog-buttonpane {
+	position: absolute; 
+	right: .3em; 
+	top: 30px; 
+	width: 19px; 
+	margin: -10px 0 0 0; 
+	padding: 1px; height: 18px; 
+}
+
+.googleapps-dialog.ui-dialog .ui-dialog-buttonpane button { 
+	cursor: pointer; 
+	padding: .2em .6em .3em .6em; 
+	line-height: 1.4em; 
+	width:auto; 
+	overflow:visible; 
+}
+
+.googleapps-dialog.ui-dialog .ui-dialog-buttonpane button {
+	-moz-border-radius:4px 4px 4px 4px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	background:none repeat scroll 0 0 #000000;
+	border:1px solid #000000;
+	color:#FFFFFF;
+	cursor:pointer;
+	font:bold 12px/100% Arial,Helvetica,sans-serif;
+	height:25px;
+	float: right; margin: .5em .4em .5em 0; 
+	padding:2px 6px;
+	width:auto;
 }

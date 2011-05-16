@@ -126,7 +126,18 @@ function googleapps_get_page_content_docs_share() {
 		'filter' => '',
 	);
 	$params['title'] = elgg_echo('googleapps:label:google_docs');
-	$params['content'] = elgg_view('googleapps/forms/share_document');
+		
+	// Form vars
+	$vars = array();
+	$vars['id'] = 'google-docs-share-form';
+	$vars['name'] = 'google_docs_share_form';
+	
+	// Form body vars
+	$body_vars = array();
+	
+	// View share form
+	$params['content'] = elgg_view_form('google/docs/share', $vars);
+		
 	return $params;
 }
 
@@ -911,7 +922,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 
 
 /**
- * Get google docs for authorised client and folder
+ * Get google docs for authorized client and folder
  *
  * @param object $client
  * @param string $folder
@@ -954,7 +965,6 @@ function googleapps_google_docs($client, $folder = null) {
 			}
 			if (!empty ($attrs['scheme']) && $attrs['scheme'] == 'http://schemas.google.com/g/2005#kind') {
 				$type = preg_replace('/\ label\=\"(.*)\"/', '$1', $attrs['label']->asXML());
-				;
 				$is_folder = ($type == 'folder');
 			}
 		}

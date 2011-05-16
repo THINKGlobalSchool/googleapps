@@ -17,7 +17,8 @@ $container_guid = get_input('container_guid');
 
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
-	echo elgg_echo('googleapps:error:nopermission');
+	register_error(elgg_echo('googleapps:error:nopermission'));
+	forward();
 }
 
 // Get google docs from session
@@ -50,5 +51,5 @@ switch (get_input('answer')) {
 		share_document($document, $description, $tags, $access_id, $container_guid);
 		break;
 }
-die (elgg_view('googleapps/success', array('container_guid' => $container_guid)));
-exit;
+echo elgg_view('googleapps/success', array('container_guid' => $container_guid));
+forward();
