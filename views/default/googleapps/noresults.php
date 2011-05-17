@@ -12,10 +12,10 @@
 ?>
 <div>
 	<center>
-		<b>
+		<label>
 			<?php 
-				echo elgg_echo("todo:label:noresults");
+				echo elgg_echo("search:no_results");
 			?>
-		</b>
+		</label>
 	</center>
 </div>

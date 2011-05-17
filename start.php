@@ -10,9 +10,6 @@
 
 /******************************* @TODO *********************************
  *
- * - Test and make sure that we don't need to manually 
- *   load the google docs list on the share form
- *   if not, then things will be nice and snappy
  * - Test the google docs sharing some more (ie, match permissions)
  * - Minimize $_SESSION junk
  * - Have another look at the en.php language file (remove unused)

@@ -329,8 +329,7 @@ function googleapps_list_sites() {
 	$output .= "<p>Site entities found: {$site_count}</p>";
 	if ($site_entities) {
 		foreach($site_entities as $site_entity) {
-			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
-			$output .= "<br/>";
+			$output .= elgg_view('object/site', array('entity' => $site_entity, 'debug' => TRUE));
 		}
 	}
 
@@ -352,7 +351,7 @@ function googleapps_list_sites_by_user() {
 		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
 		foreach($site_list as $key => $site) {
 			$site_entity = get_entity($site['entity_id']);
-			$output .= elgg_view('googleapps/admin/site_entity',array('site_entity'=>$site_entity));
+			$output .= elgg_view('object/site', array('entity' => $site_entity, 'debug' => TRUE));
 		}
 		$output .= "<hr />";
 	}

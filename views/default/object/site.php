@@ -50,13 +50,49 @@ $date = elgg_view_friendly_time($site->modified);
 $subtitle = "<p><strong>" . elgg_echo('googleapps:label:updated') . ":</strong> $date <br /> 
 				<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string</p>";
 
-// brief view
-$params = array(
-	'entity' => $site,
-	'metadata' => $metadata,
-	'subtitle' => $subtitle,
-	'tags' => 'false',
-);
-$list_body = elgg_view('page/components/summary', $params);
+if ($vars['debug'] == TRUE) {
+	// Admin debug view
+	
+	$date = date(DATE_ATOM, $site->modified);
+	
+	$content = <<<HTML
+		<hr />
+		<table class='googleapps-sites-debug'>
+			<tbody>
+				<tr>
+					<td style='padding-right: 10px;'><strong>GUID:</strong> </td>
+					<td>$owner->username ($owner->guid)</td>
+				</tr>
+				<tr>
+					<td style='padding-right: 10px;'><strong>Owner:</strong></td>
+					<td>$site->guid</td>
+				</tr>
+				<tr>
+					<td style='padding-right: 10px;'><strong>URL:</strong></td>
+					<td><a href='$site->url'>{$site->url}</a></td>
+				</tr>
+				<tr>
+					<td style='padding-right: 10px;'><strong>Access Level:</strong> </td>
+					<td>$site->site_access_id</td>
+				</tr>
+				<tr>
+					<td style='padding-right: 10px;'><strong>Last modified:</strong></td>
+					<td>$date</td>
+				</tr>
+			</tbody>
+		</table>
+		<br />
+HTML;
+	echo elgg_view_module('info', $site->title, $content);
+} else {
+	// brief view
+	$params = array(
+		'entity' => $site,
+		'metadata' => $metadata,
+		'subtitle' => $subtitle,
+		'tags' => 'false',
+	);
+	$list_body = elgg_view('page/components/summary', $params);
 
-echo elgg_view_image_block($site_icon, $list_body);
+	echo elgg_view_image_block($site_icon, $list_body);
+}

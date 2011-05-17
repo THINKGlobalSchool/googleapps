@@ -30,7 +30,7 @@ switch ($selected) {
 		$content .= googleapps_list_sites_by_user();
 		break;
 	case "reset":
-		$content .= elgg_view('googleapps/admin/reset');
+		$content .= elgg_view_form('google/wikis/reset');
 		break;
 	default:
 		$content .= googleapps_list_sites();

@@ -55,5 +55,4 @@ $body .= elgg_view('input/radio', array('name' => 'params[oauth_sync_sites]', 'o
 $body .= '<p><label>' . elgg_echo('googleapps:admin:sync_docs') . "</label><br />";
 $body .= elgg_view('input/radio', array('name' => 'params[oauth_sync_docs]', 'options' => $options, 'value' => $oauth_sync_docs)) . "</p>";
 
-
 echo $body;

@@ -39,6 +39,8 @@ $english = array(
 	'googleapps:admin:sync_sites' => 'Enable Google Sites ',
    	'googleapps:admin:sync_docs' => 'Enable Google Docs',
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
+	'googleapps:admin:resetwikis' => 'Reset all learned Google Sites:',
+	'googleapps:admin:reset' => 'Reset',
 	'admin:utilities:debug_sites' => 'Google Sites Debug',
 
 	// User settings

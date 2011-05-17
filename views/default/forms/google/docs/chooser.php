@@ -11,9 +11,16 @@
  */
 
 $user = elgg_get_logged_in_user_entity();
-// Looks like we have this data already with the oauth_update! 
-// Need to double check though.. that'll speed this up if thats the case
-//googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
+/*
+This used to be called on every load of this form:
+
+	googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
+
+All that accomplished was refreshing the list of documents at load time. 
+Since we have an oauth_update action running every minute (see JS lib) we already
+have a recent list of documents saved in the session
+
+*/
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
 
