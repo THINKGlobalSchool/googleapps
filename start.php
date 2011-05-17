@@ -10,7 +10,6 @@
 
 /******************************* @TODO *********************************
  *
- * - Fix group modules
  * - Test and make sure that we don't need to manually 
  *   load the google docs list on the share form
  *   if not, then things will be nice and snappy
@@ -19,6 +18,7 @@
  * - Have another go at the CSS
  * - Widgets??
  * - Figure out why wiki data is out of date (cron maybe?)
+ * - Clean up wiki river entries
  * 
  ***********************************************************************/
 

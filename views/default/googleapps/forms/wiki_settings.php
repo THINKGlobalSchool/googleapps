@@ -60,7 +60,7 @@ $_SESSION['user_site_entities']=serialize($user_site_entities);
 
 				}
 			}
-			$body .= '<tr class="wiki-submit-row"><td colspan=2 class="wiki-submit-cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'submit_button')).'</td></tr>';
+			$body .= '<tr class="wiki-submit-row"><td colspan=2 class="wiki-submit-cell">'.elgg_view('input/submit', array('value' => elgg_echo('save'), 'class' => 'elgg-button elgg-button-submit')).'</td></tr>';
 			$body .= '</table>';
 			echo elgg_view('input/form',array(
 				'body' => $body,

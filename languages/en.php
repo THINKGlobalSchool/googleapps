@@ -16,6 +16,7 @@ $english = array(
 	'shared_doc' => 'Google Docs',
 	'googleapps:googleshareddoc' => 'Google Shared Docs',
 	'googleapps/docs:add' => 'Share New Google Doc',
+	'googleapps:docs:none' => 'No Shared Documents',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -110,7 +111,8 @@ $english = array(
 	'googleapps:submit:cancel' => 'Cancel',
 
 	// River
-	'googleapps:river:shared_doc:create' => '%s shared a Google Document titled ',
+	'googleapps:river:withgroup' => 'with the group %s',
+	'googleapps:river:shared_doc:create' => 'shared a Google Document titled ',
 );
 
 add_translation('en',$english);
