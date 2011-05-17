@@ -14,7 +14,6 @@
  *   load the google docs list on the share form
  *   if not, then things will be nice and snappy
  * - Test the google docs sharing some more (ie, match permissions)
- * - Try to get rid of some more of these $GLOBALS
  * - Minimize $_SESSION junk
  * - Have another go at the CSS
  * - Have another look at the en.php language file (remove unused)
@@ -45,16 +44,6 @@ function googleapps_init() {
 	// Need to use SSL for google urls
 	$CONFIG->sslroot = str_replace('http://','https://', elgg_get_site_url());
 
-	// Set up some urls
-	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
-
-	// Set to globals
-	$GLOBALS['googleapps_url'] = $googleapps_url;
-	
-	// Get google apps domain
-	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
-
 	// Constants
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
@@ -66,7 +55,7 @@ function googleapps_init() {
 	elgg_load_js('elgg.google');
 
 	// Extend login view google login button
-	elgg_extend_view('login/extend', 'googleapps/login_dropdown');
+	elgg_extend_view('login/extend', 'googleapps/login');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css/elgg','css/googleapps/css');
@@ -199,59 +188,6 @@ function googleapps_pagesetup() {
 		'contexts' => array('settings'),
 		'priority' => 99999,
 	);
-
-	/* Oldschool and redundant 
-	// Wikis
-	$menuitems[] = array(
-		'name' => 'wikis_your',
-		'text' => elgg_echo('googleapps:menu:wikisyour'),
-		'href' =>  'googleapps/wikis/' . elgg_get_logged_in_user_entity()->username,
-		'contexts' => array('wikis'),
-		'priority' => 99997,
-	);
-
-	$menuitems[] = array(
-		'name' => 'wikis_everyone',
-		'text' => elgg_echo('googleapps:menu:wikiseveryone'),
-		'href' =>  'googleapps/wikis',
-		'contexts' => array('wikis'),
-		'priority' => 99998,
-	);
-
-	$menuitems[] = array(
-		'name' => 'create_wiki',
-		'text' => elgg_echo('googleapps:menu:create_new_wiki'),
-		'href' =>  $GLOBALS['link_to_add_site'],
-		'contexts' => array('wikis'),
-		'priority' => 99999,
-	);
-
-	// Docs
-	$menuitems[] = array(
-		'name' => 'docs_your',
-		'text' => elgg_echo('googleapps:menu:yourshareddocs'),
-		'href' =>  'googleapps/docs/' . elgg_get_logged_in_user_entity()->username,
-		'contexts' => array('docs'),
-		'priority' => 99997,
-	);
-
-	$menuitems[] = array(
-		'name' => 'docs_friends',
-		'text' => elgg_echo('googleapps:menu:friendsshareddocs'),
-		'href' =>  'googleapps/docs/friends',
-		'contexts' => array('docs'),
-		'priority' => 99998,
-	);
-
-	$menuitems[] = array(
-		'name' => 'docs_all',
-		'text' => elgg_echo('googleapps:menu:allshareddocs'),
-		'href' =>  'googleapps/docs',
-		'contexts' => array('docs'),
-		'priority' => 99998,
-	);
-	*/
-
 
 	// Register menus
 	foreach($menuitems as $menuitem) {

@@ -10,7 +10,6 @@
 
 session_start();
 
-//print_r($GLOBALS);
 $user = $_SESSION['user'];
 
 $CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');

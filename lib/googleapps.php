@@ -244,7 +244,23 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 		}
 	}
 	
-	$params['buttons'] = FALSE;
+	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+	$new_url = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
+	
+	$new_link = elgg_view('output/url', array(
+		'href' => $new_url,
+		'text' => elgg_echo('googleapps:menu:create_new_wiki'),
+		'class' => 'elgg-button elgg-button-action',
+	));
+	
+	// Show create wiki button
+	if (elgg_is_logged_in()) {
+		$new_link = "<ul class='elgg-menu elgg-menu-title elgg-menu-hz elgg-menu-title-default'><li>$new_link</li></ul>";
+		$params['buttons'] = $new_link;
+	} else {
+		$params['buttons'] = FALSE;
+	}
+	
 	$params['filter'] = elgg_view_menu('wiki_filter', array(
 		'sort_by' => 'priority',
 		// recycle the menu filter css
