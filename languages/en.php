@@ -97,6 +97,8 @@ $english = array(
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
 	'googleapps:label:viewdocument' => 'View Document',
+	'googleapps:label:connect' => 'Connect with Google Account',
+	'googleapps:label:disconnect' => 'Disconnect Google Account',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

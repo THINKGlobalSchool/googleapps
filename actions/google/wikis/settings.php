@@ -8,39 +8,19 @@
  * @link http://www.thinkglobalschool.org
  */
 
-global $SESSION;
 
-$googleapps_controlled_profile = strip_tags(get_input('googleapps_controlled_profile'));
-$googleapps_sites_settings = $_POST['googleapps_sites_settings'];
+$googleapps_sites_settings = get_input('googleapps_sites_settings');
 
-$user_id = get_input('guid');
-$user = "";
 $error = false;
-$synchronize = false;
 
-if (!$user_id) {
-	$user = $_SESSION['user'];
-} else {
-	$user = get_entity($user_id);
+$user = elgg_get_logged_in_user_entity();
+
+if (!$user) {
+	forward();
 }
 
-$subtype = $user->getSubtype();
-
 if ($user->google == 1) {
-	if ($googleapps_controlled_profile == 'no' && empty($user->password)) {
-		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passwordstop')));
-		forward(REFERER);
-	}
-	if (elgg_strlen($googleapps_controlled_profile) > 50) {
-		register_error(elgg_echo('admin:configuration:fail'));
-		forward(REFERER);
-	}
 	if (($user) && ($user->canEdit())) {
-		if ($googleapps_controlled_profile != $user->googleapps_controlled_profile) {
-			if (!$user->save()) {
-				$error = true;
-			}
-		}
 		if (!empty($googleapps_sites_settings)) {
 			$site_list = unserialize($user->site_list);
 			foreach ($googleapps_sites_settings as $site_id => $access) {

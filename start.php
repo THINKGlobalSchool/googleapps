@@ -15,10 +15,13 @@
  *   if not, then things will be nice and snappy
  * - Test the google docs sharing some more (ie, match permissions)
  * - Try to get rid of some more of these $GLOBALS
+ * - Minimize $_SESSION junk
  * - Have another go at the CSS
+ * - Have another look at the en.php language file (remove unused)
  * - Widgets??
  * - Figure out why wiki data is out of date (cron maybe?)
  * - Clean up wiki river entries
+ * - Set a password somewhere by default
  * 
  ***********************************************************************/
 
@@ -44,25 +47,16 @@ function googleapps_init() {
 
 	// Set up some urls
 	$googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
-	$googleappsconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/connect', FALSE);
-	$googleappsdisconnect_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/disconnect', FALSE);
 
 	// Set to globals
 	$GLOBALS['googleapps_url'] = $googleapps_url;
-	$GLOBALS['googleappsconnect_url'] = $googleappsconnect_url;
-	$GLOBALS['googleappsdisconnect_url'] = $googleappsdisconnect_url;
-
-	// Constants
-	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
-
-	// Get plugin settings
-	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
-
+	
 	// Get google apps domain
 	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$GLOBALS['link_to_add_site'] = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
+
+	// Constants
+	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
 	// Register JS
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
@@ -141,12 +135,12 @@ function googleapps_init() {
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = elgg_get_logged_in_user_entity();
-	if (!empty($user) && $user->google) {
-		if ($oauth_sync_sites != 'no') {
+	if (!empty($user) && $user->google) {		
+		if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
 			$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
 			elgg_register_menu_item('site', $item);
 		}
-		if ($oauth_sync_docs != 'no') {
+		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') != 'no') {
 			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 			elgg_register_menu_item('site', $item);
 		}
@@ -165,11 +159,11 @@ function googleapps_init() {
 	elgg_register_action('google/auth/disconnect', "$action_base/disconnect.php", 'public');
 	elgg_register_action('google/auth/return', "$action_base/return.php", 'public');
 	elgg_register_action('google/auth/return_with_connect', "$action_base/return_with_connect.php", 'public');
-	elgg_register_action('google/auth/save_user_sync_settings', "$action_base/save_user_sync_settings.php");
+	elgg_register_action('google/auth/settings', "$action_base/settings.php");
 
 	// Wiki related (wiki)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/wikis";
-	elgg_register_action('google/wikis/save_wiki_settings', "$action_base/save_wiki_settings.php");
+	elgg_register_action('google/wikis/settings', "$action_base/settings.php");
 	elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
 
 	// Shared Doc related (docs)
@@ -583,7 +577,7 @@ function googleapps_topbar_menu_setup($hook, $type, $value, $params) {
 			$options = array(
 				'name' => 'google_email',
 				'text' => $text,
-				'href' =>  'todo',
+				'href' => "https://mail.google.com/a/$domain",
 				'priority' => 999,
 				'item_class' => 'google-email-container',
 			);

@@ -11,10 +11,10 @@
 
 $home_url = elgg_get_site_url();
 
-$user = elgg_get_page_owner_entity();
+$user = elgg_get_logged_in_user_entity();
 
 if (!$user) {
-	$user = $_SESSION['user'];
+	forward();
 }
 $subtype = $user->getSubtype();
 
@@ -43,5 +43,3 @@ if ($user->google) {
 }
 
 forward('googleapps/settings/account');
-
-exit;

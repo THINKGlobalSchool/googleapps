@@ -90,42 +90,6 @@ span.google-email-notifier {
 	margin-top: -5px;
 }
 
-table.googleapps-wiki-activity-settings {
-	width: 500px;
-	margin: 10px auto;
-}
-
-table.googleapps-wiki-activity-settings th {
-	border: 0;
-	border-bottom: 1px solid #888888;
-	font-weight: bold;
-	text-align: left;
-}
-
-table.googleapps-wiki-activity-settings tr {
-	border-bottom: 1px solid #888888;
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-table.googleapps-wiki-activity-settings td {
-	vertical-align: middle;
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-table.googleapps-wiki-activity-settings td.wiki-access {
- text-align: right;
-}
-
-table.googleapps-wiki-activity-settings tr.wiki-submit-row {
-	border:0;
-}
-
-table.googleapps-wiki-activity-settings td.wiki-submit-cell {
-	text-align:right;
-}
-
 #googleapps #googleapps-docs-loading {
 	border: 1px solid #666;
 	background: #fff;

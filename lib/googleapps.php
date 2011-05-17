@@ -20,7 +20,17 @@ require_once(elgg_get_plugins_path() . 'googleapps/lib/OAuth.php');
  */
 function googleapps_get_page_content_settings_wikiactivity() {
 	$params['title'] = elgg_echo('googleapps:menu:wiki_settings');
-	$params['content'] = elgg_view('googleapps/forms/wiki_settings');
+	
+	$user = elgg_get_logged_in_user_entity();
+		
+	if ($user->google == 1) {
+		$vars = array(
+			'id' => 'google-wikis-settings-form',
+			'forms' => 'google_wikis_settings_form',
+		);
+		$params['content'] = elgg_view_form('google/wikis/settings', $vars, array('user', $user));	
+	}
+	
 	$params['layout'] = 'one_sidebar';
 	return $params;
 }
@@ -30,7 +40,22 @@ function googleapps_get_page_content_settings_wikiactivity() {
  */
 function googleapps_get_page_content_settings_account() {
 	$params['title'] = elgg_echo('googleapps:menu:google_sync_settings');
-	$params['content'] = elgg_view('googleapps/forms/sync_form');
+	
+	$user = elgg_get_logged_in_user_entity();
+
+	if ($user->google == 1) {
+		$params['content'] = "<div>" . elgg_echo('googleapps:usersettings:sync_description') . "</div><br />";
+		$vars = array(
+			'id' => 'google-auth-settings-form',
+			'forms' => 'google_auth_settings_form',
+		);
+		$params['content'] .= elgg_view_form('google/auth/settings', $vars, array('user' => $user));
+		$params['content'] .= elgg_view_form('google/auth/disconnect');
+	} else {
+		$params['content'] .= "<div>" . elgg_echo('googleapps:usersettings:login_description') . "</div><br />";
+		$params['content'] .= elgg_view_form('google/auth/connect');
+	}
+	
 	$params['layout'] = 'one_sidebar';
 	return $params;
 }

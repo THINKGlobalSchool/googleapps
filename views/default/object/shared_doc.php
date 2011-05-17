@@ -24,7 +24,7 @@ $excerpt = elgg_get_excerpt($doc->description);
 
 $owner_icon = elgg_view_entity_icon($owner, 'tiny');
 $owner_link = elgg_view('output/url', array(
-	'href' => "blog/owner/$owner->username",
+	'href' => "googleapps/docs/owner/$owner->username",
 	'text' => $owner->name,
 ));
 

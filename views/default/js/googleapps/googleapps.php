@@ -114,10 +114,7 @@ elgg.google.loadDocumentChooser = function(id) {
 }
 
 // Submit handler
-elgg.google.docsSubmit = function(event) {	
-		
-	console.log('IN SUBMIT FUNCTION');
-		
+elgg.google.docsSubmit = function(event) {			
 	var data = {};
 	
 	$($(this).serializeArray()).each(function (i, e) {
@@ -134,9 +131,7 @@ elgg.google.docsSubmit = function(event) {
 	
 	elgg.action(this.action, {
 		data: data,
-		success: function(json) {
-			console.log(json);
-			
+		success: function(json) {			
 			// Return false on error. The action should spit out some useful information
 			if (json.status == -1) {
 				return false;
