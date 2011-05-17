@@ -17,6 +17,11 @@ array(
 		'title' => 'Reset',
 		'url' => 'admin/utilities/debug_sites?tab=reset', 
 		'selected'=> $selected == "reset" ? true : false
+),
+array(
+		'title' => 'Trigger Cron',
+		'url' => 'admin/utilities/debug_sites?tab=cron', 
+		'selected'=> $selected == "cron" ? true : false
 ));
 
 echo elgg_view('navigation/tabs', array(
@@ -31,6 +36,15 @@ switch ($selected) {
 		break;
 	case "reset":
 		$content .= elgg_view_form('google/wikis/reset');
+		break;
+	case 'cron':
+		// Start output buffering so we can see the logs
+		ob_start();
+		googleapps_cron_fetch_data();
+		$output = ob_get_contents();
+		ob_end_clean();
+		// Dump output
+		echo "<pre>$output</pre>";
 		break;
 	default:
 		$content .= googleapps_list_sites();

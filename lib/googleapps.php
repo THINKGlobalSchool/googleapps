@@ -463,7 +463,7 @@ function googleapps_cron_fetch_data() {
 		$all_site_entities_count =count($res['all_site_entities']); // sites objects
 		$all_site_entities =$res['all_site_entities'];
 
-		echo "========== Processing user ".$user->name." ==========";
+		echo "========== Processing user ".$user->name." ==========\n";
 
 		$max_time = null;
 		$times = array();
@@ -580,9 +580,9 @@ function googleapps_cron_fetch_data() {
 		}
 
 		if ($is_new_activity) {
-			echo 'New activity added for ' . $user->username . '\n';
+			echo 'New activity added for ' . $user->username . "\n";
 		} else {
-			echo 'No new activity for ' . $user->username . '\n';
+			echo 'No new activity for ' . $user->username . "\n";
 		}
 
 		echo "\n\n";
@@ -821,7 +821,6 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
 
 		// create new site entity
 		if (!$found) {
-			echo "<b> CREATED SITE ENTITY </b><br />";
 			$new_site = new ElggObject();
 			$new_site->owner_guid = $user->guid;
 			$new_site->site_id = $site['site_id'];

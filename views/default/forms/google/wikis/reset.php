@@ -2,10 +2,12 @@
 /**
  * Googleapps reset google sites view
  *
- * @package googleapps
+ * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
- * @link http://www.thinkglobalschool.org
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010
+ * @link http://www.thinkglobalschool.com/
+ *
  */
 
 $description = elgg_echo('googleapps:admin:resetwikis');

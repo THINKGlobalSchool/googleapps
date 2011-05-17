@@ -13,8 +13,6 @@
  * - Test the google docs sharing some more (ie, match permissions)
  * - Minimize $_SESSION junk
  * - Have another look at the en.php language file (remove unused)
- * - Figure out why wiki data is out of date (cron maybe?)
- * - Clean up wiki river entries
  * - Set a password somewhere by default
  * - Widgets??
  * 
