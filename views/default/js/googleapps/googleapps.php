@@ -72,6 +72,7 @@ elgg.google.updateGoogleApps = function() {
 			console.log(e);
 		},
 		success: function(json) {
+			
 			// Check if grabbing email count is enabled
 			if (elgg.google.SYNC_EMAIL == 'yes') {
 				var anchor = $('.google-email-container a');
@@ -80,8 +81,8 @@ elgg.google.updateGoogleApps = function() {
 				anchor.find('.messages-new').remove();
 				
 				// Add mail count if it exists
-				if (json.mail_count != 0) {
-					anchor.append("<span class='messages-new'>" + json.mail_count + "</span>")
+				if (json.output.mail_count && json.output.mail_count != 0) {
+					anchor.append("<span class='messages-new'>" + json.output.mail_count + "</span>")
 				} 
 			}
 			

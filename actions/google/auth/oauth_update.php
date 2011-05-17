@@ -11,4 +11,3 @@
 
 $result = googleapps_get_oauth_data(true);
 echo $result;
-exit;
