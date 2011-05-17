@@ -80,18 +80,12 @@ $submit_input = elgg_view('input/submit', array(
 	'value' => elgg_echo('save')
 ));	
 
-// Browse document container
-$browse_content .= '<div id="googleapps">
-				<div id="googleapps-docs-loading">
-					<img src="' . elgg_get_site_url() . '_graphics/ajax_loader_bw.gif" />
-					<p>' . elgg_echo('googleapps:label:loading') . '</p>
-				</div>
-			</div>';
-
 // Build Form Body
 $form_body = <<<HTML
 <div>
-	$browse_content
+	<div id="googleapps-docs-container">
+		<div id="googleapps-docs-loading" class="elgg-ajax-loader"></div>
+	</div>
 	<div>
 		<label>$description_label</label><br />
         $description_input
@@ -120,7 +114,7 @@ HTML;
 $script = <<<HTML
 	<script type="text/javascript">
 		$(function() {
-			elgg.google.loadDocumentChooser('googleapps');
+			elgg.google.loadDocumentChooser('googleapps-docs-container');
 		});
 	</script>
 HTML;

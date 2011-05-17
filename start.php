@@ -15,12 +15,11 @@
  *   if not, then things will be nice and snappy
  * - Test the google docs sharing some more (ie, match permissions)
  * - Minimize $_SESSION junk
- * - Have another go at the CSS
  * - Have another look at the en.php language file (remove unused)
- * - Widgets??
  * - Figure out why wiki data is out of date (cron maybe?)
  * - Clean up wiki river entries
  * - Set a password somewhere by default
+ * - Widgets??
  * 
  ***********************************************************************/
 

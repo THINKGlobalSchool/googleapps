@@ -158,7 +158,7 @@ elgg.google.docsSubmit = function(event) {
 			});
 				
 			if (json.output.toUpperCase() === 'OK') {
-				elgg.google.loadDocumentChooser('googleapps');
+				elgg.google.loadDocumentChooser('googleapps-docs-container');
 			}	
 		}
 	});

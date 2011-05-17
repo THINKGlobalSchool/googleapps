@@ -8,8 +8,8 @@
  * @link http://www.thinkglobalschool.org
  */
 
-global $SESSION;
-$user = $_SESSION['user'];
+
+$user = elgg_get_logged_in_user_entity();
 
 $sync_settings = get_input('sync_settings');
 $user_sync_settings = unserialize($user->sync_settings);

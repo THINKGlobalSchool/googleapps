@@ -8,12 +8,8 @@
  * @link http://www.thinkglobalschool.org
  */
 ?>
-
-.view-all {
-    text-align:right;
-    font-size:90%;
-}
-
+/*<style>*/
+/* Document Icons */
 .document-icon {
     background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/mimetypes.gif") no-repeat 0 0;
 	background-position:0 -50px;
@@ -78,11 +74,6 @@
     background-position:0 -190px;
 }
 
-div#share_browse {
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
 /* Gmail Icon */
 span.google-email-notifier {
 	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
@@ -90,42 +81,7 @@ span.google-email-notifier {
 	margin-top: -5px;
 }
 
-#googleapps #googleapps-docs-loading {
-	border: 1px solid #666;
-	background: #fff;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	margin-top: 15px;
-	margin-bottom: 15px;
-	width: 100%;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-	-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-}
-
-#googleapps #googleapps-docs-loading img {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 7px;
-	margin-bottom: 7px;
-}
-
-#googleapps #googleapps-docs-loading p {
-	text-align: center;
-	font-weight: bold;
-	color: #333;
-}
-
-#googleapps-docs-browse-table {
-	border: 1px solid #bbb;
-	height: 300px;
-	overflow: scroll;
-	overflow-x: hidden;
-	width: 100%
-}
-
+/* Tooltip for share form */
 a.googleapps-tooltip {
 	padding-left: 5px;
 	font-size: 11px;
@@ -209,3 +165,4 @@ a.googleapps-tooltip:hover span {
 	padding:2px 6px;
 	width:auto;
 }
+/*</style>*/
