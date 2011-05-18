@@ -98,6 +98,10 @@ $english = array(
 	'googleapps:label:viewdocument' => 'View Document',
 	'googleapps:label:connect' => 'Connect with Google Account',
 	'googleapps:label:disconnect' => 'Disconnect Google Account',
+	'googleapps:label:documentsdisplay' => 'Documents to display',
+	'googleapps:label:allfolders' => 'All Folders',
+	'googleapps:label:choosefolder' => 'Select Folder',
+	'googleapps:label:moredocs' => 'More Shared Docs',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

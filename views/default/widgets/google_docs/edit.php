@@ -2,39 +2,37 @@
 /**
  * Googleapps docs widget edit view
  *
- * @package googleapps
+ * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
- * @link http://www.thinkglobalschool.org
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010
+ * @link http://www.thinkglobalschool.com/
+ *
  */
 
-if (empty($vars['entity']->max_entry)) {
-	$vars['entity']->max_entry = 20;
+if (empty($vars['entity']->max_display)) {
+	$vars['entity']->max_display = 4;
 }
-$vars['entity']->title = '';
 
-//$folders = !empty($_SESSION['oauth_google_folders']) ? unserialize($_SESSION['oauth_google_folders']) : array();
-//$main_folders = child_folders('', $folders);
+$max_display_input = elgg_view('input/dropdown', array(
+	'name' => "params[max_display]",
+	'value' => $vars['entity']->max_display,
+	'options' => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+));
 
 /*
- ?>
- <p>
- Title:<br />
- <input type="text" name="params[title]" value="<?php echo htmlentities($vars['entity']->title); ?>" />
- </p>
- <?
- */
+// Old widget
+$google_folder_input = elgg_view('input/dropdown', array(
+	'name' => "params[google_folder]",
+	'id' => 'google_folders',
+	'value' => elgg_echo('googleapps:label:allfolders'),
+	'options' => array(elgg_echo('googleapps:label:allfolders')),
+));
+*/
+
 ?>
-<input
-	type="hidden" name="params[title]" value="" />
-<p>
-	How many display: <input type="text" name="params[max_entry]"
-		value="<?php echo htmlentities($vars['entity']->max_entry); ?>"
-		style="width: 20px;" maxlength="2" />
-</p>
-<p>
-	Choose folder:<br /> <select id="google_folders"
-		name="params[google_folder]">
-		<option value="">All folders</option>
-	</select>
-</p>
+<div>
+	<?php echo elgg_echo('googleapps:label:documentsdisplay'); ?>
+	<?php echo $max_display_input; ?>
+</div>
+

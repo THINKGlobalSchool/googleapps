@@ -12,7 +12,6 @@
  *
  * - Check out the login/connection process
  * - Set a password somewhere by default
- * - Widgets??
  * 
  ***********************************************************************/
 

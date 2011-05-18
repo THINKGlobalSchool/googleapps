@@ -1,6 +1,9 @@
 <?php
 /**
  * Googleapps docs widget
+ * 
+ * This is the old widget, which kind of works but it slow and gross, it looks like
+ * it was intended to be a way to browse through all of your google docs (not the elgg entities)
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
@@ -11,7 +14,7 @@
 $CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
 $google_folder = !empty($vars['entity']->google_folder) ? $vars['entity']->google_folder : '';
-$max_entry = !empty($vars['entity']->max_entry) ? (int) $vars['entity']->max_entry : 15;
+$max = !empty($vars['entity']->max_display) ? (int) $vars['entity']->max_display : 15;
 
 $_SESSION['oauth_google_folder'] = $google_folder;
 
@@ -105,7 +108,7 @@ $_SESSION['oauth_google_folder'] = $google_folder->id;
 		<?
 		$i = 0;
 		foreach ($oauth_google_docs as $doc) {
-			if ($i >= $max_entry) {
+			if ($i >= $max) {
 				break;
 			}
 
