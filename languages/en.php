@@ -118,6 +118,19 @@ $english = array(
 	// River
 	'googleapps:river:withgroup' => 'with the group %s',
 	'googleapps:river:shared_doc:create' => 'shared a Google Document titled ',
+	
+	// Emails
+	'googleapps:email:created:subject' => 'Google Connected Spot Account Created',
+	'googleapps:email:created:body' => 	"Hi %s,
+
+	You have successfully created a new Spot account that is connected to your Google Account.
+	
+	In case you disconnect your account, or cannot login with Google for whatever reason, use the following username and password to login: 
+	
+	Username: %s
+	Password: %s
+	
+	You can change your password here: %s",
 );
 
 add_translation('en',$english);

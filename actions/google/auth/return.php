@@ -109,6 +109,13 @@ if (!$google->is_authorized()) {
 			$user->access_id = 2;
 			$user->subtype = 'googleapps';
 			$user->username = $username;
+			
+			// Create a password for the user
+			$password = generate_random_cleartext_password();
+
+			// Always reset the salt before generating the user password.
+			$user->salt = generate_random_cleartext_password();
+			$user->password = generate_user_password($user, $password);
 				
 			$user->google = 1;
 			$user->sync = 1;
@@ -117,6 +124,20 @@ if (!$google->is_authorized()) {
 			if ($user->save()) {
 				//automatically validate user
 				elgg_set_user_validation_status($user->guid,true);
+				
+				// Send user an email confirming that the account is created and supply them 
+				// with a password, just in case
+				notify_user($user->guid,
+					elgg_get_site_entity()->guid,
+					elgg_echo('googleapps:email:created:subject'),
+					elgg_echo('googleapps:email:created:body', array(
+						$user->username, 
+						$user->username, 
+						$password,
+						elgg_get_site_url() . 'settings/user/' . $user->username)),
+					NULL,
+					'email'
+				);
 
 				$new_account = true;
 				$do_login = true;
