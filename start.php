@@ -10,9 +10,7 @@
 
 /******************************* @TODO *********************************
  *
- * - Test the google docs sharing some more (ie, match permissions)
- * - Minimize $_SESSION junk
- * - Have another look at the en.php language file (remove unused)
+ * - Check out the login/connection process
  * - Set a password somewhere by default
  * - Widgets??
  * 

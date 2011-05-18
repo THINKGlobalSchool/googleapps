@@ -65,7 +65,7 @@ elgg_set_context($context);
 
 $match_label = elgg_echo('googleapps:label:match_permissions');
 $match_input = elgg_view('input/dropdown', array(
-	'name' => 'google_docs_match_permissions',
+	'name' => 'match_permissions',
 	'id' => 'google-docs-match-permissions',
 	'options_values' =>	array(
 							0 => 'No',

@@ -2,14 +2,16 @@
 /**
  * Googleapps english translation
  *
- * @package googleapps
+ * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
- * @link http://www.thinkglobalschool.org
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010
+ * @link http://www.thinkglobalschool.com/
+ *
  */
 
 $english = array(
-	// Entity/Object labels
+	// General/Built In
 	'item:object:site_activity' => 'Wiki activity',
    	'item:object:shared_doc' => 'Google Shared Document',
 	'item:user:googleapps' => 'googleapps users',
@@ -17,15 +19,13 @@ $english = array(
 	'googleapps:googleshareddoc' => 'Google Shared Docs',
 	'googleapps/docs:add' => 'Share New Google Doc',
 	'googleapps:docs:none' => 'No Shared Documents',
+	'admin:utilities:debug_sites' => 'Google Sites Debug',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
 	'googleapps:menu:google_sync_settings' => 'Google Apps Settings',
-	'googleapps:menu:wikisyour' => 'Your Wikis',
-	'googleapps:menu:wikiseveryone' => 'All Wikis',
 	'googleapps:menu:wikis' => 'Wikis',
 	'googleapps:menu:create_new_wiki' => 'Create New Wiki',
-	'googleapps:menu:yourshareddocs' => 'Your Shared Google Docs',
 	'googleapps:menu:allshareddocs' => 'All Site Google Shared Docs', 
 	'googleapps:menu:friendsshareddocs' => 'Friends\' Shared Google Docs',
 
@@ -41,10 +41,9 @@ $english = array(
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 	'googleapps:admin:resetwikis' => 'Reset all learned Google Sites:',
 	'googleapps:admin:reset' => 'Reset',
-	'admin:utilities:debug_sites' => 'Google Sites Debug',
+
 
 	// User settings
-	'googleapps:usersettings:login_title' => 'Google Apps Login',
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
 	'googleapps:usersettings:sites_description' => 'Set who gets to see wiki activity for the wikis you are in.  NOTE: These settings control the publish activity for everyone. Take care when making changes here.',
 	'googleapps:usersettings:sync_description' => 'Manage your connection to Google Apps',
@@ -56,7 +55,6 @@ $english = array(
 	'googleapps:error:googlereturned' => 'Google returned the following error message: %s',
 	'googleapps:error:account_duplicate' => 'Account with the same username: (%s) already exists on this site.',
 	'googleapps:error:wrongdomain' => 'Cannot resolve OpenID entrypoint for your Google Apps (hosted) domain or domain is not google-hosted.',
-	'googleapps:error:passwordstop' => 'Please provide a password before you stop synchronizing with Google Apps.',
 	'googleapps:error:passworddisconnect' => 'Please provide a password before you disconnect your profile from Google Apps.',
 	'googleapps:error:notauthorized' => 'Not authorized',
 	'googleapps:error:nodata' => 'No data',
@@ -83,7 +81,6 @@ $english = array(
 	'googleapps:label:google_docs_description' => '',
 	'googleapps:label:site' => 'Wiki',
 	'googleapps:label:access_level' => 'Access Level',
-	'googleapps:label:loading' => 'Loading...',
 	'googleapps:label:match_permissions' => 'Match permissions of Google Document?',
 	'googleapps:label:action_required' => 'Action Required',
 	'googleapps:label:shared_by' => 'Shared by %s',

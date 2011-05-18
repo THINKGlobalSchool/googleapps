@@ -23,7 +23,6 @@ $oauth_verifier = get_input('oauth_verifier');
 $client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
 
 if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oauth_sync_sites != 'no')) {
-
 	if (empty($oauth_verifier)) {
 		$result = $client->oauth_authorize();
 		header('Location: ' . $result);
@@ -45,10 +44,12 @@ if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oa
 
 };
 
+
 if (!empty($_SESSION['oauth_connect'])) {
 	unset($_SESSION['oauth_connect']);
 	forward('googleapps/settings/account');
 }
+
 
 $googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
@@ -67,7 +68,7 @@ if (!empty($response)) {
 if (!$google->is_authorized()) {
 	register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:notauthorized')));
 	forward();
-} else {
+} else {	
 	$email = $google->get_email();
 	$firstname = $google->get_firstname();
 	$lastname = $google->get_lastname();
