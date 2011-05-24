@@ -4,7 +4,8 @@
 	<author>Jeff Tilson</author>
 	<version>1.8</version>
 	<category>tgs</category>
-	<category>extension</category>
+	<category>content</category>
+	<category>api</category>
 	<blurb>Google Integration and Google Apps</blurb>
 	<description>Provides Google authorization and authentication, as well as Google Docs and Sites integration</description>
 	<website>http://www.thinkglobalschool.org</website>
