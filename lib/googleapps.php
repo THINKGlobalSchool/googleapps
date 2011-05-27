@@ -435,7 +435,13 @@ function googleapps_cron_fetch_data() {
 	$a_time=time();
 
 	/* find all users with googleapps controlled profile */
-	$result = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	$result = elgg_get_metadata(array(
+		'annotation_name' => 'googleapps_controlled_profile',
+		'annotation_value' => 'yes',
+		'type' => 'user',
+		'limit' => 0,
+ 	));
+	
 	if (empty($result)) {
 		return;
 	}

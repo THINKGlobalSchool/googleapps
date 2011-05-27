@@ -126,7 +126,7 @@ function googleapps_init() {
 	}
 
 	// Register widgets
-	add_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
+	elgg_register_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 
 	// Register actions
 

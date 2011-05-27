@@ -62,7 +62,7 @@ foreach ($google_docs as $id => $doc) {
 		 	<a href="' . $doc["href"] . '" target="_blank">' . $doc["title"] . '</a>
 		</td>
 		<td>' . $permission_str.'</td>
-		<td>' . friendly_time($doc["updated"]) . '</td>
+		<td>' . elgg_view_friendly_time($doc["updated"]) . '</td>
     </tr>
     ';
 }
