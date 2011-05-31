@@ -600,7 +600,7 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
  */
 function googleapps_shared_doc_output_access_handler($hook, $type, $value, $params) {
 	$entity = $params['vars']['entity'];
-	if ($entity->getSubtype() == 'shared_doc') {
+	if ($entity && $entity->getSubtype() == 'shared_doc') {
 		$access_id = $entity->access_id;
 
 		// Try to get the regular string
