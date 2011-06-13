@@ -92,7 +92,7 @@ HTML;
 		'subtitle' => $subtitle,
 		'tags' => 'false',
 	);
-	$list_body = elgg_view('page/components/summary', $params);
+	$list_body = elgg_view('object/elements/summary', $params);
 
 	echo elgg_view_image_block($site_icon, $list_body);
 }
