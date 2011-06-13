@@ -55,6 +55,6 @@ $params = array(
 	'tags' => $tags,
 	'content' => $excerpt,
 );
-$list_body = elgg_view('page/components/summary', $params);
+$list_body = elgg_view('object/elements/summary', $params);
 
 echo elgg_view_image_block($owner_icon, $list_body);
