@@ -103,7 +103,7 @@ $form_body = <<<HTML
 		<label id='google-docs-access-id-label'>$access_label</label>
 		$access_input
 	</div><br />
-	<div>
+	<div class="elgg-form-footer-alt">
 		$submit_input
 		$container_hidden
 		$entity_hidden
