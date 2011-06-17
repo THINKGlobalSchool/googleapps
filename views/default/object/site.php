@@ -29,7 +29,6 @@ $owners[] = $owner;
 // @TODO make it work?
 $other_owners = array();
 if (!empty($site->other_owners)) {
-	var_dump('blah');
 	$other_owners = unserialize($site->other_owners);
 	foreach ($other_owners as $owner) {
 		$owners[] = get_entity($owner);

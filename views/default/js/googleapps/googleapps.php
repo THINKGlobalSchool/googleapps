@@ -33,9 +33,6 @@ elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
 elgg.google.init = function() {	
 	$(function() {	
-		// Do an initial update
-		elgg.google.updateGoogleApps();
-		
 		// Register interval for future updates
 		setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
 		

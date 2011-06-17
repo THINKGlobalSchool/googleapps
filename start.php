@@ -41,8 +41,10 @@ function googleapps_init() {
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
 	
-	// Load JS lib, we'll need this globally
-	elgg_load_js('elgg.google');
+	// Load JS lib, only if logged in and not in admin context
+	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
+		elgg_load_js('elgg.google');
+	}
 
 	// Extend login view google login button
 	elgg_extend_view('login/extend', 'googleapps/login');
