@@ -21,6 +21,7 @@ Since we have an oauth_update action running every minute (see JS lib) we alread
 have a recent list of documents saved in the session
 
 */
+
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
 
@@ -35,9 +36,8 @@ $docs_list = '<table class="elgg-table" width="100%">
 					</thead>
 					<tbody>';
 
-$documents_collaborators = array();
 
-// Filteres to clean up the type for CSS output
+// Filters to clean up the type for CSS output
 $filters = array(
 	'application/' => '',
 	'text/' => '',

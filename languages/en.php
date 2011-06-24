@@ -116,8 +116,7 @@ $english = array(
 	'googleapps:submit:cancel' => 'Cancel',
 
 	// River
-	'googleapps:river:withgroup' => 'with the group %s',
-	'googleapps:river:shared_doc:create' => 'shared a Google Document titled ',
+	'river:create:object:shared_doc' => '%s shared a Google Document titled %s',
 	
 	// Emails
 	'googleapps:email:created:subject' => 'Google Connected Spot Account Created',

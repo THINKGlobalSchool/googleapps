@@ -12,8 +12,15 @@ $object = $vars['item']->getObjectEntity();
 
 $owner = $object->getContainerEntity();
 
+$owner_link = "<a href='" . $owner->getURL . "'>" . $owner->name . "</a>";
+
 $string = !empty($object->text) ? preg_replace("/\<div([^>]+)\>(.*?)\<\/div\>/", "$2", $object->text) : $object->text;
 
 $string = str_replace($owner->name, '', $string);
 
-echo $string;
+$string = $owner_link . $string;
+
+echo elgg_view('river/item', array(
+	'summary' => $string,
+	'item' => $vars['item']
+));
