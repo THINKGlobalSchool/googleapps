@@ -78,7 +78,7 @@
 span.google-email-notifier {
 	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
 	cursor:pointer;
-	margin-top: -5px;
+	margin-top: -6px !important;
 }
 
 /* Tooltip for share form */
