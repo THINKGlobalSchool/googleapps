@@ -21,10 +21,6 @@ $all_link = elgg_view('output/url', array(
 	'text' => elgg_echo('link:view:all'),
 ));
 
-$header = "<span class=\"groups-widget-viewall\">$all_link</span>";
-$header .= '<h3>' . elgg_echo('googleapps:label:google_docs') . '</h3>';
-
-
 elgg_push_context('widgets');
 $options = array(
 	'type' => 'object',
@@ -41,12 +37,14 @@ if (!$content) {
 	$content = '<p>' . elgg_echo('googleapps:docs:none') . '</p>';
 }
 
-if ($group->canWriteToContainer()) {
-	$new_link = elgg_view('output/url', array(
-		'href' => "googleapps/docs/add/$group->guid",
-		'text' => elgg_echo('googleapps:label:shareadoc'),
-	));
-	$content .= "<span class='elgg-widget-more'>$new_link</span>";
-}
+$new_link = elgg_view('output/url', array(
+	'href' => "googleapps/docs/add/$group->guid",
+	'text' => elgg_echo('googleapps:label:shareadoc'),
+));
 
-echo elgg_view_module('info', '', $content, array('header' => $header));
+echo elgg_view('groups/profile/module', array(
+	'title' => elgg_echo('googleapps:label:google_docs'),
+	'content' => $content,
+	'all_link' => $all_link,
+	'add_link' => $new_link,
+));
