@@ -96,6 +96,8 @@ function googleapps_init() {
 	// Register profile menu hook
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
 	
+	elgg_register_plugin_hook_handler('register', 'menu:river', 'googleapps_wiki_activity_menu');
+	
 	// Interrupt output/access view
 	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
 
@@ -588,6 +590,22 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
 		}
 	}
 
+	return $value;
+}
+
+/**
+ * Remove items from the river menu for wiki activity entries
+ *
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_wiki_activity_menu($hook, $type, $value, $params) {
+	if ($params['item']->subtype == 'site_activity') {
+		return false;
+	}
 	return $value;
 }
 
