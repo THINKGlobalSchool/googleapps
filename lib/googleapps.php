@@ -78,11 +78,11 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 		if ($container != elgg_get_logged_in_user_entity()) {
 			$params['filter_context'] = FALSE;
 		} else {
-			elgg_register_add_button('googleapps/docs');
+			elgg_register_title_button('googleapps/docs');
 		}
 		
 		if (elgg_instanceof($container, 'group')) {
-			elgg_register_add_button('googleapps/docs');
+			elgg_register_title_button('googleapps/docs');
 			$params['filter'] = FALSE;
 		}
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
@@ -91,7 +91,7 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'container_guid' => $container_guid));
 		$params['title'] = elgg_echo('googleapps:label:user_docs', array($container->name));
 	} else {
-		elgg_register_add_button('googleapps/docs');
+		elgg_register_title_button('googleapps/docs');
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
 		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc'));
 		$params['title'] = elgg_echo('googleapps:menu:allshareddocs');
