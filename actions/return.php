@@ -93,9 +93,14 @@ if (!$google->is_authorized()) {
 		$username = $email;
 		$username = preg_replace("/\@[a-zA-Z\.0-9\-]+$/", "", $username);
 
+		/* 
+			Don't know why the heck this is here, if there is an existing username
+			we don't want to create a new one!
+		 
 		if (get_user_by_username($username)) {
 			$username = preg_replace("/\@([a-zA-Z\.0-9\-]+)/", ".$1", $email);
 		}
+		*/
 
 		if (get_user_by_username($username)) {
 			$duplicate_account = true;
