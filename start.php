@@ -531,11 +531,16 @@ function googleapps_topbar_menu_setup($hook, $type, $value, $params) {
 function googleapps_shared_doc_entity_menu_setup($hook, $type, $value, $params) {
 	$entity = $params['entity'];
 
-	// don't display edit link for polls
+	// don't display edit links for google docs
 	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
 		foreach ($value['default'] as $i => $menu) {
 			if ($menu->getName() == 'edit') {
 				unset ($value['default'][$i]);
+			}
+			
+			if ($menu->getName() == 'access') {
+				$text = $menu->getText();
+				$menu->setText(elgg_get_excerpt($text, 45));
 			}
 		}
 	}
