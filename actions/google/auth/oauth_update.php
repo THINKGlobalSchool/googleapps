@@ -9,5 +9,5 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$result = googleapps_get_oauth_data(true);
-echo $result;
+//$result = googleapps_get_oauth_data(true);
+//echo $result;
