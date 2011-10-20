@@ -22,6 +22,8 @@ have a recent list of documents saved in the session
 
 */
 
+googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
+
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
 

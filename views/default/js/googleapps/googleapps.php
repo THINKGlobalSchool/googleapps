@@ -34,7 +34,7 @@ elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 elgg.google.init = function() {	
 	$(function() {	
 		// Register interval for future updates
-		setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
+		//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
 		
 		// Google Docs Form Stuff (need to test this)
 		$('.permissions-update-input').live('click', function(event) {
