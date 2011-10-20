@@ -44,8 +44,8 @@ class OAuthClient {
 		//if (isset($user->googleapps_sync_sites) && $user->googleapps_sync_sites != 'no') {
 		$scopes[] = 'https://sites.google.com/feeds';
 
-		$scopes[] = 'http://docs.google.com/feeds/';
-		$scopes[] = 'http://spreadsheets.google.com/feeds/';
+		$scopes[] = 'https://docs.google.com/feeds/';
+		$scopes[] = 'https://spreadsheets.google.com/feeds/';
 		//}
 		if ($scopes) {
 			$this->scope = implode(' ', $scopes);

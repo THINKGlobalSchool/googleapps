@@ -857,7 +857,7 @@ function googleapps_sync_sites($do_not_redirect = true, $user = null) {
  */
 function googleapps_google_docs_folders($client) {
 
-	$feed = 'http://docs.google.com/feeds/default/private/full/-/folder';
+	$feed = 'https://docs.google.com/feeds/default/private/full/-/folder';
 	$result = $client->execute($feed, '3.0');
 	$folders_rss = simplexml_load_string($result);
 
@@ -875,9 +875,10 @@ function googleapps_google_docs_folders($client) {
  * @return object
  */
 function googleapps_google_docs_get_collaborators($client, $doc_id) {
-	$feed = 'http://docs.google.com/feeds/acl/private/full/' . $doc_id ;
+	$feed = 'https://docs.google.com/feeds/acl/private/full/' . $doc_id ;
 
 	$result = $client->execute($feed, '2.0');
+	
 	$rss = simplexml_load_string($result);
 
 	$shared_with_users=array();
@@ -919,7 +920,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 				break;
 		}
 
-		$feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
+		$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
 
 		$data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
 				<category scheme='http://schemas.google.com/g/2005#kind'
@@ -939,7 +940,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 
 	} else { // Batching ACL requests
 
-		$feed = 'http://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
+		$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
 
 		$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
 					xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
@@ -975,9 +976,9 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 function googleapps_google_docs($client, $folder = null) {
 	// Get google docs feeds list
 	if (empty($folder)) {
-		$feed = 'http://docs.google.com/feeds/default/private/full/-/mine';
+		$feed = 'https://docs.google.com/feeds/default/private/full/-/mine';
 	} else {
-		$feed = 'http://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
+		$feed = 'https://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
 	}
 
 	$result = $client->execute($feed, '3.0');
@@ -991,11 +992,10 @@ function googleapps_google_docs($client, $folder = null) {
 			//break;
 		}
 
-		$id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
+		$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 		$title = $item['title'];
 
 		$collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
-		
 
 		$links = $item->link;
 		$src = '';
