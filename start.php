@@ -39,6 +39,7 @@ function googleapps_init() {
 
 	// Register JS
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
+	elgg_register_simplecache_view('js/googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
 	
 	// Load JS lib, only if logged in and not in admin context
