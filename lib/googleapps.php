@@ -88,12 +88,24 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
 		elgg_push_breadcrumb($container->name);
 		
-		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc', 'container_guid' => $container_guid));
+		$content = elgg_list_entities(array(
+			'type' => 'object', 
+			'subtype' => 'shared_doc', 
+			'container_guid' => $container_guid,
+			'full_view' => FALSE
+		));
+
 		$params['title'] = elgg_echo('googleapps:label:user_docs', array($container->name));
 	} else {
 		elgg_register_title_button('googleapps/docs');
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
-		$content = elgg_list_entities(array('type' => 'object', 'subtype' => 'shared_doc'));
+
+		$content = elgg_list_entities(array(
+			'type' => 'object', 
+			'subtype' => 'shared_doc',
+			'full_view' => FALSE
+		));
+
 		$params['title'] = elgg_echo('googleapps:menu:allshareddocs');
 	}
 
