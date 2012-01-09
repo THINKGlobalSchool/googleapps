@@ -70,10 +70,16 @@ function googleapps_init() {
 	elgg_register_plugin_hook_handler('register', 'menu:topbar', 'googleapps_topbar_menu_setup', 9000);
 	
 	// Remove the edit link from the shared doc entity menu
-	elgg_register_plugin_hook_handler('prepare', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
+	elgg_register_plugin_hook_handler('register', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
+	
+	// Register profile menu hook
+	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
+	
+	// Register river menu
+	elgg_register_plugin_hook_handler('register', 'menu:river', 'googleapps_wiki_activity_menu');
 	
 	// Register a handler for creating shared docs
-	elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
+	//elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
 
 	elgg_register_plugin_hook_handler('permissions_check','user','googleapps_can_edit');
 
@@ -93,11 +99,6 @@ function googleapps_init() {
 
 	//register CRON hook to poll for Google Site activity
 	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
-
-	// Register profile menu hook
-	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
-	
-	elgg_register_plugin_hook_handler('register', 'menu:river', 'googleapps_wiki_activity_menu');
 	
 	// Interrupt output/access view
 	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
@@ -534,9 +535,9 @@ function googleapps_shared_doc_entity_menu_setup($hook, $type, $value, $params) 
 
 	// don't display edit links for google docs
 	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
-		foreach ($value['default'] as $i => $menu) {
+		foreach ($value as $idx => $menu) {
 			if ($menu->getName() == 'edit') {
-				unset ($value['default'][$i]);
+				unset ($value[$idx]);
 			}
 			
 			if ($menu->getName() == 'access') {
@@ -610,7 +611,7 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
  */
 function googleapps_wiki_activity_menu($hook, $type, $value, $params) {
 	if ($params['item']->subtype == 'site_activity') {
-		return false;
+		$value = array();
 	}
 	return $value;
 }
