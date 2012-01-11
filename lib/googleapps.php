@@ -353,7 +353,13 @@ function googleapps_list_sites() {
 function googleapps_list_sites_by_user() {
 	$output = "";
 
-	$googleusers = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	$googleusers = elgg_get_metadata(array(
+		'metadata_name' => 'googleapps_controlled_profile',
+		'metadata_value' => 'yes',
+		'type' => 'user',
+		'limit' => 0,
+	));
+
 	foreach($googleusers as $googleuser) {
 		$user = get_user($googleuser->owner_guid);
 		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
@@ -384,7 +390,13 @@ function googleapps_delete_all_site_entities() {
  * Reset all user sites
  */
 function googleapps_reset_user_sites() {
-	$googleusers = find_metadata('googleapps_controlled_profile', 'yes', 'user', '', 999);
+	$googleusers = $googleusers = elgg_get_metadata(array(
+		'metadata_name' => 'googleapps_controlled_profile',
+		'metadata_value' => 'yes',
+		'type' => 'user',
+		'limit' => 0,
+	));
+
 	foreach($googleusers as $googleuser) {
 		$user = get_user($googleuser->owner_guid);
 		$user->site_list = NULL;
@@ -447,8 +459,8 @@ function googleapps_cron_fetch_data() {
 
 	/* find all users with googleapps controlled profile */
 	$result = elgg_get_metadata(array(
-		'annotation_name' => 'googleapps_controlled_profile',
-		'annotation_value' => 'yes',
+		'metadata_name' => 'googleapps_controlled_profile',
+		'metadata_value' => 'yes',
 		'type' => 'user',
 		'limit' => 0,
  	));
