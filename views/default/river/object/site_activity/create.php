@@ -20,7 +20,7 @@ $string = str_replace($owner->name, '', $string);
 
 $string = $owner_link . $string;
 
-echo elgg_view('river/item', array(
+echo elgg_view('river/elements/layout', array(
 	'summary' => $string,
 	'item' => $vars['item']
 ));
