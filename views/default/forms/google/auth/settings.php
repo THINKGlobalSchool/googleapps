@@ -15,9 +15,9 @@ $user = elgg_extract('user', $vars);
 $user_sync_settings = unserialize($user->sync_settings);
 $enabled = array();
 
-// If the sync name settings doesn't exist, set it here
+// If the sync name settings doesn't exist, set it here (default off)
 if(!is_array($user_sync_settings)) {
-	$user_sync_settings['sync_name'] = 1;
+	$user_sync_settings['sync_name'] = 0;
 	$user->sync_settings = serialize($user_sync_settings);
 	$user->save();
 }
