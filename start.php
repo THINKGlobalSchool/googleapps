@@ -460,7 +460,11 @@ function google_apps_shared_doc_create_event_listener($event, $object_type, $obj
 				elgg_set_context('shared_doc_acl');
 				foreach ($object->collaborators as $collaborator) {
 					if ($user = get_user_by_email($collaborator)) {
-						$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
+						try {
+							$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
+						} catch (DatabaseException $e) {
+							$result = FALSE;
+						}
 					}
 				}
 				elgg_set_context($context);
