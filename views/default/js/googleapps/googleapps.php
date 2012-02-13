@@ -181,4 +181,4 @@ elgg.google.showTab = function(event) {
 }
 
 elgg.register_hook_handler('init', 'system', elgg.google.init);
-//</script>
+elgg.blah_blah;

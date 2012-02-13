@@ -19,8 +19,8 @@ $english = array(
 	'googleapps:googleshareddoc' => 'Google Shared Docs',
 	'googleapps/docs:add' => 'Share New Google Doc',
 	'googleapps:docs:none' => 'No Shared Documents',
-	'admin:utilities' => 'Utilities',
-	'admin:utilities:debug_sites' => 'Google Sites Debug',
+	'admin:administer_utilities' => 'Utilities',
+	'admin:administer_utilities:debug_sites' => 'Google Sites Debug',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',

@@ -38,12 +38,15 @@ function googleapps_init() {
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
 	// Register JS
-	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
-	elgg_register_simplecache_view('js/googleapps/googleapps');
-	elgg_register_js('elgg.google', $googleapps_js);
+//	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
+//	elgg_register_simplecache_view('js/googleapps/googleapps');
+//	elgg_register_js('elgg.google', $googleapps_js);
 	
 	// Load JS lib, only if logged in and not in admin context
 	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
+		// Extend JS
+		elgg_extend_view('js/elgg', 'js/googleapps/googleapps');
+		
 		elgg_load_js('elgg.google');
 	}
 
@@ -192,7 +195,7 @@ function googleapps_pagesetup() {
 
 	// Admin wiki debug
 	if (elgg_in_context('admin')) {
-		elgg_register_admin_menu_item('administer', 'debug_sites', 'utilities');
+		elgg_register_admin_menu_item('administer', 'debug_sites', 'administer_utilities');
 	}
 }
 
