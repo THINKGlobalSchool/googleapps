@@ -31,7 +31,7 @@ class OAuthClient {
 		$this->secret = $consumer_secret;
 		$this->priv_key = $priv_key;
 
-		$this->consumer = new OAuthConsumer($this->key, $this->secret, null);
+		$this->consumer = new GAOAuthConsumer($this->key, $this->secret, null);
 
 		$this->access_token = $_SESSION['access_token'];
 		$this->access_secret = $_SESSION['token_secret'];
@@ -53,14 +53,14 @@ class OAuthClient {
 
 		switch ($signature_method_name) {
 			case SIG_METHOD_PLAINTEXT:
-				$this->signature_method = new OAuthSignatureMethod_PLAINTEXT();
+				$this->signature_method = new GAOAuthSignatureMethod_PLAINTEXT();
 				break;
 			case SIG_METHOD_RSA:
-				$this->signature_method = new OAuthSignatureMethod_RSA_SHA1();
+				$this->signature_method = new GAOAuthSignatureMethod_RSA_SHA1();
 				break;
 			case SIG_METHOD_HMAC:
 			default:
-				$this->signature_method = new OAuthSignatureMethod_HMAC_SHA1();
+				$this->signature_method = new GAOAuthSignatureMethod_HMAC_SHA1();
 				break;
 		}
 	}
@@ -85,7 +85,7 @@ class OAuthClient {
 		}
 
 		$url = $endpoint . '?scope=' . urlencode($this->scope);
-		$req_req = OAuthRequest::from_consumer_and_token($this->consumer, NULL, "GET", $endpoint, $params);
+		$req_req = GAOAuthRequest::from_consumer_and_token($this->consumer, NULL, "GET", $endpoint, $params);
 		$req_req->sign_request($this->signature_method, $this->consumer, NULL);
 
 		$service_response = $this->send_signed_request('GET', $url, array($req_req->to_header()), null, false);
@@ -99,7 +99,7 @@ class OAuthClient {
 		$request_secret = $result['oauth_token_secret'];
 		$_SESSION['request_key'] = $request_key;
 		$_SESSION['request_secret'] = $request_secret;
-		return new OAuthToken($request_key, $request_secret);
+		return new GAOAuthToken($request_key, $request_secret);
 	}
 
 	public function oauth_authorize() {
@@ -147,9 +147,9 @@ class OAuthClient {
 
 		$endpoint = 'https://www.google.com/accounts/OAuthGetAccessToken';
 
-		$request_token = new OAuthToken($request_key, $request_secret);
+		$request_token = new GAOAuthToken($request_key, $request_secret);
 
-		$acc_req = OAuthRequest::from_consumer_and_token($this->consumer, $request_token,
+		$acc_req = GAOAuthRequest::from_consumer_and_token($this->consumer, $request_token,
 				'GET', $endpoint,
 		array('oauth_verifier' => $verifier));
 		$acc_req->sign_request($this->signature_method, $this->consumer, $request_token);
@@ -163,7 +163,7 @@ class OAuthClient {
 		$this->access_token = $access['oauth_token'];
 		$this->access_secret = $access['oauth_token_secret'];
 
-		$token = new OAuthToken($this->access_token, $this->access_secret);
+		$token = new GAOAuthToken($this->access_token, $this->access_secret);
 		return $token;
 	}
 
@@ -176,9 +176,9 @@ class OAuthClient {
 		if (empty($params)) {
 			$params = array();
 		}
-		$access_token = new OAuthToken($this->access_token, $this->access_secret);
+		$access_token = new GAOAuthToken($this->access_token, $this->access_secret);
 
-		$echo_req = OAuthRequest::from_consumer_and_token($this->consumer, $access_token,
+		$echo_req = GAOAuthRequest::from_consumer_and_token($this->consumer, $access_token,
 				'GET', $endpoint, $params);
 		$echo_req->sign_request($this->signature_method, $this->consumer, $access_token);
 		$content_type = 'Content-Type: application/atom+xml';
@@ -199,8 +199,8 @@ class OAuthClient {
 		if (empty($params)) {
 			$params = array();
 		}
-		$access_token = new OAuthToken($this->access_token, $this->access_secret);
-		$echo_req = OAuthRequest::from_consumer_and_token($this->consumer, $access_token,
+		$access_token = new GAOAuthToken($this->access_token, $this->access_secret);
+		$echo_req = GAOAuthRequest::from_consumer_and_token($this->consumer, $access_token,
 		$method, $endpoint, $params);
 
 		 

@@ -11,7 +11,7 @@
  */
 
 // Throwing this in here for now
-require_once(elgg_get_plugins_path() . 'googleapps/lib/OAuth.php');
+require_once(elgg_get_plugins_path() . 'googleapps/lib/GAOAuth.php');
 
 /**
  * Get wiki activity settings content

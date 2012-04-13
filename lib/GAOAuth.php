@@ -3,11 +3,11 @@
 
 /* Generic exception class
  */
-class OAuthException extends Exception {/*{{{*/
+class GAOAuthException extends Exception {/*{{{*/
   // pass
 }/*}}}*/
 
-class OAuthConsumer {/*{{{*/
+class GAOAuthConsumer {/*{{{*/
   public $key;
   public $secret;
 
@@ -18,7 +18,7 @@ class OAuthConsumer {/*{{{*/
   }/*}}}*/
 }/*}}}*/
 
-class OAuthToken {/*{{{*/
+class GAOAuthToken {/*{{{*/
   // access tokens and request tokens
   public $key;
   public $secret;
@@ -37,8 +37,8 @@ class OAuthToken {/*{{{*/
    * would respond to request_token and access_token calls with
    */
   function to_string() {/*{{{*/
-    return "oauth_token=" . OAuthUtil::urlencodeRFC3986($this->key) . 
-        "&oauth_token_secret=" . OAuthUtil::urlencodeRFC3986($this->secret);
+    return "oauth_token=" . GAOAuthUtil::urlencodeRFC3986($this->key) . 
+        "&oauth_token_secret=" . GAOAuthUtil::urlencodeRFC3986($this->secret);
   }/*}}}*/
 
   function __toString() {/*{{{*/
@@ -46,14 +46,14 @@ class OAuthToken {/*{{{*/
   }/*}}}*/
 }/*}}}*/
 
-class OAuthSignatureMethod {/*{{{*/
+class GAOAuthSignatureMethod {/*{{{*/
   public function check_signature(&$request, $consumer, $token, $signature) {
     $built = $this->build_signature($request, $consumer, $token);
     return $built == $signature;
   }
 }/*}}}*/
 
-class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {/*{{{*/
+class GAOAuthSignatureMethod_HMAC_SHA1 extends GAOAuthSignatureMethod {/*{{{*/
   function get_name() {/*{{{*/
     return "HMAC-SHA1";
   }/*}}}*/
@@ -67,14 +67,14 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {/*{{{*/
       ($token) ? $token->secret : ""
     );
 
-    $key_parts = array_map(array('OAuthUtil','urlencodeRFC3986'), $key_parts);
+    $key_parts = array_map(array('GAOAuthUtil','urlencodeRFC3986'), $key_parts);
     $key = implode('&', $key_parts);
 
     return base64_encode( hash_hmac('sha1', $base_string, $key, true));
   }/*}}}*/
 }/*}}}*/
 
-class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod {/*{{{*/
+class GAOAuthSignatureMethod_RSA_SHA1 extends GAOAuthSignatureMethod {/*{{{*/
   public function get_name() {/*{{{*/
     return "RSA-SHA1";
   }/*}}}*/
@@ -144,7 +144,7 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod {/*{{{*/
   } /*}}}*/
 }/*}}}*/
 
-class OAuthRequest {/*{{{*/
+class GAOAuthRequest {/*{{{*/
   private $parameters;
   private $http_method;
   private $http_url;
@@ -168,19 +168,19 @@ class OAuthRequest {/*{{{*/
     @$http_url or $http_url = $scheme . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     @$http_method or $http_method = $_SERVER['REQUEST_METHOD'];
 
-    $request_headers = OAuthRequest::get_headers();
+    $request_headers = GAOAuthRequest::get_headers();
 
     // let the library user override things however they'd like, if they know
     // which parameters to use then go for it, for example XMLRPC might want to
     // do this
     if ($parameters) {
-      $req = new OAuthRequest($http_method, $http_url, $parameters);
+      $req = new GAOAuthRequest($http_method, $http_url, $parameters);
     }
     // next check for the auth header, we need to do some extra stuff
     // if that is the case, namely suck in the parameters from GET or POST
     // so that we can include them in the signature
     else if (@substr($request_headers['Authorization'], 0, 5) == "OAuth") {
-      $header_parameters = OAuthRequest::split_header($request_headers['Authorization']);
+      $header_parameters = GAOAuthRequest::split_header($request_headers['Authorization']);
       if ($http_method == "GET") {
         $req_parameters = $_GET;
       } 
@@ -188,13 +188,13 @@ class OAuthRequest {/*{{{*/
         $req_parameters = $_POST;
       } 
       $parameters = array_merge($header_parameters, $req_parameters);
-      $req = new OAuthRequest($http_method, $http_url, $parameters);
+      $req = new GAOAuthRequest($http_method, $http_url, $parameters);
     }
     else if ($http_method == "GET") {
-      $req = new OAuthRequest($http_method, $http_url, $_GET);
+      $req = new GAOAuthRequest($http_method, $http_url, $_GET);
     }
     else if ($http_method == "POST") {
-      $req = new OAuthRequest($http_method, $http_url, $_POST);
+      $req = new GAOAuthRequest($http_method, $http_url, $_POST);
     }
     return $req;
   }/*}}}*/
@@ -204,9 +204,9 @@ class OAuthRequest {/*{{{*/
    */
   public static function from_consumer_and_token($consumer, $token, $http_method, $http_url, $parameters=NULL) {/*{{{*/
     @$parameters or $parameters = array();
-    $defaults = array("oauth_version" => OAuthRequest::$version,
-                      "oauth_nonce" => OAuthRequest::generate_nonce(),
-                      "oauth_timestamp" => OAuthRequest::generate_timestamp(),
+    $defaults = array("oauth_version" => GAOAuthRequest::$version,
+                      "oauth_nonce" => GAOAuthRequest::generate_nonce(),
+                      "oauth_timestamp" => GAOAuthRequest::generate_timestamp(),
                       "oauth_consumer_key" => $consumer->key);
     $parameters = array_merge($defaults, $parameters);
 
@@ -220,7 +220,7 @@ class OAuthRequest {/*{{{*/
     }*/
 
 
-    return new OAuthRequest($http_method, $http_url, $parameters);
+    return new GAOAuthRequest($http_method, $http_url, $parameters);
   }/*}}}*/
 
   public function set_parameter($name, $value) {/*{{{*/
@@ -257,8 +257,8 @@ class OAuthRequest {/*{{{*/
     }
 		
     // Urlencode both keys and values
-    $keys = array_map(array('OAuthUtil', 'urlencodeRFC3986'), array_keys($params));
-    $values = array_map(array('OAuthUtil', 'urlencodeRFC3986'), array_values($params));
+    $keys = array_map(array('GAOAuthUtil', 'urlencodeRFC3986'), array_keys($params));
+    $values = array_map(array('GAOAuthUtil', 'urlencodeRFC3986'), array_values($params));
     $params = array_combine($keys, $values);
 
     // Sort by keys (natsort)
@@ -308,7 +308,7 @@ if(isset($params['title']) && isset($params['title-exact'])) {
       $this->get_signable_parameters()
     );
 
-    $parts = array_map(array('OAuthUtil', 'urlencodeRFC3986'), $parts);
+    $parts = array_map(array('GAOAuthUtil', 'urlencodeRFC3986'), $parts);
 
     return implode('&', $parts);
   }/*}}}*/
@@ -349,7 +349,7 @@ if(isset($params['title']) && isset($params['title-exact'])) {
   public function to_postdata() {/*{{{*/
     $total = array();
     foreach ($this->parameters as $k => $v) {
-      $total[] = OAuthUtil::urlencodeRFC3986($k) . "=" . OAuthUtil::urlencodeRFC3986($v);
+      $total[] = GAOAuthUtil::urlencodeRFC3986($k) . "=" . GAOAuthUtil::urlencodeRFC3986($v);
     }
     $out = implode("&", $total);
     return $out;
@@ -371,7 +371,7 @@ if(isset($params['title']) && isset($params['title-exact'])) {
     
     foreach ($this->parameters as $k => $v) {
       if (substr($k, 0, 5) != "oauth") continue;
-      $out .= OAuthUtil::urlencodeRFC3986($k) . '="' . OAuthUtil::urlencodeRFC3986($v) . '", ';
+      $out .= GAOAuthUtil::urlencodeRFC3986($k) . '="' . GAOAuthUtil::urlencodeRFC3986($v) . '", ';
     }
     $out = substr_replace($out, '', strlen($out) - 2);
     
@@ -459,7 +459,7 @@ if(isset($params['title']) && isset($params['title-exact'])) {
   }/*}}}*/
 }/*}}}*/
 
-class OAuthServer {/*{{{*/
+class GAOAuthServer {/*{{{*/
   protected $timestamp_threshold = 300; // in seconds, five minutes
   protected $version = 1.0;             // hi blaine
   protected $signature_methods = array();
@@ -536,7 +536,7 @@ class OAuthServer {/*{{{*/
       $version = 1.0;
     }
     if ($version && $version != $this->version) {
-      throw new OAuthException("OAuth version '$version' not supported");
+      throw new GAOAuthException("OAuth version '$version' not supported");
     }
     return $version;
   }/*}}}*/
@@ -552,7 +552,7 @@ class OAuthServer {/*{{{*/
     }
     if (!in_array($signature_method, 
                   array_keys($this->signature_methods))) {
-      throw new OAuthException(
+      throw new GAOAuthException(
         "Signature method '$signature_method' not supported try one of the following: " . implode(", ", array_keys($this->signature_methods))
       );      
     }
@@ -565,12 +565,12 @@ class OAuthServer {/*{{{*/
   private function get_consumer(&$request) {/*{{{*/
     $consumer_key = @$request->get_parameter("oauth_consumer_key");
     if (!$consumer_key) {
-      throw new OAuthException("Invalid consumer key");
+      throw new GAOAuthException("Invalid consumer key");
     }
 
     $consumer = $this->data_store->lookup_consumer($consumer_key);
     if (!$consumer) {
-      throw new OAuthException("Invalid consumer");
+      throw new GAOAuthException("Invalid consumer");
     }
 
     return $consumer;
@@ -585,7 +585,7 @@ class OAuthServer {/*{{{*/
       $consumer, $token_type, $token_field
     );
     if (!$token) {
-      throw new OAuthException("Invalid $token_type token: $token_field");
+      throw new GAOAuthException("Invalid $token_type token: $token_field");
     }
     return $token;
   }/*}}}*/
@@ -613,7 +613,7 @@ class OAuthServer {/*{{{*/
     );
 
     if (!$valid_sig) {
-      throw new OAuthException("Invalid signature");
+      throw new GAOAuthException("Invalid signature");
     }
   }/*}}}*/
 
@@ -624,7 +624,7 @@ class OAuthServer {/*{{{*/
     // verify that timestamp is recentish
     $now = time();
     if ($now - $timestamp > $this->timestamp_threshold) {
-      throw new OAuthException("Expired timestamp, yours $timestamp, ours $now");
+      throw new GAOAuthException("Expired timestamp, yours $timestamp, ours $now");
     }
   }/*}}}*/
 
@@ -635,7 +635,7 @@ class OAuthServer {/*{{{*/
     // verify that the nonce is uniqueish
     $found = $this->data_store->lookup_nonce($consumer, $token, $nonce, $timestamp);
     if ($found) {
-      throw new OAuthException("Nonce already used: $nonce");
+      throw new GAOAuthException("Nonce already used: $nonce");
     }
   }/*}}}*/
 
@@ -643,7 +643,7 @@ class OAuthServer {/*{{{*/
 
 }/*}}}*/
 
-class OAuthDataStore {/*{{{*/
+class GAOAuthDataStore {/*{{{*/
   function lookup_consumer($consumer_key) {/*{{{*/
     // implement me
   }/*}}}*/
@@ -672,7 +672,7 @@ class OAuthDataStore {/*{{{*/
 
 /*  A very naive dbm-based oauth storage
  */
-class SimpleOAuthDataStore extends OAuthDataStore {/*{{{*/
+class SimpleGAOAuthDataStore extends GAOAuthDataStore {/*{{{*/
   private $dbh;
 
   function __construct($path = "oauth.gdbm") {/*{{{*/
@@ -689,7 +689,7 @@ class SimpleOAuthDataStore extends OAuthDataStore {/*{{{*/
       return NULL;
     }
     $obj = unserialize($rv);
-    if (!($obj instanceof OAuthConsumer)) {
+    if (!($obj instanceof GAOAuthConsumer)) {
       return NULL;
     }
     return $obj;
@@ -701,7 +701,7 @@ class SimpleOAuthDataStore extends OAuthDataStore {/*{{{*/
       return NULL;
     }
     $obj = unserialize($rv);
-    if (!($obj instanceof OAuthToken)) {
+    if (!($obj instanceof GAOAuthToken)) {
       return NULL;
     }
     return $obj;
@@ -714,9 +714,9 @@ class SimpleOAuthDataStore extends OAuthDataStore {/*{{{*/
   function new_token($consumer, $type="request") {/*{{{*/
     $key = md5(time());
     $secret = time() + time();
-    $token = new OAuthToken($key, md5(md5($secret)));
+    $token = new GAOAuthToken($key, md5(md5($secret)));
     if (!dba_insert("${type}_$key", serialize($token), $this->dbh)) {
-      throw new OAuthException("doooom!");
+      throw new GAOAuthException("doooom!");
     }
     return $token;
   }/*}}}*/
@@ -733,7 +733,7 @@ class SimpleOAuthDataStore extends OAuthDataStore {/*{{{*/
   }/*}}}*/
 }/*}}}*/
 
-class OAuthUtil {/*{{{*/
+class GAOAuthUtil {/*{{{*/
   public static function urlencodeRFC3986($string) {/*{{{*/
     return str_replace('%7E', '~', rawurlencode($string));
   }/*}}}*/
