@@ -706,7 +706,6 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 	}
 
 	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
 	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 
 	$count = 0;

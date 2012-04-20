@@ -336,10 +336,9 @@ function googleapps_login() {
 	$user = elgg_get_logged_in_user_entity();
 	if (!empty($user) &&
 	$user->google &&
-	($oauth_sync_email != 'no' || $oauth_sync_sites != 'no' || $oauth_sync_docs != 'no'))
-	{
-		// Email/docs/sites syncing enabled, so grab data
-		googleapps_get_oauth_data();
+	($oauth_sync_email != 'no')) {
+		$client = authorized_client();
+		googleapps_fetch_oauth_data($client, false, 'mail');
 	}
 }
 
