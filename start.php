@@ -105,6 +105,9 @@ function googleapps_init() {
 	
 	// Interrupt output/access view
 	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
+	
+	// Hook into walled garden public pages to allow logging in with a google account
+	elgg_register_plugin_hook_handler('public_pages', 'walled_garden', 'googleapps_public_pages_handler');
 
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
@@ -650,6 +653,24 @@ function googleapps_shared_doc_output_access_handler($hook, $type, $value, $para
 	return $value;
 }
 
+/**
+ * Hook into walled garden public pages to allow logging in with a google account
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_public_pages_handler($hook, $type, $value, $params) {
+	$value[] = 'action/google/auth/login';
+	$value[] = 'action/google/auth/connect';
+	$value[] = 'action/google/auth/disconnect';
+	$value[] = 'action/google/auth/return';
+	$value[] = 'action/google/auth/return_with_connect';
+
+	return $value;
+}
 
 /**
  * Populates the ->getUrl() method for shared google docs
