@@ -76,7 +76,9 @@ function googleapps_init() {
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
 	
 	// Register profile menu hook
-	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
+	if (elgg_is_logged_in()) {
+		elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
+	}
 	
 	// Register river menu
 	elgg_register_plugin_hook_handler('register', 'menu:river', 'googleapps_wiki_activity_menu');
