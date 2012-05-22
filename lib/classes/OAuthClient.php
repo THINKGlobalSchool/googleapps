@@ -93,7 +93,7 @@ class OAuthClient {
 		parse_str($service_response, $result);
 
 		if (empty($result['oauth_token']) || empty($result['oauth_token_secret'])) {
-			die('Can not fetch request token. Server\'s response:' . "\n" . $service_response);
+			die('Cannot fetch request token. Server\'s response:' . "\n" . $service_response);
 		}
 		$request_key = $result['oauth_token'];
 		$request_secret = $result['oauth_token_secret'];
@@ -181,6 +181,25 @@ class OAuthClient {
 		$echo_req = GAOAuthRequest::from_consumer_and_token($this->consumer, $access_token,
 				'GET', $endpoint, $params);
 		$echo_req->sign_request($this->signature_method, $this->consumer, $access_token);
+		$content_type = 'Content-Type: application/atom+xml';
+		$gdataVersion = 'GData-Version: ' . $version;
+
+		return $this->send_signed_request('GET', $endpoint,
+		array($echo_req->to_header(), $content_type, $gdataVersion),
+		null, false);
+
+	}
+	
+	public function execute_without_token($endpoint, $version = '2.0', $params = null) {
+		if (empty($params)) {
+			$params = array();
+		}
+
+		$echo_req = GAOAuthRequest::from_consumer_and_token($this->consumer, NULL,
+				'GET', $endpoint, $params);
+
+		$echo_req->sign_request($this->signature_method, $this->consumer, NULL);
+
 		$content_type = 'Content-Type: application/atom+xml';
 		$gdataVersion = 'GData-Version: ' . $version;
 

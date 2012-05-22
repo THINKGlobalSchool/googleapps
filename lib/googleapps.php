@@ -904,7 +904,7 @@ function googleapps_google_docs_get_collaborators($client, $doc_id) {
 	
 	$rss = simplexml_load_string($result);
 
-	$shared_with_users=array();
+	$shared_with_users = array();
 
 	// Parse for each permission entity
 	foreach ($rss->entry as $item) {
@@ -999,25 +999,23 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
 function googleapps_google_docs($client, $folder = null) {
 	// Get google docs feeds list
 	if (empty($folder)) {
+		$params = array('max-results' => 25, 'expand-acl' => 'true'); 
 		$feed = 'https://docs.google.com/feeds/default/private/full/-/mine';
+		$feed = $feed . '?' . implode_assoc('=', '&', $params);
 	} else {
 		$feed = 'https://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
 	}
 
-	$result = $client->execute($feed, '3.0');
+	$result = $client->execute($feed, '3.0', $params);
+
 	$rss = simplexml_load_string($result);
 	$documents = array();
 
 	// Parse entries for each google document
 	foreach ($rss->entry as $item) {
-
-		if (count($documents) >= $max_entry) {
-			//break;
-		}
-
 		$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 		$title = $item['title'];
-
+	
 		$collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
 
 		$links = $item->link;
@@ -1352,4 +1350,188 @@ function get_members_not_shared($members, $doc) {
 		}
 	}
 	return $members_not_shared;
+}
+
+/**
+ * Fetch and save new google sites data
+ *
+ * @return object
+ */
+function googleapps_cron_process_sites($hook, $type, $value, $params) {
+	set_time_limit(0); // No timeout, just in case
+
+	$log .= "Processing Google Sites\n";
+	$log .= "-----------------------\n";
+
+	if (elgg_in_context('googleapps_sites_log')) {
+		echo "<pre>";
+		echo $log;
+		echo "</pre>";
+	}
+}
+
+/**
+ * Get google sites data and save it for user
+ *
+ * @param bool $do_not_redirect
+ * @param object $user
+ * @return array|false
+ */
+function googleapps_process_sites() {
+	// Don't do anything if sites are disabled
+	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
+		return FALSE;
+	}
+	
+	set_time_limit(9000); // Long timeout, just in case
+
+	$log .= "Processing Google Sites\n";
+	$log .= "-----------------------\n";
+	
+	/* Build a 2-legged OAuth Client */		// @TODO should be in a function 
+	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
+	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+	
+	if ($client) {
+		$user = 'jtilson@thinkglobalschool.com';
+
+		$log .= "Creating 2-legged client for: {$user}\n";
+
+		$params = array('max-results' => 500, 'xoauth_requestor_id' => $user, 'include-all-sites' => 'true'); 
+ 
+		$base_feed = "https://sites.google.com/feeds/site/$CONSUMER_KEY/";
+
+		$url = $base_feed . '?' . implode_assoc('=', '&', $params);
+
+		$log .= "Request: {$url}\n";
+
+		$result = $client->execute_without_token($url, '1.4', $params);
+
+		$response_list = $client->fetch_sites($result); // Site list
+
+		if ($response_list && is_array($response_list) && count($response_list) > 0) {
+			$log .= "\nSuccess..\n";
+			
+			// Get exising elgg site entities
+			$site_entities = elgg_get_entities(array(
+				'type' => 'object', 
+				'subtype' => 'site', 
+				'limit' => 0
+			)); 
+			
+			$log .= "Found " . count($site_entities) . " local site(s)\n";
+			
+			$local_site_ids = array();
+			foreach ($site_entities as $site) {
+				$log .= "\n[{$site->title}]\n";
+				$log .= "ID: {$site->site_id}\n";
+				$log .= "URL: {$site->url}\n";
+				$local_site_ids[] = $site->site_id;
+			}
+			
+			$log .= "\nFound " . count($response_list) . " remote site(s)\n";
+
+			$log .= "\nRemote list:\n------------\n";
+			
+			$new_sites = array();
+			
+			foreach ($response_list as $site) {
+				$log .= "\n[{$site['title']}]\n";
+				$log .= "ID: {$site['site_id']}\n";
+				$log .= "URL: {$site['url']}\n";
+				
+				if (!in_array($site['site_id'], $local_site_ids)) {
+					$new_sites[$site['title']] = $site['site_id'];
+					$log .= "New site!\n";
+				} else {
+					$log .= "Local site exists!\n";
+				}
+			}
+
+		} else {
+			$log .= "\n" . $result;
+			$log .= "\nNo sites found\n";
+		}
+	} else {
+		$log .= "Error creating client!\n";
+		return FALSE;
+	}
+
+	if (elgg_in_context('googleapps_sites_log')) {
+		echo "<pre>";
+		echo $log;
+		echo "</pre>";
+	}
+	
+	return TRUE;
+
+	// 2. Get local site list
+	if($user == null) {
+		$user =& $_SESSION['user'];
+	}
+
+	// 3. Save
+	//$user_site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
+
+	// user's site list
+	$merged = array();
+
+
+
+	// site entities what have user
+	$users_site_entities=array();
+
+	// 4.2 Update normalized sites: create new sites
+	foreach ($response_list as $site) {
+		$found = false;
+
+		// search for site in elgg entities
+		foreach ($all_site_entities as $site_entity) {
+			if ($site['site_id'] == $site_entity->site_id) {
+				$users_site_entities[]=$site_entity;
+				save_site_to_user_list($site_entity, $site, $merged);
+				$found = true;
+				break;
+			}
+		}
+
+		// create new site entity
+		if (!$found) {
+			$new_site = new ElggObject();
+			$new_site->owner_guid = $user->guid;
+			$new_site->site_id = $site['site_id'];
+			$new_site->title = $site['title'];
+			$new_site->subtype = "site";
+			$new_site->url = $site['url'];
+			$new_site->modified = $site['modified'];
+			$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
+			$new_site->site_access_id = ACCESS_PRIVATE ; // for site
+			$new_site->save();
+			$users_site_entities[]=$new_site;
+			save_site_to_user_list($new_site, $site, $merged);
+		}
+	}
+
+	// 4. Update user
+	$user->site_list = serialize($merged);
+	$user->save();
+
+	// 5. Profit
+	return array('response_list'=>$response_list,  'site_entities'=>$users_site_entities, 'all_site_entities' => $all_site_entities );
+}
+  
+/** 
+ * Joins key:value pairs by inner_glue and each pair together by outer_glue 
+ * @param string $inner_glue The HTTP method (GET, POST, PUT, DELETE) 
+ * @param string $outer_glue Full URL of the resource to access 
+ * @param array $array Associative array of query parameters 
+ * @return string Urlencoded string of query parameters 
+ */  
+function implode_assoc($inner_glue, $outer_glue, $array) {  
+  $output = array();  
+  foreach($array as $key => $item) {  
+    $output[] = $key . $inner_glue . urlencode($item);  
+  }  
+  return implode($outer_glue, $output);  
 }
