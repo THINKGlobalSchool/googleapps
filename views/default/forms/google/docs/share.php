@@ -113,9 +113,13 @@ HTML;
 
 $script = <<<HTML
 	<script type="text/javascript">
-		$(function() {
-			elgg.google.loadDocumentChooser('googleapps-docs-container');
-		});
+		// Function to click default tab
+		load_chooser = function() {
+			elgg.google.loadDocumentChooser('googleapps-docs-container');	
+		}
+
+		// Need to click AFTER elgg is initted
+		elgg.register_hook_handler('ready', 'system', load_chooser);
 	</script>
 HTML;
 
