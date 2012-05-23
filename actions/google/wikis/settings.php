@@ -26,7 +26,6 @@ if ($user->google == 1) {
 			foreach ($googleapps_sites_settings as $site_id => $access) {
 				$site_list[$site_id]['access'] = $access;
 				$entity_id = $site_list[$site_id]['entity_id'];
-				googleapps_update_site_entity_access($entity_id, $access);
 			}
 			$user->site_list = serialize($site_list);
 			$user->save();

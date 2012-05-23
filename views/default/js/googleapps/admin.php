@@ -1,0 +1,59 @@
+<?php
+/**
+ * Googleapps Admin JS library
+ *
+ * @package Googleapps
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010
+ * @link http://www.thinkglobalschool.com/
+ *
+ */
+?>
+//<script>
+elgg.provide('elgg.google_admin');
+
+elgg.google_admin.init = function() {	
+	// Delegate click handler for admin menu items
+	$(document).delegate('.googleapps-admin-menu-item', 'click', elgg.google_admin.adminMenuClick);
+
+	// Delegate click handler for admin run cron
+	$(document).delegate('#googleapps-run-cron', 'click', elgg.google_admin.adminRunCronClick);
+	
+		$(document).delegate('#googleapps-test-one', 'click', elgg.google_admin.adminTestOneClick);
+		
+			$(document).delegate('#googleapps-test-two', 'click', elgg.google_admin.adminTestTwoClick);
+}
+
+// Click handler for admin menu items
+elgg.google_admin.adminMenuClick = function(event) {
+	$('.googleapps-admin-menu-item').parent().removeClass('elgg-state-selected');
+	$(this).parent().addClass('elgg-state-selected');
+
+	$('.googleapps-menu-container').hide();
+	
+	// Hide 'save' button
+	if ($(this).attr('href') != "#googleapps-admin-settings") {
+		$('form#googleapps-settings').find('input.elgg-button-submit').hide();
+	} else {
+		$('form#googleapps-settings').find('input.elgg-button-submit').show();
+	}
+	
+	$($(this).attr('href')).show();
+	
+	event.preventDefault();
+}
+
+// Admin run cron click handler 
+elgg.google_admin.adminRunCronClick = function(event) {
+	elgg.get(elgg.get_site_url() + "googleapps/admin/wiki_cron", {
+		success: function(data) {
+			$("#googleapps-cron-output").html(data);
+		},
+		error: function() {
+			$("#googleapps-cron-output").html("There was an error loading output");
+		}
+	});
+}
+
+elgg.register_hook_handler('init', 'system', elgg.google_admin.init);

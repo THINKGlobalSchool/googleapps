@@ -19,8 +19,11 @@ $english = array(
 	'googleapps:googleshareddoc' => 'Google Shared Docs',
 	'googleapps/docs:add' => 'Share New Google Doc',
 	'googleapps:docs:none' => 'No Shared Documents',
-	'admin:administer_utilities' => 'Utilities',
-	'admin:administer_utilities:debug_sites' => 'Google Sites Debug',
+	//'admin:administer_utilities' => 'Utilities',
+	//'admin:administer_utilities:debug_sites' => 'Google Sites Debug',
+	'admin:google_apps:sites_settings' => 'Sites Settings',
+	'admin:google_apps:sites_debug' => 'Sites Debug',
+	'admin:google_apps' => 'Google Apps',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -40,6 +43,7 @@ $english = array(
 	'googleapps:admin:sync_sites' => 'Enable Google Sites ',
    	'googleapps:admin:sync_docs' => 'Enable Google Docs',
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
+	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
 	'googleapps:admin:resetwikis' => 'Reset all learned Google Sites:',
 	'googleapps:admin:reset' => 'Reset',
 
@@ -92,7 +96,7 @@ $english = array(
 	'googleapps:label:table_select' => 'Select',
 	'googleapps:label:table_name' => 'Name',
 	'googleapps:label:table_collaborators' => 'Collaborators',
-	'googleapps:label:owners' => 'Owners',
+	'googleapps:label:owners' => 'Owner(s)',
 	'googleapps:label:updated' => 'Updated',
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
@@ -103,6 +107,9 @@ $english = array(
 	'googleapps:label:allfolders' => 'All Folders',
 	'googleapps:label:choosefolder' => 'Select Folder',
 	'googleapps:label:moredocs' => 'More Shared Docs',
+	'googleapps:label:listsites' => 'List Sites',
+	'googleapps:label:resetsites' => 'Reset Sites',
+	'googleapps:label:cronsites' => 'Run Cron',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

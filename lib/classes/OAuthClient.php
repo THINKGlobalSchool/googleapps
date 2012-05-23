@@ -22,6 +22,7 @@ class OAuthClient {
 	var $access_token = null;
 	var $access_secret = null;
 	var $scope = 'https://mail.google.com/mail/feed/atom/ https://sites.google.com/feeds';
+	var $params = null;
 
 	public function OAuthClient($consumer_key, $consumer_secret,
 	$signature_method_name = SIG_METHOD_HMAC, $priv_key = '') {
@@ -63,6 +64,22 @@ class OAuthClient {
 				$this->signature_method = new GAOAuthSignatureMethod_HMAC_SHA1();
 				break;
 		}
+	}
+	
+	/**
+	 * Create a 2 legged client
+	 */
+	public static function create_2_legged_client($consumer_key, $consumer_secret, $signature_method_name, $private_key, $requestor_id, $params = array()) 
+	{
+		$client = new OAuthClient($consumer_key, $consumer_secret, $signature_method_name, $private_key);
+		
+		$requestor = array('xoauth_requestor_id' => $requestor_id);
+		
+		$params = array_merge($requestor, $params);
+		
+		$client->params = $params;
+		
+		return $client;
 	}
 
 	public function oauth_fetch_request_token() {
@@ -235,43 +252,76 @@ class OAuthClient {
 		$data, false);
 	}
 
-	public function fetch_sites($xml) {
+	public function populate_sites($xml) {
 
 		$rss = simplexml_load_string($xml);
 
 		$list = array();
 		foreach ($rss->entry as $item) {
-			$feedUri = preg_replace('!(.*)feeds/site/(.*)!', '$1feeds/activity/$2', $item->id);
+			// Activity feed url
+			$feed_url = preg_replace('!(.*)feeds/site/(.*)!', '$1feeds/activity/$2', $item->id);
 
 			$namespaces = array_merge(array('' => ''), $rss->getDocNamespaces(true));
 			$item_array = array();
 			$item_array = $this->xml2phpArray($item, $namespaces, $item_array);
 
+			// Get site and acl url's
 			$site_url = '';
-			foreach ($item->link[0]->attributes() as $key => $val) {
-				if ($key == 'href') {
-					$site_url = $val;
+			$acl_url = '';
+			
+			foreach ($item->link as $link) {
+				// acl url
+				if ($link->attributes()->rel == "http://schemas.google.com/acl/2007#accessControlList") {
+					$acl_url = $link->attributes()->href;
 				}
-			}
-
-			foreach ($item->link[1]->attributes() as $key => $val) {
-				if ($key == 'href') {
-					$acl_url = $val;
+				
+				// site url
+				if ($link->attributes()->rel == "alternate" && $link->attributes()->type == "text/html") {
+					$site_url = $link->attributes()->href;
 				}
 			}
 
 			$public = false;
-			$acl_xml = $this->execute($acl_url, '1.2');
-
-			if ( preg_match("/<\?xml/", $acl_xml) && !empty($acl_xml) ) {
-				$acl = simplexml_load_string($acl_xml);
+			
+			// Get acl feed
+			$requestor_id = $this->params['xoauth_requestor_id'];
+			$this->params = array('xoauth_requestor_id' => $requestor_id);
+			$acl_xml = $this->execute_without_token($acl_url, '1.4', $this->params);
+			
+			// Check that site exists before we go any further (gross)
+			if ($acl_xml == "Site not found") {
+				continue;
 			}
 
+			$acl = simplexml_load_string($acl_xml);
+			
+			// Get activity feed
+			$feed_request_url = $feed_url . '?' . implode_assoc('=', '&', $this->params);
+			$activity_xml = $this->execute_without_token($feed_request_url, '1.4', $this->params);
+			$activity = simplexml_load_string($activity_xml);
+			
+			// Grab the latest updated entry
+			foreach ($activity->entry as $activity_item) {
+				$updated_timestamp = strtotime($activity_item->updated);
+				break;
+			}
+			
+			// If there's no activity updated timestamp, use whatever was provided by the site feed
+			if (!$updated_timestamp) {
+				$updated_timestamp = strtotime($item_array['updated']); // Site updated time
+			}
 
+			// Find site owner(s)
+			$owners = array();
 
 			if (!empty($acl)) {
-				foreach ($acl->entry as $item) {
-					if($item->id == $acl->id . '/default') $public = true;
+				foreach ($acl->entry as $entry) {
+					foreach ($entry->xpath("gAcl:role[@value='owner']") as $role) {
+						foreach($entry->xpath("gAcl:scope[@type='user']") as $owner) {
+							$attr = $owner->attributes();
+							$owners[] = (string)$attr['value'];
+						}
+					}
 				}
 			}
 
@@ -284,10 +334,10 @@ class OAuthClient {
 
 			$site['site_id'] = $item_array['id'];
 			$site['title'] = $item_array['title'];
-			$site['feed'] = $feedUri;
+			$site['feed'] = $feed_url;
 			$site['url'] = $site_url;
-			$site['modified'] = strtotime($item_array['updated']);
-
+			$site['modified'] = $updated_timestamp;
+			$site['owners'] = $owners;
 			$list[] = $site;
 		}
 
@@ -407,5 +457,4 @@ class OAuthClient {
 
 		return $arr;
 	}
-
 }

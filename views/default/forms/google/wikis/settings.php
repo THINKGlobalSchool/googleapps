@@ -16,7 +16,7 @@ if ($user->connect == 1) {
 	$user->google = 1;
 }
 
-$response = googleapps_sync_sites();
+//$response = googleapps_sync_sites();
 $user_site_entities = $response['site_entities'];
 
 $_SESSION['user_site_entities'] = serialize($user_site_entities);

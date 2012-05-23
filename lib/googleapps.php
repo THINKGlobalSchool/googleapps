@@ -198,25 +198,9 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 		'limit' => 10,
 	);
 	
-	
 	$container = get_entity($container_guid);
 	if (elgg_instanceof($container, 'user')) {
 		$params['title'] = elgg_echo('googleapps:label:user_wikis', array($container->name));
-		elgg_push_breadcrumb($container->name);
-		/* 
-			This use to work like this:
-			
-			$res = googleapps_sync_sites(true, $container);
-			$sites = $res['site_entities'];
-			$params['content'] = elgg_view('googleapps/wiki_list', array('wikis' => $sites));
-			
-			* Note: that wiki_list view was god-awful, its long gone. 
-			  It was just a weird way of listing wikis with an icon. I've remedied 
-			  the issue with a proper site object view
-		*/
-		
-		// Now we'll do the same (update sites) then list it the elggy way
-		googleapps_sync_sites(true, $container);
 		
 		if ($container != elgg_get_logged_in_user_entity()) {
 			$params['filter_context'] = FALSE;
@@ -234,31 +218,7 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 	}
 	
 	$params['content'] = $content;
-	
-	// Build custom tabs
-	if (elgg_is_logged_in()) {
-		$username = elgg_get_logged_in_user_entity()->username;
-		$tabs = array(
-			'all' => array(
-				'text' => elgg_echo('all'),
-				'href' => (isset($vars['all_link'])) ? $vars['all_link'] : "{$params['context']}/all",
-				'selected' => ($params['filter_context'] == 'all'),
-				'priority' => 200,
-			),
-			'mine' => array(
-				'text' => elgg_echo('mine'),
-				'href' => (isset($vars['mine_link'])) ? $vars['mine_link'] : "{$params['context']}/owner/$username",
-				'selected' => ($params['filter_context'] == 'mine'),
-				'priority' => 300,
-			)
-		);
 
-		foreach ($tabs as $name => $tab) {
-			$tab['name'] = $name;
-			elgg_register_menu_item('wiki_filter', $tab);
-		}
-	}
-	
 	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$new_url = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
 	
@@ -272,30 +232,8 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 		));
 	} 
 	
-	$params['filter'] = elgg_view_menu('wiki_filter', array(
-		'sort_by' => 'priority',
-		// recycle the menu filter css
-		'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default'
-	));
+	$params['filter'] = ' ';
 	return $params;
-}
-
-/**
- * Update site entity access access
- */
-function googleapps_update_site_entity_access($entity_id, $access) {
-	$context = elgg_get_context();
-	elgg_set_context('googleapps_cron_job');
-
-	$user_site_entities = unserialize($_SESSION['user_site_entities']);
-
-	foreach ($user_site_entities as $entity) {
-		if ($entity->guid == $entity_id ) {
-			$entity->site_access_id = $access;
-			$entity->save();
-		}
-	}
-	elgg_set_context($context);
 }
 
 /**
@@ -314,102 +252,23 @@ function googleapps_santize_google_doc_input($string) {
 
 	$string = str_replace($prefix, $new_prefix, $string);
 	return $string;
-
-}
-
-/**
- * List site entities
- */
-function googleapps_list_sites() {
-	$output = "";
-
-	$options = array(
-		'type'=>'object', 
-		'subtype'=>'site', 
-		'limit'=> 0,
-		'count' => TRUE,
-	);
-
-	$site_count = elgg_get_entities($options);
-
-	$options['count'] = FALSE;
-
-	$site_entities = elgg_get_entities($options);
-
-
-	$output .= "<p>Site entities found: {$site_count}</p>";
-	if ($site_entities) {
-		foreach($site_entities as $site_entity) {
-			$output .= elgg_view('object/site', array('entity' => $site_entity, 'debug' => TRUE));
-		}
-	}
-
-	return $output;
-}
-
-/**
- * List site entities by user
- */
-function googleapps_list_sites_by_user() {
-	$output = "";
-
-	$googleusers = elgg_get_metadata(array(
-		'metadata_name' => 'googleapps_controlled_profile',
-		'metadata_value' => 'yes',
-		'type' => 'user',
-		'limit' => 0,
-	));
-
-	foreach($googleusers as $googleuser) {
-		$user = get_user($googleuser->owner_guid);
-		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
-		$site_count = count($site_list);
-
-		$output .= "<p>Sites found for <strong>{$user->name} ({$site_count})</strong>:";
-		foreach($site_list as $key => $site) {
-			$site_entity = get_entity($site['entity_id']);
-			$output .= elgg_view('object/site', array('entity' => $site_entity, 'debug' => TRUE));
-		}
-		$output .= "<hr />";
-	}
-	return $output;
 }
 
 /**
  * Delete all site entities
  */
 function googleapps_delete_all_site_entities() {
-	$site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>99999));
+	$site_entities = elgg_get_entities(array(
+		'type'=>'object', 
+		'subtype'=>'site', 
+		'limit'=>0
+	));
+
 	foreach($site_entities as $site_entity) {
 		$site_entity->delete();
 	}
+
 	return;
-}
-
-/**
- * Reset all user sites
- */
-function googleapps_reset_user_sites() {
-	$googleusers = $googleusers = elgg_get_metadata(array(
-		'metadata_name' => 'googleapps_controlled_profile',
-		'metadata_value' => 'yes',
-		'type' => 'user',
-		'limit' => 0,
-	));
-
-	foreach($googleusers as $googleuser) {
-		$user = get_user($googleuser->owner_guid);
-		$user->site_list = NULL;
-	}
-	return;
-}
-
-/**
- * Reset sites and user sites
- */
-function googleapps_reset_sites() {
-	googleapps_delete_all_site_entities();
-	googleapps_reset_user_sites();
 }
 
 /**
@@ -437,193 +296,6 @@ function get_client($user) {
 	$client->access_secret = $user->token_secret;
 
 	return $client;
-}
-
-/**
- * Save new google sites and site activity for googleapps users
- *
- * @return object
- */
-function googleapps_cron_fetch_data() {
-
-	$context = elgg_get_context();
-	elgg_set_context('googleapps_cron_job');
-
-
-	/* need to sync sites ? */
-	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-	if ($oauth_sync_sites == 'no') return;
-
-	set_time_limit(0);
-	$a_time=time();
-
-	/* find all users with googleapps controlled profile */
-	$result = elgg_get_metadata(array(
-		'metadata_name' => 'googleapps_controlled_profile',
-		'metadata_value' => 'yes',
-		'type' => 'user',
-		'limit' => 0,
- 	));
-	
-	if (empty($result)) {
-		return;
-	}
-
-	foreach ($result as $gapps_user) {
-		$user = get_user($gapps_user->owner_guid);
-		if (empty($user->access_token) || empty($user->token_secret)) {
-			echo 'No access token for ' . $user->username . '\n';
-			continue;
-		}
-
-		$_SESSION['user'] = $user;
-		$client = get_client($user);
-		$all = true;
-
-		$count = 0;
-
-		$is_new_activity = false;
-		$is_new_docs = false;
-
-		$res=googleapps_sync_sites(true, $user);
-
-		$response_list = $res['response_list']; //sites xml list
-		$site_entities =$res['site_entities']; // sites objects
-		$all_site_entities_count =count($res['all_site_entities']); // sites objects
-		$all_site_entities =$res['all_site_entities'];
-
-		echo "========== Processing user ".$user->name." ==========\n";
-
-		$max_time = null;
-		$times = array();
-
-		$site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
-
-		if (empty($user->last_site_activity)) {
-			$user->last_site_activity = '0';
-		}
-
-		// Parse server response for google sites activity stream
-		foreach ($response_list as $site) {
-
-			// found current site entity obj
-			$site_entity=null;
-			foreach ($site_entities as $site_obj) {
-				if ($site_obj->site_id == $site['site_id']) {
-					$site_entity =  $site_obj;
-					break; // found
-				}
-			}
-
-
-			$last_time_site_updated = $site_entity->modified;
-
-			$title = $site['title'];
-			$feed = $site['feed'];
-			$site_exist = null;
-
-			// update access settings for site in user site list
-			save_site_to_user_list($site_entity, $site, $site_list);
-
-			// Get google sites activity stream
-			$activity_xml = $client->execute($feed, '1.1');
-			$rss = simplexml_load_string($activity_xml);
-			$times[] = strtotime($rss->updated);
-
-			$site_title = $title;
-			$title = 'Changes on ' . $title . ' site';
-
-
-			// Parse entries for each google site
-			echo "site entity id=".$site_entity->guid." site title= ".$site_entity->title." ( ".$site_entity->site_id." )\n";
-			if ($site_entity->site_access_id == ACCESS_PRIVATE) { echo "site access is private\n"; }
-
-			foreach ($rss->entry as $item) {
-				// Get entry data
-				$text = $item->summary->div->asXML();
-				$author_email = @$item->author->email[0];
-				$date = $item->updated;
-
-				if (strtotime($date)>$last_time_site_updated) $last_time_site_updated=strtotime($date); // update site time
-
-				$time = strtotime($date);
-				$site_access = $site_entity->site_access_id;
-				$access = calc_access($site_access);
-				$times[] = $time; // all user's sites time
-
-				// if sit is public
-				if ($site_entity->site_access_id != ACCESS_PRIVATE) {
-					if ( $user->last_site_activity <= $time // not publish already
-					&& $author_email == $user->email // edited by this user
-					/* &&  $site['isPublic'] == true */ )
-					{
-						// Initialise a new ElggObject (entity)
-						$site_activity = new ElggObject();
-						$site_activity->subtype = "site_activity";
-						$site_activity->owner_guid = $user->guid;
-						$site_activity->container_guid = $user->guid;
-
-						$site_activity->access_id = $access;
-						$site_activity->title = $title;
-
-						$site_activity->updated = $date;
-
-						$site_activity->text = str_replace('<a href', '<a target="_blank" href', $text) . ' on the <a target="_blank" href="' . $site['url'] . '">' . $site_title . '</a> site';
-						$site_activity->site_name = $site_title;
-
-						// Now save the object
-						if (!$site_activity->save()) {
-							register_error('Site activity has not saved.');
-							//forward(REFERER);
-						}
-
-						if (add_to_river('river/object/site_activity/create', 'create', $user->guid, $site_activity->guid, "", strtotime($date))) {
-							$is_new_activity = true;
-							echo "\nPublished activity for this site</b>. Site is access is ".$access."\n";
-						} else {
-							echo "error adding activity to river\n";
-						}
-
-					} // need to add activite
-				} // public activity
-
-			} // rss in site
-
-			// change site time
-			if( $last_time_site_updated > $site_entity->modified ) {
-				$site_entity->modified = $last_time_site_updated;
-				$site_entity->save();
-				echo "\nupdated last updated time.\n";
-			};
-		} // all sites
-
-		if($response_list) {
-			$max_time = max($times);
-			$user->last_site_activity = $max_time;
-			$user->save();
-		}
-
-		if (!empty($site_list)) {
-			$user->site_list = serialize($site_list);
-			$user->save();
-		}
-
-		if ($is_new_activity) {
-			echo 'New activity added for ' . $user->username . "\n";
-		} else {
-			echo 'No new activity for ' . $user->username . "\n";
-		}
-
-		echo "\n\n";
-	} // each user
-
-
-	echo "\n\nAll finished\n";
-	$b_time=time();
-	echo "\n".($b_time-$a_time)." sec";
-	flush();
-
-	elgg_set_context($context);
 }
 
 /**
@@ -693,6 +365,7 @@ function googleapps_get_oauth_data($ajax = false) {
  */
 // googleapps_fetch_oauth_data($client, false, 'mail sites folders docs')
 function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
+	set_time_limit(0); // No timeout until this is sped up
 
 	if (!is_object($client)) {
 		return false;
@@ -746,130 +419,6 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 		$response['new_docs'] = !empty($is_new_docs) ? 1 : 0;
 		return json_encode($response);
 	}
-}
-
-/**
- * Get google sites data and save it for user
- *
- * @param bool $do_not_redirect
- * @param object $user
- * @return array|false
- */
-function googleapps_sync_sites($do_not_redirect = true, $user = null) {
-	// 0. Check settings
-	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
-		return false;
-	}
-
-	if($user == null) {
-		$client = authorized_client($do_not_redirect);
-	} else {
-		$client = get_client($user);
-	}
-
-	if (!$client) {
-		return false;
-	}
-
-	// 1. Get google site feeds list
-	$result = $client->execute('https://sites.google.com/feeds/site/' . $client->key . '/', '1.1');
-	$response_list = $client->fetch_sites($result); // Site list
-
-	$all_site_entities = elgg_get_entities(array('type'=>'object', 'subtype'=>'site', 'limit'=>9999)); // Get all site entities
-
-
-	// 2. Get local site list
-	if($user == null) {
-		$user =& $_SESSION['user'];
-	}
-
-	// 3. Save
-	//$user_site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
-
-	// user's site list
-	$merged = array();
-
-	//	// 4.1 Update normalized sites: destroy deleted sites
-	//	if($normalized_sites) {
-	//		foreach ($normalized_sites as $site_entity) {
-	//
-	//			$found = false; // User's google site list
-	//			foreach ($response_list as $site) {
-	//
-	//				if (empty($site_entity->site_id)) {
-	//					continue;
-	//				}
-	//				if ($site['site_id'] == $site_entity->site_id) {
-	//					$found = $site;
-	//					break;
-	//				}
-	//			}
-	//
-	//			if (!$found) {
-	//				/* $site_entity->delete(); */
-	//			} else {
-	//				$modified = false;
-	//				if ($site['url'] != $site_entity->url) {
-	//					$site_entity->url = $found['url'];
-	//					$modified = true;
-	//				}
-	//				if ($site['title'] != $site_entity->title) {
-	//					$site_entity->title = $found['title'];
-	//					$modified = true;
-	//				}
-	//				if ($site['modified'] > $site_entity->modified) {
-	//					$site_entity->modified = $found['modified'];
-	//					$modified = true;
-	//				}
-	//				if ($modified) {
-	//					$site_entity->save();
-	//                                                echo "<h3>global site ". $site_entity->title." updated</h3>";
-	//				}
-	//			}
-	//
-	//		}
-	//	}
-
-	// site entities what have user
-	$users_site_entities=array();
-
-	// 4.2 Update normalized sites: create new sites
-	foreach ($response_list as $site) {
-		$found = false;
-
-		// search for site in elgg entities
-		foreach ($all_site_entities as $site_entity) {
-			if ($site['site_id'] == $site_entity->site_id) {
-				$users_site_entities[]=$site_entity;
-				save_site_to_user_list($site_entity, $site, $merged);
-				$found = true;
-				break;
-			}
-		}
-
-		// create new site entity
-		if (!$found) {
-			$new_site = new ElggObject();
-			$new_site->owner_guid = $user->guid;
-			$new_site->site_id = $site['site_id'];
-			$new_site->title = $site['title'];
-			$new_site->subtype = "site";
-			$new_site->url = $site['url'];
-			$new_site->modified = $site['modified'];
-			$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
-			$new_site->site_access_id = ACCESS_PRIVATE ; // for site
-			$new_site->save();
-			$users_site_entities[]=$new_site;
-			save_site_to_user_list($new_site, $site, $merged);
-		}
-	}
-
-	// 4. Update user
-	$user->site_list = serialize($merged);
-	$user->save();
-
-	// 5. Profit
-	return array('response_list'=>$response_list,  'site_entities'=>$users_site_entities, 'all_site_entities' => $all_site_entities );
 }
 
 /**
@@ -1322,13 +871,6 @@ function check_document_permission($collaborators, $access_level) {
 	}
 }
 
-function save_site_to_user_list($site_entity, $site_xml, &$merged) {
-	$title = $site_xml['title'];
-	$site_id = $site_xml['site_id'];
-	$access = $site_entity->site_access_id;
-	$merged[$site_id] = array('title'=>$title, 'access'=>$access, 'entity_id' =>  $site_entity->guid);
-}
-
 function get_members_emails($members) {
 	$members_emails = array();
 	foreach ($members as $member) {
@@ -1353,28 +895,10 @@ function get_members_not_shared($members, $doc) {
 }
 
 /**
- * Fetch and save new google sites data
+ * Process Google Sites 
+ * - Creates new local entities 
+ * - Deletes local entities not found/deleted remotley
  *
- * @return object
- */
-function googleapps_cron_process_sites($hook, $type, $value, $params) {
-	set_time_limit(0); // No timeout, just in case
-
-	$log .= "Processing Google Sites\n";
-	$log .= "-----------------------\n";
-
-	if (elgg_in_context('googleapps_sites_log')) {
-		echo "<pre>";
-		echo $log;
-		echo "</pre>";
-	}
-}
-
-/**
- * Get google sites data and save it for user
- *
- * @param bool $do_not_redirect
- * @param object $user
  * @return array|false
  */
 function googleapps_process_sites() {
@@ -1383,7 +907,7 @@ function googleapps_process_sites() {
 		return FALSE;
 	}
 	
-	set_time_limit(9000); // Long timeout, just in case
+	set_time_limit(0); // Long timeout, just in case
 
 	$log .= "Processing Google Sites\n";
 	$log .= "-----------------------\n";
@@ -1391,24 +915,28 @@ function googleapps_process_sites() {
 	/* Build a 2-legged OAuth Client */		// @TODO should be in a function 
 	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
-	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+	$ADMIN_ACCOUNT = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
+	//$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
+	
+	$params = array('max-results' => 500, 'include-all-sites' => 'true'); 
+	
+	$client = OAuthClient::create_2_legged_client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC, null, $ADMIN_ACCOUNT, $params);
 	
 	if ($client) {
-		$user = 'jtilson@thinkglobalschool.com';
 
-		$log .= "Creating 2-legged client for: {$user}\n";
+		$log .= "Creating 2-legged client for: {$ADMIN_ACCOUNT}\n";
 
-		$params = array('max-results' => 500, 'xoauth_requestor_id' => $user, 'include-all-sites' => 'true'); 
+		//$params = array('max-results' => 500, 'xoauth_requestor_id' => $ADMIN_ACCOUNT, 'include-all-sites' => 'true'); 
  
 		$base_feed = "https://sites.google.com/feeds/site/$CONSUMER_KEY/";
 
-		$url = $base_feed . '?' . implode_assoc('=', '&', $params);
+		$url = $base_feed . '?' . implode_assoc('=', '&', $client->params);
 
 		$log .= "Request: {$url}\n";
 
-		$result = $client->execute_without_token($url, '1.4', $params);
+		$result = $client->execute_without_token($url, '1.4', $client->params);
 
-		$response_list = $client->fetch_sites($result); // Site list
+		$response_list = $client->populate_sites($result); // Site list
 
 		if ($response_list && is_array($response_list) && count($response_list) > 0) {
 			$log .= "\nSuccess..\n";
@@ -1420,22 +948,64 @@ function googleapps_process_sites() {
 				'limit' => 0
 			)); 
 			
+			// Elgg site guid, for owner/container guid's
+			$site_guid = elgg_get_site_entity()->guid;
+			
 			$log .= "Found " . count($site_entities) . " local site(s)\n";
 			
+			// Array to compare local site id's
 			$local_site_ids = array();
+			
+			// Array to compate remote site id's
+			$remote_site_ids = array();
+			
+			// Build an array of remote site id's
+			foreach ($response_list as $site) {
+				$remote_site_ids[] = $site['site_id'];
+			}
+	
+			// Deleted count
+			$sites_deleted = 0;
+	
+			// Process local sites
 			foreach ($site_entities as $site) {
 				$log .= "\n[{$site->title}]\n";
 				$log .= "ID: {$site->site_id}\n";
 				$log .= "URL: {$site->url}\n";
 				$local_site_ids[] = $site->site_id;
+				
+				// Make sure site entity is owned by the elgg site, not a specific user
+				if ($site->container_guid != $site_guid) {
+					$site->container_guid = $site_guid;
+					$site->owner_guid = $site_guid;
+					$site->save();
+					$log .= "Updated owner/container guid: {$site_guid}\n";
+				}
+				
+				// Set access to logged in users
+				if ($site->access_id != ACCESS_LOGGED_IN) {
+					$site->access_id = ACCESS_LOGGED_IN;
+					$site->save();
+					$log .= "Updated access ID: ACCESS_LOGGED_IN\n";
+				}
+				
+				// Remove deleted/unavailable local sites
+				if (!in_array($site->site_id, $remote_site_ids)) {
+					$log .= "Site not found remotely, will be deleted.\n";
+					$site->delete();
+					$sites_deleted++;
+				}
 			}
 			
+			// Process all remote sites
 			$log .= "\nFound " . count($response_list) . " remote site(s)\n";
 
 			$log .= "\nRemote list:\n------------\n";
 			
+			// Array to hold new site
 			$new_sites = array();
 			
+			// Process new sites
 			foreach ($response_list as $site) {
 				$log .= "\n[{$site['title']}]\n";
 				$log .= "ID: {$site['site_id']}\n";
@@ -1443,11 +1013,42 @@ function googleapps_process_sites() {
 				
 				if (!in_array($site['site_id'], $local_site_ids)) {
 					$new_sites[$site['title']] = $site['site_id'];
-					$log .= "New site!\n";
+
+					// Create new site
+					$new_site = new ElggObject();
+					$new_site->owner_guid = $site_guid;
+					$new_site->container_guid = $site_guid;
+					$new_site->site_id = $site['site_id'];
+					$new_site->title = $site['title'];
+					$new_site->subtype = "site";
+					$new_site->url = $site['url'];
+					$new_site->modified = $site['modified'];
+					$new_site->remote_owners = $site['owners'];
+					$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
+					$new_site->site_access_id = ACCESS_PRIVATE ; // for site
+					$new_site->save();
+					
+					$log .= "New site! ({$new_site->guid})\n";
+					
 				} else {
 					$log .= "Local site exists!\n";
+					// Update local site info
+					googleapps_update_local_site_info($site);
 				}
 			}
+			
+			// New count
+			$sites_created = count($new_sites);
+			
+			$log .= "\n\nCreated {$sites_created} local site(s)\n";
+			$log .= "Deleted {$sites_deleted} local site(s)\n";
+			
+			// Get exising elgg site entities again
+			$site_entities = elgg_get_entities(array(
+				'type' => 'object', 
+				'subtype' => 'site', 
+				'limit' => 0
+			));
 
 		} else {
 			$log .= "\n" . $result;
@@ -1463,62 +1064,41 @@ function googleapps_process_sites() {
 		echo $log;
 		echo "</pre>";
 	}
-	
-	return TRUE;
 
-	// 2. Get local site list
-	if($user == null) {
-		$user =& $_SESSION['user'];
+	return array(
+		'response_list'=>$response_list,  
+		'site_entities'=>$site_entities,
+		'all_site_entities'=>$site_entities // @TODO phase this out
+	);
+}
+
+/**
+ * Helper function to update a local site entities information
+ * 
+ * @param array $remote_site site info
+ * @return mixed
+ */
+function googleapps_update_local_site_info($remote_site) {
+	// Grab sites
+	$site = elgg_get_entities_from_metadata(array(
+		'type' => 'object', 
+		'subtype' => 'site',
+		'metadata_name' => 'site_id',
+		'metadata_value' => $remote_site['site_id'],
+		'limit' => 1,
+	));
+
+	// If we've got a proper site
+	if (count($site) >= 1 && elgg_instanceof($site[0], 'object', 'site')) {
+		$site = $site[0];
+		$site->remote_owners = $remote_site['owners'];
+		$site->modified = $remote_site['modified'];
+		$site->url = $remote_site['url'];
+		$site->title = $remote_site['title'];
+		$site->save();
 	}
 
-	// 3. Save
-	//$user_site_list = empty($user->site_list) ? array() : unserialize($user->site_list);
-
-	// user's site list
-	$merged = array();
-
-
-
-	// site entities what have user
-	$users_site_entities=array();
-
-	// 4.2 Update normalized sites: create new sites
-	foreach ($response_list as $site) {
-		$found = false;
-
-		// search for site in elgg entities
-		foreach ($all_site_entities as $site_entity) {
-			if ($site['site_id'] == $site_entity->site_id) {
-				$users_site_entities[]=$site_entity;
-				save_site_to_user_list($site_entity, $site, $merged);
-				$found = true;
-				break;
-			}
-		}
-
-		// create new site entity
-		if (!$found) {
-			$new_site = new ElggObject();
-			$new_site->owner_guid = $user->guid;
-			$new_site->site_id = $site['site_id'];
-			$new_site->title = $site['title'];
-			$new_site->subtype = "site";
-			$new_site->url = $site['url'];
-			$new_site->modified = $site['modified'];
-			$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
-			$new_site->site_access_id = ACCESS_PRIVATE ; // for site
-			$new_site->save();
-			$users_site_entities[]=$new_site;
-			save_site_to_user_list($new_site, $site, $merged);
-		}
-	}
-
-	// 4. Update user
-	$user->site_list = serialize($merged);
-	$user->save();
-
-	// 5. Profit
-	return array('response_list'=>$response_list,  'site_entities'=>$users_site_entities, 'all_site_entities' => $all_site_entities );
+	return FALSE;
 }
   
 /** 

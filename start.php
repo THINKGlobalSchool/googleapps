@@ -38,26 +38,23 @@ function googleapps_init() {
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 
 	// Register JS
-//	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
-//	elgg_register_simplecache_view('js/googleapps/googleapps');
-//	elgg_register_js('elgg.google', $googleapps_js);
-	
+	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
+	elgg_register_simplecache_view('js/googleapps/googleapps');
+	elgg_register_js('elgg.google', $googleapps_js);
+
 	// Load JS lib, only if logged in and not in admin context
 	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
-		// Extend JS
-		elgg_extend_view('js/elgg', 'js/googleapps/googleapps');
-		
 		elgg_load_js('elgg.google');
 	}
+	
+	// Extend admin JS
+	elgg_extend_view('js/admin', 'js/googleapps/admin');
 
 	// Extend login view google login button
 	elgg_extend_view('login/extend', 'googleapps/login');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css/elgg','css/googleapps/css');
-
-	// Include tablesorter
-	//elgg_register_js(elgg_get_site_url() . "mod/googleapps/vendors/jquery.tablesorter.js", 'jquery.tablesorter');
 
 	// Register subtypes
 	elgg_register_entity_type('object','site_activity', 'Site activity');
@@ -102,8 +99,8 @@ function googleapps_init() {
 	// Will add groups to access dropdown for google doc sharing
 	elgg_register_plugin_hook_handler('access:collections:write', 'all', 'googleapps_doc_group_plugin_hook', 999);
 
-	//register CRON hook to poll for Google Site activity
-	elgg_register_plugin_hook_handler('cron', 'fiveminute', 'googleapps_cron_fetch_data');
+	// register CRON hook to poll for Google Sites
+	elgg_register_plugin_hook_handler('cron', 'halfhour', 'googleapps_sites_cron_handler');
 	
 	// Interrupt output/access view
 	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
@@ -129,14 +126,16 @@ function googleapps_init() {
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = elgg_get_logged_in_user_entity();
 	if (!empty($user) && $user->google) {		
-		if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
-			$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
-			elgg_register_menu_item('site', $item);
-		}
 		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') != 'no') {
 			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 			elgg_register_menu_item('site', $item);
 		}
+	}
+
+	// Show wiki's to logged in users
+	if (elgg_is_logged_in() && elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
+		$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
+		elgg_register_menu_item('site', $item);
 	}
 
 	// Register widgets
@@ -176,6 +175,7 @@ function googleapps_pagesetup() {
 	$menuitems = array();
 
 	// Settings items
+	/** @TODO delete
 	$menuitems[] = array(
 		'name' => 'wiki_settings',
 		'text' => elgg_echo('googleapps:menu:wiki_settings'),
@@ -183,7 +183,7 @@ function googleapps_pagesetup() {
 		'contexts' => array('settings'),
 		'priority' => 99999,
 	);
-
+	*/
 
 	$menuitems[] = array(
 		'name' => 'sync_settings',
@@ -200,7 +200,8 @@ function googleapps_pagesetup() {
 
 	// Admin wiki debug
 	if (elgg_in_context('admin')) {
-		elgg_register_admin_menu_item('administer', 'debug_sites', 'administer_utilities');
+		elgg_register_admin_menu_item('administer', 'sites_debug', 'google_apps');
+		//elgg_register_admin_menu_item('administer', 'sites_settings', 'google_apps');
 	}
 }
 
@@ -231,6 +232,12 @@ function googleapps_pagesetup() {
  * User's wikis:	googleapps/wikis/owner/<username>
  * Friends wikis: 	googleapps/wikis/friends/<username>
  * 
+ * Admin:
+ * ------
+ * Ajax endpoints:
+ * googleapps/admin/wiki_reset
+ * googleapps/admin/wiki_cron
+ * 
  * 
  * @param array $page From the page_handler function
  * @return true|false Depending on success
@@ -238,7 +245,7 @@ function googleapps_pagesetup() {
 function googleapps_page_handler($page) {	
 	gatekeeper();
 	
-	// One of three: settings/docs/wikis
+	// One of four: settings/docs/wikis/admin
 	$sub_handler = $page[0];
 	
 	$page_type = $page[1];
@@ -314,6 +321,25 @@ function googleapps_page_handler($page) {
 					break;
 			}
 			break;
+		case 'admin':
+			if (elgg_is_admin_logged_in()) {
+				switch ($page_type) {
+					case 'wiki_cron':
+						elgg_set_context('googleapps_sites_log');
+						googleapps_process_sites();
+						return TRUE;
+						break;
+					case 'wiki_reset': // @TODO
+						echo "Wiki Reset";
+						return TRUE;
+						break;
+					default: 
+						forward();
+				}
+			} else {
+				forward();
+			}
+			break;
 		default:
 			return FALSE;
 	}
@@ -373,6 +399,26 @@ function googleapps_doc_group_plugin_hook($hook, $type, $value, $params) {
 }
 
 /**
+ * Cron handler to kick off google sites polling
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_sites_cron_handler($hook, $type, $value, $params) {
+	// Ignore access
+	$ia = elgg_get_ignore_access();
+	elgg_set_ignore_access(TRUE);
+	// Process sites
+	googleapps_process_sites();
+	elgg_set_ignore_access($ia);
+	return $value;
+}
+
+
+/**
  * Canedit plugin hook
  * 
  * @param string $hook   Name of hook
@@ -386,10 +432,6 @@ function googleapps_can_edit($hook, $type, $value, $params) {
 	$context = elgg_get_context();
 	if ($context == 'googleapps' && $entity->google == 1) {
 		// should be able to do anything with googleapps user data
-		return true;
-	}
-
-	if ($context == 'googleapps_cron_job') {
 		return true;
 	}
 

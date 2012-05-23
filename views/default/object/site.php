@@ -21,27 +21,33 @@ $container = $site->getContainerEntity();
 
 $site_icon = "<img src='" . elgg_get_site_url() . 'mod/googleapps/graphics/icon_site.jpg' . "' />";
 
-$owner = get_entity($site->owner_guid);
-$owners = array();
-$owners[] = $owner;
+$owners = $site->remote_owners;
 
-// This never worked.. 'other_owners' isn't set anywhere. WTF is up with that?
-// @TODO make it work?
-$other_owners = array();
-if (!empty($site->other_owners)) {
-	$other_owners = unserialize($site->other_owners);
-	foreach ($other_owners as $owner) {
-		$owners[] = get_entity($owner);
+if (!$owners) {
+	$owners_string = "Unknown";
+} else if (is_array($owners)) {
+	foreach ($owners as $owner) {
+		$owner_entity = get_user_by_email($owner);
+		if (is_array($owner_entity) && count($owner_entity) && elgg_instanceof($owner_entity[0], 'user')) {
+			$owner_link = '<a href="' . $owner_entity[0]->getURL() . '">' . $owner_entity[0]->name . '</a>';
+		} else {
+			$owner_link = $owner;
+		}
+
+		$owners_string .= $owner_link;
+
+		if ($c + 1 < count($owners)) {
+			$owners_string .= ', ';
+		}
+ 		$c++;
 	}
-}
-$c = 0;
-$owners_string = '';
-foreach ($owners as $owner) {
-	$owners_string .= '<a href="' . $owner->getURL() . '">' . $owner->name . '</a>';
-	if ($c + 1 < count($owners)) {
-		$owners_string .= ', ';
+} else {
+	$owner_entity = get_user_by_email($owners);
+	if (is_array($owner_entity) && count($owner_entity) && elgg_instanceof($owner_entity[0], 'user')) {
+		$owners_string = '<a href="' . $owner_entity[0]->getURL() . '">' . $owner_entity[0]->name . '</a>';
+	} else {
+		$owners_string = $owners;
 	}
-	$c++;
 }
 
 $date = elgg_view_friendly_time($site->modified);

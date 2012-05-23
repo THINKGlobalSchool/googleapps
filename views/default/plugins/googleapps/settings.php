@@ -22,6 +22,7 @@ $oauth_update_interval = elgg_get_plugin_setting('oauth_update_interval', 'googl
 $oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
 $oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
 $oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
+$oauth_admin_account = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
 
 $body .= elgg_echo('googleapps:admin:details');
 $body .= '<br /><br />';
@@ -35,6 +36,8 @@ $body .= elgg_view('input/text', array('name' => 'params[login_secret]', 'value'
 $body .= '<p><label>' . elgg_echo('googleapps:admin:oauth_update_interval') . "</label><br />";
 $body .= elgg_view('input/text', array('name' => 'params[oauth_update_interval]', 'value' => $oauth_update_interval)) . "</p>";
 
+$body .= '<p><label>' . elgg_echo('googleapps:admin:2_legged_account') . "</label><br />";
+$body .= elgg_view('input/text', array('name' => 'params[oauth_admin_account]', 'value' => $oauth_admin_account)) . "</p>";
 
 if (!$oauth_sync_email) {
 	$oauth_sync_email = 'yes';
