@@ -32,34 +32,34 @@ elgg.google.UPDATE_INTERVAL = "<?php echo $oauth_update_interval; ?>";
 elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
 elgg.google.init = function() {	
-	$(function() {	
-		// Register interval for future updates
-		//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
-		
-		// Google Docs Form Stuff (need to test this)
-		$('.permissions-update-input').live('click', function(event) {
-			$(this).closest('form').find('#googleapps-docs-permissions-answer').val($(this).val());
-		})
-		
-		// Match permissions UI
-		$('#google-docs-match-permissions').change(function() {
-			if ($(this).val() == 0) {
-				$('#google-docs-access-id').removeAttr('disabled');
-				$('#google-docs-access-id-label').removeAttr('style');
-			} else {
-				$('#google-docs-access-id').attr('disabled', 'disabled');
-				$('#google-docs-access-id-label').attr('style', 'color: #999999');
-			}
-		});
-		
-		// Bind docsSubmit function to forms
-		$('#google-docs-update-permissions').live('submit', elgg.google.docsSubmit);
-		$('#google-docs-share-form').live('submit', elgg.google.docsSubmit);
-		
-		// Switch share form click event (makes tabs clickable)
-		$('.googleapps-docs-share-switch').live('click', elgg.google.showTab);
-
+	// Register interval for future updates
+	//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
+	
+	// Google Docs Form Stuff
+	$('.permissions-update-input').live('click', function(event) {
+		$(this).closest('form').find('#googleapps-docs-permissions-answer').val($(this).val());
+	})
+	
+	// Match permissions UI
+	$('#google-docs-match-permissions').change(function() {
+		if ($(this).val() == 0) {
+			$('#google-docs-access-id').removeAttr('disabled');
+			$('#google-docs-access-id-label').removeAttr('style');
+		} else {
+			$('#google-docs-access-id').attr('disabled', 'disabled');
+			$('#google-docs-access-id-label').attr('style', 'color: #999999');
+		}
 	});
+	
+	// Bind docsSubmit function to forms
+	$('#google-docs-update-permissions').live('submit', elgg.google.docsSubmit);
+	$('#google-docs-share-form').live('submit', elgg.google.docsSubmit);
+	
+	// Switch share form click event (makes tabs clickable)
+	$('.googleapps-docs-share-switch').live('click', elgg.google.showTab);
+	
+	// Change handler for wiki menu orderby change
+	$(document).delegate('#googlapps-wiki-orderby', 'change', elgg.google.wikiOrderByChange);
 }
 
 // Call the oauth_update action 
@@ -176,6 +176,31 @@ elgg.google.showTab = function(event) {
 	
 	// Show this HREF's div
 	$($(this).attr('href')).show();
+	
+	event.preventDefault();
+}
+
+// Change handler for wiki sort by change
+elgg.google.wikiOrderByChange = function(event) {
+	var order_by = $(this).val();
+	var href = $('#googleapps-wiki-order').attr('href');
+	var location;
+	
+	// Switch ASC/DESC
+	if (href.search('ASC') != -1) {
+		href = href.replace('ASC', 'DESC');
+	} else if (href.search('DESC') != -1) {
+		href = href.replace('DESC', 'ASC');
+	}
+
+	// Set sort by
+	if (order_by == 'alpha') {
+		location = href.replace('updated', order_by);
+	} else {
+		location = href.replace('alpha', order_by);		
+	}
+	
+	window.location = (location);
 	
 	event.preventDefault();
 }

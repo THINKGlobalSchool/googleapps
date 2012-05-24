@@ -165,4 +165,40 @@ a.googleapps-tooltip:hover span {
 	padding:2px 6px;
 	width:auto;
 }
+
+/** WIKI FILTER/SORT MENU **/
+
+.elgg-menu-googleapps-wiki-filter {
+
+}
+
+.elgg-menu-googleapps-wiki-filter li label {
+	margin-right: 10px;
+	font-size: 90%;
+	text-transform: uppercase;
+}
+
+.elgg-menu-googleapps-wiki-filter li.elgg-menu-item-googleapps-wiki-order {
+	margin-right: 10px;
+	font-size: 90%;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+.elgg-menu-googleapps-wiki-filter li select {
+	margin-right: 15px;
+}
+
+.elgg-menu-googleapps-wiki-filter li a {
+	color: #666;
+}
+
+.elgg-menu-googleapps-wiki-filter li.elgg-state-selected a {
+	font-weight: bold;
+	color: inherit;
+}
+
+
+/** END OF SORT MENU **/
+
 /*</style>*/

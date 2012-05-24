@@ -72,12 +72,15 @@ $english = array(
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 	'googleapps:error:notfound' => 'Document not found',
 	'googleapps:error:nopermission' => 'You do not have permission to share this document to the group',
+	'googleapps:error:feature_error' => 'Invalid wiki',
 
 	// Success messages
 	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
 	'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 	'googleapps:success' => 'Success!',
+	'googleapps:success:feature' => 'Wiki Successfully Featured',
+	'googleapps:success:unfeature' => 'Wiki Successfully Unfeatured',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
@@ -110,6 +113,14 @@ $english = array(
 	'googleapps:label:listsites' => 'List Sites',
 	'googleapps:label:resetsites' => 'Reset Sites',
 	'googleapps:label:cronsites' => 'Run Cron',
+	'googleapps:label:makefeatured' => 'Make featured',
+	'googleapps:label:unfeature' => 'Unfeature',
+	'googleapps:label:featuredsites' => 'Featured Wiki\'s',
+	'googleapps:label:orderalpha' => 'Alphabetical',
+	'googleapps:label:orderupdated' => 'Updated',
+	'googleapps:label:wikisortby' => 'Sort',
+	'googleapps:label:sortasc' => 'Sort Ascending &#9650;',
+	'googleapps:label:sortdesc' => 'Sort Descending &#9660;',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

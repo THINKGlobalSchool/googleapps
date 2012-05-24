@@ -72,6 +72,9 @@ function googleapps_init() {
 	// Remove the edit link from the shared doc entity menu
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
 	
+	// Remove the edit link from the shared doc entity menu
+	elgg_register_plugin_hook_handler('register', 'menu:entity', 'googleapps_wiki_entity_menu_setup', 9999);
+	
 	// Register profile menu hook
 	if (elgg_is_logged_in()) {
 		elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'googleapps_docs_owner_block_menu');
@@ -132,8 +135,8 @@ function googleapps_init() {
 		}
 	}
 
-	// Show wiki's to logged in users
-	if (elgg_is_logged_in() && elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
+	// Show wiki's if enabled
+	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
 		$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
 		elgg_register_menu_item('site', $item);
 	}
@@ -156,7 +159,8 @@ function googleapps_init() {
 	// Wiki related (wiki)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/wikis";
 	elgg_register_action('google/wikis/settings', "$action_base/settings.php", 'admin');
-	elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
+	//elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
+	elgg_register_action('google/wikis/featured', "$action_base/featured.php", 'admin');
 
 	// Shared Doc related (docs)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/docs";
@@ -243,8 +247,6 @@ function googleapps_pagesetup() {
  * @return true|false Depending on success
  */
 function googleapps_page_handler($page) {	
-	gatekeeper();
-	
 	// One of four: settings/docs/wikis/admin
 	$sub_handler = $page[0];
 	
@@ -253,11 +255,9 @@ function googleapps_page_handler($page) {
 	switch ($sub_handler) {
 		// Settings subhandler
 		case 'settings':
+			gatekeeper();
 			elgg_set_context('settings');
 			switch ($page_type) {
-				case 'wikiactivity':
-					$params = googleapps_get_page_content_settings_wikiactivity();
-					break;
 				default:
 				case 'account':
 					$params = googleapps_get_page_content_settings_account();
@@ -266,6 +266,7 @@ function googleapps_page_handler($page) {
 			break;
 		// Docs subhandler
 		case 'docs':
+			gatekeeper();
 			elgg_push_context('docs');
 			switch ($page_type) {
 				case 'chooser':
@@ -304,17 +305,6 @@ function googleapps_page_handler($page) {
 		case 'wikis':
 			elgg_push_context('wikis');
 			switch ($page_type) {
-				case 'owner':
-					$user = get_user_by_username($page[2]);
-					elgg_set_page_owner_guid($user->guid);
-					$params = googleapps_get_page_content_wikis_list($user->guid);
-					break;
-				/*
-				case 'friends':
-					$user = get_user_by_username($page[2]);
-					$params = googleapps_get_page_content_docs_friends($user->getGUID());
-					break;
-				*/
 				case 'all':
 				default:
 					$params = googleapps_get_page_content_wikis_list();
@@ -322,6 +312,7 @@ function googleapps_page_handler($page) {
 			}
 			break;
 		case 'admin':
+			admin_atekeeper();
 			if (elgg_is_admin_logged_in()) {
 				switch ($page_type) {
 					case 'wiki_cron':
@@ -597,6 +588,60 @@ function googleapps_shared_doc_entity_menu_setup($hook, $type, $value, $params) 
 				$menu->setText(elgg_get_excerpt($text, 45));
 			}
 		}
+	}
+
+	return $value;
+}
+
+/**
+ * Customize the entity menu for wikis
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_wiki_entity_menu_setup($hook, $type, $value, $params) {
+	$entity = $params['entity'];
+
+
+	if (elgg_instanceof($entity, 'object', 'site')) {
+		// Nuke menu
+		$value = array();
+		
+		// Add a 'feature' menu item
+		if (elgg_is_admin_logged_in()) {
+			if ($entity->featured_wiki == "yes") {
+				$url = "action/google/wikis/featured?guid={$entity->guid}&action_type=unfeature";
+				$wording = elgg_echo("googleapps:label:unfeature");
+			} else {
+				$url = "action/google/wikis/featured?guid={$entity->guid}&action_type=feature";
+				$wording = elgg_echo("googleapps:label:makefeatured");
+			}
+			$options = array(
+				'name' => 'wiki_feature',
+				'text' => $wording,
+				'href' => $url,
+				'priority' => 300,
+				'section' => 'info',
+				'is_action' => true
+			);
+			$value[] = ElggMenuItem::factory($options);
+		}
+		
+		// Access items
+		$access_text = elgg_view('output/access', array('entity' => $entity));
+		$options = array(
+			'name' => 'wiki_access',
+			'text' => "<span>{$access_text}</span>",
+			'href' => false,
+			'priority' => 150,
+			'section' => 'info'
+		);
+		$value[] = ElggMenuItem::factory($options);
+		
+		
 	}
 
 	return $value;

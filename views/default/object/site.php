@@ -19,8 +19,6 @@ if (!$site) {
 $owner = $site->getOwnerEntity();
 $container = $site->getContainerEntity();
 
-$site_icon = "<img src='" . elgg_get_site_url() . 'mod/googleapps/graphics/icon_site.jpg' . "' />";
-
 $owners = $site->remote_owners;
 
 if (!$owners) {
@@ -52,8 +50,6 @@ if (!$owners) {
 
 $date = elgg_view_friendly_time($site->modified);
 
-$subtitle = "<p><strong>" . elgg_echo('googleapps:label:updated') . ":</strong> $date <br /> 
-				<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string</p>";
 
 if (elgg_in_context('sites_debug')) {
 	// Admin debug view
@@ -90,6 +86,22 @@ if (elgg_in_context('sites_debug')) {
 HTML;
 	echo elgg_view_module('info', $site->title, $content);
 } else {
+
+	if (!elgg_in_context('widgets')) {
+		$site_icon = "<img src='" . elgg_get_site_url() . 'mod/googleapps/graphics/icon_site.jpg' . "' />";
+		$metadata = elgg_view_menu('entity', array(
+			'entity' => $site,
+			'handler' => 'wikis',
+			'sort_by' => 'priority',
+			'class' => 'elgg-menu-hz',
+		));
+	} else {
+
+	}
+
+	$subtitle = "<p><strong>" . elgg_echo('googleapps:label:updated') . ":</strong> $date <br /> 
+					<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string</p>";
+	
 	// brief view
 	$params = array(
 		'entity' => $site,

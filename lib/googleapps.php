@@ -14,28 +14,6 @@
 require_once(elgg_get_plugins_path() . 'googleapps/lib/GAOAuth.php');
 
 /**
- * Get wiki activity settings content
- *
- * @return array
- */
-function googleapps_get_page_content_settings_wikiactivity() {
-	$params['title'] = elgg_echo('googleapps:menu:wiki_settings');
-	
-	$user = elgg_get_logged_in_user_entity();
-		
-	if ($user->google == 1) {
-		$vars = array(
-			'id' => 'google-wikis-settings-form',
-			'forms' => 'google_wikis_settings_form',
-		);
-		$params['content'] = elgg_view_form('google/wikis/settings', $vars, array('user', $user));	
-	}
-	
-	$params['layout'] = 'one_sidebar';
-	return $params;
-}
-
-/**
  * Get account settings content
  */
 function googleapps_get_page_content_settings_account() {
@@ -190,6 +168,11 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 	$params['title'] = elgg_echo('googleapps:menu:wikis');
 	$params['filter_context'] = $container_guid ? 'mine' : 'all';
 	
+	$db_prefix = elgg_get_config('dbprefix');
+	
+	$order = sanitize_string(get_input('order', 'ASC'));
+	$order_by = sanitize_string(get_input('by', 'alpha'));
+
 	// Default options (for 'ALL')
 	$options = array(
 		'type' => 'object', 
@@ -197,20 +180,19 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 		'full_view' => FALSE,
 		'limit' => 10,
 	);
-	
-	$container = get_entity($container_guid);
-	if (elgg_instanceof($container, 'user')) {
-		$params['title'] = elgg_echo('googleapps:label:user_wikis', array($container->name));
-		
-		if ($container != elgg_get_logged_in_user_entity()) {
-			$params['filter_context'] = FALSE;
-		}
-		
-		// Should be enough to set the container guid here.. otherwise see above
-		$options['container_guid'] = $container_guid;
-	} 
-	
-	$list = elgg_list_entities($options);
+
+	if ($order_by == 'updated') {
+		$options['order_by_metadata'] = array('name' => 'modified', 'as' => 'int', 'direction' => $order);
+		$options['reverse_order_by'] = TRUE;
+		$list = elgg_list_entities_from_metadata($options);
+	} else {
+		$options['joins'] = array("JOIN {$db_prefix}objects_entity oe on e.guid = oe.guid");
+		$options['order_by'] = "oe.title {$order}";
+		$list = elgg_list_entities($options);
+	}
+ 
+	$content = elgg_view('googleapps/wiki_sort');
+
 	if (!$list) {
 		$content .= elgg_view('googleapps/noresults');
 	} else {
@@ -218,6 +200,7 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 	}
 	
 	$params['content'] = $content;
+	$params['sidebar'] = elgg_view('googleapps/featured_site_sidebar');
 
 	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 	$new_url = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
