@@ -312,7 +312,7 @@ function googleapps_page_handler($page) {
 			}
 			break;
 		case 'admin':
-			admin_atekeeper();
+			admin_gatekeeper();
 			if (elgg_is_admin_logged_in()) {
 				switch ($page_type) {
 					case 'wiki_cron':
