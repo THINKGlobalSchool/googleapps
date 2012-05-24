@@ -423,40 +423,6 @@ function googleapps_google_docs_folders($client) {
 }
 
 /**
- * Get google docs for authorised client and folder
- *
- * @param object $client
- * @param string $folder
- * @return object
- */
-function googleapps_google_docs_get_collaborators($client, $doc_id) {
-	$feed = 'https://docs.google.com/feeds/acl/private/full/' . $doc_id ;
-
-	$result = $client->execute($feed, '2.0');
-	
-	$rss = simplexml_load_string($result);
-
-	$shared_with_users = array();
-
-	// Parse for each permission entity
-	foreach ($rss->entry as $item) {
-		$user = str_replace('Document Permission - ', '', $item->title);
-		$shared_with_users[]=$user;
-	}
-
-	if  (in_array('default', $shared_with_users)) {
-		return 'public'; // Public document
-	}
-
-	if  (in_array('everyone', $shared_with_users)) {
-		return 'everyone_in_domain'; // Shared with domain
-	}
-
-	return $shared_with_users;
-}
-
-
-/**
  * Change the google docs permissions based on chosen elgg permissions
  *
  * @param OAuthClient 	$client 	OAUTH client
@@ -529,9 +495,10 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
  * @return object
  */
 function googleapps_google_docs($client, $folder = null) {
+	$params = array('max-results' => 10, 'expand-acl' => 'true'); 
+
 	// Get google docs feeds list
 	if (empty($folder)) {
-		$params = array('max-results' => 25, 'expand-acl' => 'true'); 
 		$feed = 'https://docs.google.com/feeds/default/private/full/-/mine';
 		$feed = $feed . '?' . implode_assoc('=', '&', $params);
 	} else {
@@ -540,15 +507,33 @@ function googleapps_google_docs($client, $folder = null) {
 
 	$result = $client->execute($feed, '3.0', $params);
 
+
 	$rss = simplexml_load_string($result);
+
 	$documents = array();
 
 	// Parse entries for each google document
 	foreach ($rss->entry as $item) {
 		$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 		$title = $item['title'];
-	
-		$collaborators = googleapps_google_docs_get_collaborators($client, $id); // get collaborators for this document
+
+		$collaborators = array();
+
+		// Sort out collaborators
+		foreach ($item->xpath('gd:feedLink') as $acl_feed) {
+			foreach($acl_feed->feed->entry as $feed_entry) {
+				$user = str_replace('Document Permission - ', '', $feed_entry->title);
+				$collaborators[] = $user;
+			}
+		}
+
+		if  (in_array('default', $collaborators)) {
+			$collaborators = 'public'; // Public document
+		}
+
+		if  (in_array('everyone', $collaborators)) {
+			$collaborators = 'everyone_in_domain'; // Shared with domain
+		}
 
 		$links = $item->link;
 		$src = '';
