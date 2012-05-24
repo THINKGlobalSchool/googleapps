@@ -10,20 +10,13 @@
  * 
  */
 
-$user = elgg_extract('user', $vars);
-
-if ($user->connect == 1) {
-	$user->google = 1;
-}
-
-//$response = googleapps_sync_sites();
-$user_site_entities = $response['site_entities'];
-
-$_SESSION['user_site_entities'] = serialize($user_site_entities);
-
-$site_list = unserialize($user->site_list);		
+$sites = elgg_get_entities(array(
+	'type'=>'object', 
+	'subtype'=>'site', 
+	'limit'=>0
+));
 	
-if (!empty($site_list)) {
+if (!empty($sites)) {
 	$description = elgg_echo('googleapps:usersettings:sites_description');
 
 	$table = '<table class="elgg-table">
@@ -34,29 +27,17 @@ if (!empty($site_list)) {
 			</tr>
 		</thead>
 		<tbody>';
-	
-	
-	foreach ($site_list as $site_id => $site_obj) {
 
-		$title = $site_obj['title'];
-		$access = $site_obj['access'];
+	foreach ($sites as $site) {
+		$title = $site->title;
+		$access = $site->access_id;
 
-		if (!empty($title)) {
-			if (is_null($access)) {
-				$access = 1;
-			}
-
-			$access_input = elgg_view('input/access', array(
-					'name' => 'googleapps_sites_settings[' . $site_id . ']',
-					'value' => $access
-			));
-			
-			$table .= '<tr>
-						<td>' . $title . '</td>
-						<td>' . $access_input . '</td>
-					</tr>';
-
-		}
+		$access_input = elgg_view('input/access', array(
+				'name' => "sites_access[{$site->guid}]",
+				'value' => $access
+		));
+		
+		$table .= "<tr><td>{$title}</td><td>{$access_input}</td></tr>";
 	}
 	
 	$submit_input = elgg_view('input/submit', array(

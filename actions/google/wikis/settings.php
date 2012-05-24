@@ -8,37 +8,26 @@
  * @link http://www.thinkglobalschool.org
  */
 
+$sites_access = get_input('sites_access');
 
-$googleapps_sites_settings = get_input('googleapps_sites_settings');
+if (!empty($sites_access)) {
+	$guids = array_keys($sites_access);
 
-$error = false;
+	$sites = elgg_get_entities(array(
+		'type' => 'object',
+		'subtype' => 'site', 
+		'guids' => $guids,
+		'limit' => 0,
+	));
 
-$user = elgg_get_logged_in_user_entity();
-
-if (!$user) {
-	forward();
-}
-
-if ($user->google == 1) {
-	if (($user) && ($user->canEdit())) {
-		if (!empty($googleapps_sites_settings)) {
-			$site_list = unserialize($user->site_list);
-			foreach ($googleapps_sites_settings as $site_id => $access) {
-				$site_list[$site_id]['access'] = $access;
-				$entity_id = $site_list[$site_id]['entity_id'];
-			}
-			$user->site_list = serialize($site_list);
-			$user->save();
-		}
-	} else {
-		$error = true;
-	}
-
-	if (!$error) {
-		system_message(elgg_echo('admin:configuration:success'));
-	} else {
-		register_error(elgg_echo('admin:configuration:fail'));
-	}
+	foreach ($sites as $site) {
+		$site->access_id = $sites_access[$site->guid];
+		$site->save();
+	}	
+	
+	system_message(elgg_echo('admin:configuration:success'));
+} else {
+	register_error(elgg_echo('admin:configuration:fail'));	
 }
 
 forward(REFERER);

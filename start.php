@@ -155,7 +155,7 @@ function googleapps_init() {
 
 	// Wiki related (wiki)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/wikis";
-	elgg_register_action('google/wikis/settings', "$action_base/settings.php");
+	elgg_register_action('google/wikis/settings', "$action_base/settings.php", 'admin');
 	elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
 
 	// Shared Doc related (docs)
@@ -201,7 +201,7 @@ function googleapps_pagesetup() {
 	// Admin wiki debug
 	if (elgg_in_context('admin')) {
 		elgg_register_admin_menu_item('administer', 'sites_debug', 'google_apps');
-		//elgg_register_admin_menu_item('administer', 'sites_settings', 'google_apps');
+		elgg_register_admin_menu_item('administer', 'sites_settings', 'google_apps');
 	}
 }
 

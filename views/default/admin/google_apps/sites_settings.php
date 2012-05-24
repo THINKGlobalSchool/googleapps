@@ -8,4 +8,4 @@
  * @link http://www.thinkglobalschool.org
  */
 
-// @TODO
+echo elgg_view_form('google/wikis/settings');

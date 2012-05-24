@@ -50,7 +50,7 @@ $english = array(
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
-	'googleapps:usersettings:sites_description' => 'Set who gets to see wiki activity for the wikis you are in.  NOTE: These settings control the publish activity for everyone. Take care when making changes here.',
+	'googleapps:usersettings:sites_description' => 'Set each local site\'s view access access level',
 	'googleapps:usersettings:sync_description' => 'Manage your connection to Google Apps',
 
 	// Error messages

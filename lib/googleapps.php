@@ -981,14 +981,7 @@ function googleapps_process_sites() {
 					$site->save();
 					$log .= "Updated owner/container guid: {$site_guid}\n";
 				}
-				
-				// Set access to logged in users
-				if ($site->access_id != ACCESS_LOGGED_IN) {
-					$site->access_id = ACCESS_LOGGED_IN;
-					$site->save();
-					$log .= "Updated access ID: ACCESS_LOGGED_IN\n";
-				}
-				
+
 				// Remove deleted/unavailable local sites
 				if (!in_array($site->site_id, $remote_site_ids)) {
 					$log .= "Site not found remotely, will be deleted.\n";
@@ -1024,8 +1017,8 @@ function googleapps_process_sites() {
 					$new_site->url = $site['url'];
 					$new_site->modified = $site['modified'];
 					$new_site->remote_owners = $site['owners'];
-					$new_site->access_id = ACCESS_LOGGED_IN; // for entity. just for search availably
-					$new_site->site_access_id = ACCESS_PRIVATE ; // for site
+					$new_site->access_id = ACCESS_PRIVATE; // Default access, admin controlled
+					//$new_site->site_access_id = ACCESS_PRIVATE ; // for site
 					$new_site->save();
 					
 					$log .= "New site! ({$new_site->guid})\n";

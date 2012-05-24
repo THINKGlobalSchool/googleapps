@@ -100,7 +100,9 @@ $list_options = array(
 	'limit' => 10,
 );
 
+elgg_push_context('sites_debug');
 $list_content = elgg_list_entities($list_options);
+elgg_pop_context('sites_debug');
 
 $content = <<<HTML
 	<div>

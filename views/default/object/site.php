@@ -55,22 +55,22 @@ $date = elgg_view_friendly_time($site->modified);
 $subtitle = "<p><strong>" . elgg_echo('googleapps:label:updated') . ":</strong> $date <br /> 
 				<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string</p>";
 
-if ($vars['debug'] == TRUE) {
+if (elgg_in_context('sites_debug')) {
 	// Admin debug view
-	
 	$date = date(DATE_ATOM, $site->modified);
 	
+	$access = elgg_view('output/access', array('entity' => $site));
+	
 	$content = <<<HTML
-		<hr />
 		<table class='googleapps-sites-debug'>
 			<tbody>
 				<tr>
-					<td style='padding-right: 10px;'><strong>GUID:</strong> </td>
-					<td>$owner->username ($owner->guid)</td>
+					<td style='padding-right: 10px;'><strong>GUID:</strong></td>
+					<td>$site->guid</td>
 				</tr>
 				<tr>
-					<td style='padding-right: 10px;'><strong>Owner:</strong></td>
-					<td>$site->guid</td>
+					<td style='padding-right: 10px;'><strong>Owners:</strong></td>
+					<td>$owners_string</td>
 				</tr>
 				<tr>
 					<td style='padding-right: 10px;'><strong>URL:</strong></td>
@@ -78,7 +78,7 @@ if ($vars['debug'] == TRUE) {
 				</tr>
 				<tr>
 					<td style='padding-right: 10px;'><strong>Access Level:</strong> </td>
-					<td>$site->site_access_id</td>
+					<td>$access</td>
 				</tr>
 				<tr>
 					<td style='padding-right: 10px;'><strong>Last modified:</strong></td>
