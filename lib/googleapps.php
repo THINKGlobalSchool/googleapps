@@ -495,7 +495,7 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
  * @return object
  */
 function googleapps_google_docs($client, $folder = null) {
-	$params = array('max-results' => 10, 'expand-acl' => 'true'); 
+	$params = array('max-results' => 50, 'expand-acl' => 'true'); 
 
 	// Get google docs feeds list
 	if (empty($folder)) {
