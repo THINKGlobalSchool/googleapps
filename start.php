@@ -41,6 +41,11 @@ function googleapps_init() {
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
 	elgg_register_simplecache_view('js/googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
+	
+	// Register doc chooser JS
+	$gd_js = elgg_get_simplecache_url('js', 'googleapps/docbrowser');
+	elgg_register_simplecache_view('js/googleapps/docbrowser');
+	elgg_register_js('elgg.googledocbrowser', $gd_js);
 
 	// Load JS lib, only if logged in and not in admin context
 	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
@@ -272,6 +277,13 @@ function googleapps_page_handler($page) {
 				case 'chooser':
 					echo elgg_view('forms/google/docs/chooser');
 					// Need to break out of the page handler for this one (ajax)
+					return true;
+					break;
+				case 'browser':
+					$client = authorized_client(true);
+					$start_key = get_input('start_key', null);
+					$result = googleapps_get_google_docs($client, null, 10, $start_key);
+					echo json_encode($result);
 					return true;
 					break;
 				case 'add':

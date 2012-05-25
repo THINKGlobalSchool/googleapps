@@ -346,7 +346,6 @@ function googleapps_get_oauth_data($ajax = false) {
  * @param string $scope
  * @return object|false
  */
-// googleapps_fetch_oauth_data($client, false, 'mail sites folders docs')
 function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 	set_time_limit(0); // No timeout until this is sped up
 
@@ -378,7 +377,7 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 
 		if ((!$all && in_array('folders', $scope)) || $all) {
 			// Get google docs folders
-			$folders = googleapps_google_docs_folders($client);
+			$folders = googleapps_get_google_docs_folders($client);
 			$oauth_docs_folders = serialize($folders);
 			$_SESSION['oauth_google_folders'] = $oauth_docs_folders;
 		}
@@ -386,8 +385,8 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 		if ((!$all && in_array('docs', $scope)) || $all) {
 			// Get google docs
 			$google_folder = !empty($_SESSION['oauth_google_folder']) ? $_SESSION['oauth_google_folder'] : null;
-			$documents = googleapps_google_docs($client, $google_folder);
-			$oauth_docs = serialize($documents);
+			$documents = googleapps_get_google_docs($client, $google_folder);
+			$oauth_docs = serialize($documents['list']);
 			if (empty($_SESSION['oauth_google_docs']) || $_SESSION['oauth_google_docs'] != $oauth_docs) {
 				$_SESSION['oauth_google_docs'] = $oauth_docs;
 				$is_new_docs = true;
@@ -410,7 +409,7 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
  * @param object $client
  * @return object
  */
-function googleapps_google_docs_folders($client) {
+function googleapps_get_google_docs_folders($client) {
 
 	$feed = 'https://docs.google.com/feeds/default/private/full/-/folder';
 	$result = $client->execute($feed, '3.0');
@@ -494,23 +493,40 @@ function googleapps_change_doc_sharing($client, $doc_id, $access) {
  * @param string $folder
  * @return object
  */
-function googleapps_google_docs($client, $folder = null) {
-	$params = array('max-results' => 50, 'expand-acl' => 'true'); 
+function googleapps_get_google_docs($client, $folder = null, $limit = 50, $start_key = NULL) {
+	$params = array('max-results' => $limit, 'expand-acl' => 'true'); 
+	
+	if ($start_key) {
+		$params['start-key'] = $start_key;
+	}
 
 	// Get google docs feeds list
 	if (empty($folder)) {
 		$feed = 'https://docs.google.com/feeds/default/private/full/-/mine';
-		$feed = $feed . '?' . implode_assoc('=', '&', $params);
 	} else {
 		$feed = 'https://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
 	}
+	$feed = $feed . '?' . implode_assoc('=', '&', $params);
 
 	$result = $client->execute($feed, '3.0', $params);
-
 
 	$rss = simplexml_load_string($result);
 
 	$documents = array();
+	
+	// Get next feed link
+	foreach ($rss->link as $link) {
+		if ($link->attributes()->rel == 'next') {
+			$next_feed = (string)$link->attributes()->href;
+		}
+	}
+	
+	if ($next_feed) {
+		// Need to parse out the 'start-key' param
+		$url_bits = parse_url($next_feed);
+		parse_str($url_bits['query'], $query);
+		$next_start_key = $query['start-key'];
+	}
 
 	// Parse entries for each google document
 	foreach ($rss->entry as $item) {
@@ -573,7 +589,10 @@ function googleapps_google_docs($client, $folder = null) {
 			$documents[] = $doc;
 		}
 	}
-	return $documents;
+	return array(
+		'list' => $documents,
+		'start_key' => $next_start_key,
+	);
 
 }
 

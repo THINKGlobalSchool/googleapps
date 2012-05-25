@@ -26,6 +26,17 @@ googleapps_fetch_oauth_data(authorized_client(true), false, 'docs');
 
 $google_docs = unserialize($_SESSION['oauth_google_docs']);
 
+// $docs_result = googleapps_get_google_docs(authorized_client(true), null, 10);
+// 
+// $google_docs = $docs_result['list'];
+// 
+// $docs_result = googleapps_get_google_docs(authorized_client(true), null, 10, $docs_result['start_key']);
+// 
+// $google_docs = array_merge($google_docs, $docs_result['list']);
+// 
+// $docs_result = googleapps_get_google_docs(authorized_client(true), null, 10, $docs_result['start_key']);
+// 
+// $google_docs = array_merge($google_docs, $docs_result['list']);
 
 $docs_list = '<table class="elgg-table" width="100%">
 					<thead>

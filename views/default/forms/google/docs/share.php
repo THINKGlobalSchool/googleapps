@@ -9,7 +9,9 @@
  * @link http://www.thinkglobalschool.com/
  * 
  */
-	
+
+elgg_load_js('elgg.googledocbrowser');
+
 // Check if we've got an entity, if so, we're editing.
 if (isset($vars['entity'])) {
 	/* We don't really edit these.. I suppose we could.. 
@@ -84,7 +86,9 @@ $submit_input = elgg_view('input/submit', array(
 $form_body = <<<HTML
 <div>
 	<div id="googleapps-docs-container">
-		<div id="googleapps-docs-loading" class="elgg-ajax-loader"></div>
+		<!--<div id="googleapps-docs-loading" class="elgg-ajax-loader"></div>-->
+		<div id="google-docs-browser">
+		</div>
 	</div>
 	<div>
 		<label>$description_label</label><br />
@@ -112,14 +116,14 @@ $form_body = <<<HTML
 HTML;
 
 $script = <<<HTML
-	<script type="text/javascript">
+	<script type="text/javascript">		
 		// Function to click default tab
-		load_chooser = function() {
-			elgg.google.loadDocumentChooser('googleapps-docs-container');	
-		}
+		//load_chooser = function() {
+		//	elgg.google.loadDocumentChooser('googleapps-docs-container');	
+		//}
 
 		// Need to click AFTER elgg is initted
-		elgg.register_hook_handler('ready', 'system', load_chooser);
+		//elgg.register_hook_handler('ready', 'system', load_chooser);
 	</script>
 HTML;
 
