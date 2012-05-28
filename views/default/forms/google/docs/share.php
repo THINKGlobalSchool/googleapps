@@ -82,14 +82,38 @@ $submit_input = elgg_view('input/submit', array(
 	'value' => elgg_echo('save')
 ));	
 
+// Table labels
+$select_label = elgg_echo('googleapps:label:table_select');
+$name_label = elgg_echo('googleapps:label:table_name');
+$collaborators_label = elgg_echo('googleapps:label:table_collaborators');
+$updated_label = elgg_echo('googleapps:label:table_updated');
+
 // Build Form Body
 $form_body = <<<HTML
 <div>
 	<div id="googleapps-docs-container">
-		<!--<div id="googleapps-docs-loading" class="elgg-ajax-loader"></div>-->
 		<div id="google-docs-browser">
+			<table id='google-docs-table' class="elgg-table" width="100%">
+				<thead>
+					<tr>
+						<th class='google-docs-table-select'>$select_label</th>
+						<th class='google-docs-table-name'>$name_label</th>
+						<th class='google-docs-table-collaborators'>$collaborators_label</th>
+						<th class='google-docs-table-updated'>$updated_label</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td colspan='4'>
+							<div class='elgg-ajax-loader'>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div id='google-docs-paging'></div>
 		</div>
-	</div>
+	</div><br />
 	<div>
 		<label>$description_label</label><br />
         $description_input
@@ -113,18 +137,6 @@ $form_body = <<<HTML
 		$entity_hidden
 	</div>
 </div>
-HTML;
-
-$script = <<<HTML
-	<script type="text/javascript">		
-		// Function to click default tab
-		//load_chooser = function() {
-		//	elgg.google.loadDocumentChooser('googleapps-docs-container');	
-		//}
-
-		// Need to click AFTER elgg is initted
-		//elgg.register_hook_handler('ready', 'system', load_chooser);
-	</script>
 HTML;
 
 echo $form_body . $script;

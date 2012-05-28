@@ -35,10 +35,10 @@ elgg.googledocbrowser.init = function() {
 	elgg.googledocbrowser.loadDocuments(elgg.googledocbrowser.initialLoadCallBack);
 
 	// Next link
-	$(document).delegate('#googledocsbrowser-next', 'click', elgg.googledocbrowser.nextClick);
+	$(document).delegate('a#googledocsbrowser-next', 'click', elgg.googledocbrowser.nextClick);
 
 	// Previous link
-	$(document).delegate('#googledocsbrowser-previous', 'click', elgg.googledocbrowser.previousClick);
+	$(document).delegate('a#googledocsbrowser-previous', 'click', elgg.googledocbrowser.previousClick);
 }
 
 // Loads more documents from the api
@@ -67,13 +67,19 @@ elgg.googledocbrowser.initialLoadCallBack = function() {
 	if (elgg.googledocbrowser.documents.length > 0) {
 		elgg.googledocbrowser.populate(0);
 	} else {
-		elgg.googledocbrowser.container.html('Sorry, no docs');
+		var $tbody = elgg.googledocbrowser.container.find('#google-docs-table > tbody');
+		var message = elgg.echo('googleapps:label:nodocuments');
+		$tbody.html("<tr><td colspan='4'><div class='google-docs-none'>" + message + "</div></td></tr>");
 	}
 }
 
 // Populates the document browser
 elgg.googledocbrowser.populate = function(offset) {
-	elgg.googledocbrowser.container.html('');
+	var $table = elgg.googledocbrowser.container.find('#google-docs-table');
+	var $tbody = $table.find('tbody');
+	var $paging = elgg.googledocbrowser.container.find('#google-docs-paging');
+	$tbody.html('');
+	$paging.html('');
 	
 	// Initial limit
 	var limit = offset + elgg.googledocbrowser.LIMIT;
@@ -82,29 +88,75 @@ elgg.googledocbrowser.populate = function(offset) {
 	if (limit > elgg.googledocbrowser.documents.length) {
 		limit = elgg.googledocbrowser.documents.length;
 	}
-	
+
 	// Loop over and display docs
 	for (i = offset; i < limit; i++) {
-		elgg.googledocbrowser.container.append(elgg.googledocbrowser.documents[i].title);
-		elgg.googledocbrowser.container.append("<br />");
+		// Creating table elements
+		var $tr = $(document.createElement('tr'));
+		
+		var $td = $(document.createElement('td'));
+		$td.addClass('google-docs-table-select');
+		
+		// Document input
+		var $input = $(document.createElement('input'));
+		$input.attr({
+			type: 'radio',
+			value: elgg.googledocbrowser.documents[i].id,
+			name: 'document_id'
+		});
+		
+		$td.append($input);
+		$tr.append($td);
+		
+		$td = $(document.createElement('td'));
+		$td.addClass('google-docs-table-name');
+		
+		var $icon = $(document.createElement('span'));
+		$icon.addClass('document-icon');
+		$icon.addClass(elgg.googledocbrowser.documents[i].type);
+		
+		var $link = $(document.createElement('a'));
+		$link.attr('href', elgg.googledocbrowser.documents[i].href);
+		$link.text(elgg.googledocbrowser.documents[i].title);
+		
+		$td.append($icon);
+		$td.append($link);
+		$tr.append($td);
+		
+		$td = $(document.createElement('td'));
+		$td.addClass('google-docs-table-collaborators');
+		$td.text(elgg.googledocbrowser.formatPermissions(elgg.googledocbrowser.documents[i].collaborators));
+		
+		$tr.append($td);
+		
+		$td = $(document.createElement('td'));
+		$td.addClass('google-docs-table-updated');
+		
+		var updated = $.datepicker.formatDate('yy-mm-dd', new Date(elgg.googledocbrowser.documents[i].updated * 1000));
+		
+		$td.text(updated);
+		
+		$tr.append($td);
+		
+		$tbody.append($tr);
 	}
 	
 	// Don't display previous unless we have a proper offset
 	if (offset != 0) {
 		var $prev_link = $(document.createElement('a'));
-		$prev_link.html('<< prev ');
+		$prev_link.html(elgg.echo('googleapps:label:previouspage'));
 		$prev_link.attr('id', 'googledocsbrowser-previous');
 		$prev_link.attr('href', '#');
-		elgg.googledocbrowser.container.append($prev_link);
+		$paging.append($prev_link);
 	}
 
 	// If we have a start key, or more items to display show next link
 	if (elgg.googledocbrowser.start_key || offset + elgg.googledocbrowser.LIMIT < elgg.googledocbrowser.documents.length) {
 		var $next_link = $(document.createElement('a'));
-		$next_link.html('next >>');
+		$next_link.html(elgg.echo('googleapps:label:nextpage'));
 		$next_link.attr('id', 'googledocsbrowser-next');
 		$next_link.attr('href', '#');
-		elgg.googledocbrowser.container.append($next_link);
+		$paging.append($next_link);
 	}
 }
 
@@ -116,6 +168,9 @@ elgg.googledocbrowser.pushDocuments = function(doc_array) {
 
 // Click handler for next button
 elgg.googledocbrowser.nextClick = function(event) {
+	elgg.googledocbrowser.showLoader();
+	$(this).replaceWith($("<span id='googledocsbrowser-next'>" + $(this).html() + "</span>"));
+
 	// Only load more docs if we're at the limit, and we have a start key 
 	if (elgg.googledocbrowser.start_key 
 		&& (elgg.googledocbrowser.current_offset + elgg.googledocbrowser.LIMIT) == elgg.googledocbrowser.documents.length) 
@@ -130,15 +185,52 @@ elgg.googledocbrowser.nextClick = function(event) {
 		elgg.googledocbrowser.current_offset += elgg.googledocbrowser.LIMIT;  // Increase offset
 		elgg.googledocbrowser.populate(elgg.googledocbrowser.current_offset); // Populate browser
 	}
+
 	event.preventDefault();
 }
 
 // Click handler for previous button
 elgg.googledocbrowser.previousClick = function(event) {
+	elgg.googledocbrowser.showLoader();
+	$(this).replaceWith($("<span id='googledocsbrowser-previous'>" + $(this).html() + "</span>"));
+
 	// Just going backwards through the doc array, don't need to try and load any more
 	elgg.googledocbrowser.current_offset -= elgg.googledocbrowser.LIMIT;  // Decrease offset
 	elgg.googledocbrowser.populate(elgg.googledocbrowser.current_offset); // Populate browser
+
 	event.preventDefault();
+}
+
+// Show the ajax loader animation on the browser table
+elgg.googledocbrowser.showLoader = function() {
+	var $tbody = elgg.googledocbrowser.container.find('#google-docs-table > tbody');
+	$tbody.html("<tr><td colspan='4'><div class='elgg-ajax-loader'></div></td></tr>");
+}
+
+// Helper function to create a nicely formatted permission string
+elgg.googledocbrowser.formatPermissions = function(collaborators) {
+	if(collaborators instanceof Array) {
+		collaborators = collaborators.length;
+	}
+
+	var string = '';
+
+	switch (collaborators) {
+		case 'everyone_in_domain' :
+			string = 'Everyone in domain';
+			break;
+		case 'public':
+		 	string = 'Public';
+			break;
+		default:
+			if(collaborators > 1) {
+				string = (collaborators -1) + ' collaborators'; // minus owner
+			} else {
+				string = 'me';
+			}
+			break;
+	}
+	return string;
 }
 
 elgg.register_hook_handler('init', 'system', elgg.googledocbrowser.init);

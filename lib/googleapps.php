@@ -341,6 +341,7 @@ function googleapps_get_oauth_data($ajax = false) {
 /**
  * Parse the google request data
  *
+ * @todo not sure what this function needs to be now.. pretty much just handles email at this point
  * @param object $client
  * @param bool $ajax
  * @param string $scope
@@ -361,10 +362,8 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 	}
 
 	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 
 	$count = 0;
-	$is_new_docs = false;
 	$user = $_SESSION['user'];
 	if ($oauth_sync_email != 'no' &&
 	((!$all && in_array('mail', $scope)) || $all)) {
@@ -373,32 +372,11 @@ function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
 		$_SESSION['google_mail_count'] = $count;
 	}
 
-	if ($oauth_sync_docs != 'no') {
-
-		if ((!$all && in_array('folders', $scope)) || $all) {
-			// Get google docs folders
-			$folders = googleapps_get_google_docs_folders($client);
-			$oauth_docs_folders = serialize($folders);
-			$_SESSION['oauth_google_folders'] = $oauth_docs_folders;
-		}
-
-		if ((!$all && in_array('docs', $scope)) || $all) {
-			// Get google docs
-			$google_folder = !empty($_SESSION['oauth_google_folder']) ? $_SESSION['oauth_google_folder'] : null;
-			$documents = googleapps_get_google_docs($client, $google_folder);
-			$oauth_docs = serialize($documents['list']);
-			if (empty($_SESSION['oauth_google_docs']) || $_SESSION['oauth_google_docs'] != $oauth_docs) {
-				$_SESSION['oauth_google_docs'] = $oauth_docs;
-				$is_new_docs = true;
-			}
-		}
-	}
-
 	if ($ajax) {
 		$response = array();
 		$response['mail_count'] = !empty($count) ? $count : 0;
 		//$response['new_activity'] = !empty($is_new_activity) ? 1 : 0;
-		$response['new_docs'] = !empty($is_new_docs) ? 1 : 0;
+		$response['new_docs'] = 0; //!empty($is_new_docs) ? 1 : 0;
 		return json_encode($response);
 	}
 }
@@ -428,7 +406,7 @@ function googleapps_get_google_docs_folders($client) {
  * @param string 		$doc_id 	Document id
  * @param mixed 		$access		Either an access_id, or an array of user's emails
  */
-function googleapps_change_doc_sharing($client, $doc_id, $access) {
+function googleapps_update_doc_permissions($client, $doc_id, $access) {
 	// If we have a single access id
 	if (!is_array($access) )  {
 		switch ($access) {
@@ -530,70 +508,114 @@ function googleapps_get_google_docs($client, $folder = null, $limit = 50, $start
 
 	// Parse entries for each google document
 	foreach ($rss->entry as $item) {
-		$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
-		$title = $item['title'];
-
-		$collaborators = array();
-
-		// Sort out collaborators
-		foreach ($item->xpath('gd:feedLink') as $acl_feed) {
-			foreach($acl_feed->feed->entry as $feed_entry) {
-				$user = str_replace('Document Permission - ', '', $feed_entry->title);
-				$collaborators[] = $user;
-			}
-		}
-
-		if  (in_array('default', $collaborators)) {
-			$collaborators = 'public'; // Public document
-		}
-
-		if  (in_array('everyone', $collaborators)) {
-			$collaborators = 'everyone_in_domain'; // Shared with domain
-		}
-
-		$links = $item->link;
-		$src = '';
-		$is_folder = false;
-		$type = '';
-
-		foreach ($item->category as $category) {
-			$attrs = array();
-			foreach ($category->attributes() as $a => $value) {
-				$attrs[$a] = $value[0];
-			}
-			if (!empty ($attrs['scheme']) && $attrs['scheme'] == 'http://schemas.google.com/g/2005#kind') {
-				$type = preg_replace('/\ label\=\"(.*)\"/', '$1', $attrs['label']->asXML());
-				$is_folder = ($type == 'folder');
-			}
-		}
-
-		foreach ($item->link as $link) {
-			$attrs = array();
-			foreach ($link->attributes() as $a => $value) {
-				$attrs[$a] = $value[0];
-			}
-			if (!empty ($attrs['rel']) && $attrs['rel'] == 'alternate') {
-				$src = $attrs['href'];
-				break;
-			}
-		}
-
-		if (!empty($src)) {
-			$doc['id']=$id;
-			$doc['title'] = preg_replace('/\<title\>(.*)\<\/title\>/', '$1', $item->title->asXML());
-			$doc['trunc_title'] = trunc_name($doc['title']);
-			$doc['href'] = preg_replace('/href=\"(.*)\"/', '$1', $src->asXML());
-			$doc['type'] = $type;
-			$doc['updated'] = strtotime($item->updated);
-			$doc['collaborators'] = $collaborators;
-			$documents[] = $doc;
-		}
+		$doc = googleapps_parse_doc_from_xml_element($item);
+		$documents[] = $doc;
 	}
 	return array(
 		'list' => $documents,
 		'start_key' => $next_start_key,
 	);
 
+}
+
+/**
+ * Get a single google doc from supplied ID
+ * 
+ * @param object $client
+ * @param string $id
+ * @return array
+ */
+function googleapps_get_doc_from_id($client, $id) {
+	if (empty($id) || !$id) {
+		return FALSE;
+	}
+
+	$params = array('expand-acl' => 'true'); 
+
+	$feed = "https://docs.google.com/feeds/default/private/full/{$id}?expand-acl=true";
+
+	$result = $client->execute($feed, '3.0', $params);
+
+	$rss = simplexml_load_string($result);
+
+	$doc = googleapps_parse_doc_from_xml_element($rss);
+
+	return $doc;
+}
+
+/**
+ * Parse and document array from SimpleXMLElement
+ *
+ * @param SimpleXMLElement $item
+ * @return array
+ */
+function googleapps_parse_doc_from_xml_element($item) {
+	if (!($item instanceof SimpleXMLElement)) {
+		return FALSE;
+	}
+
+	$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
+	$title = $item['title'];
+
+	$collaborators = array();
+
+	// Sort out collaborators
+	foreach ($item->xpath('gd:feedLink') as $acl_feed) {
+		// Yeah this is stupid, but xpath won't cooperate
+		foreach($acl_feed->feed as $feed) {
+			foreach($feed->entry as $feed_entry) {
+				$user = str_replace('Document Permission - ', '', $feed_entry->title);
+				$collaborators[] = $user;
+			}
+		}
+	}
+
+	// Could be public or everyone
+	if (in_array('default', $collaborators)) {
+		$collaborators = 'public'; // Public document
+	} else if (in_array('everyone', $collaborators)) {
+		$collaborators = 'everyone_in_domain'; // Shared with domain
+	}
+
+	$links = $item->link;
+	$src = '';
+	$is_folder = false;
+	$type = '';
+
+	foreach ($item->category as $category) {
+		$attrs = array();
+		foreach ($category->attributes() as $a => $value) {
+			$attrs[$a] = $value[0];
+		}
+		if (!empty ($attrs['scheme']) && $attrs['scheme'] == 'http://schemas.google.com/g/2005#kind') {
+			$type = preg_replace('/\ label\=\"(.*)\"/', '$1', $attrs['label']->asXML());
+			$is_folder = ($type == 'folder');
+		}
+	}
+
+	foreach ($item->link as $link) {
+		$attrs = array();
+		foreach ($link->attributes() as $a => $value) {
+			$attrs[$a] = $value[0];
+		}
+		if (!empty ($attrs['rel']) && $attrs['rel'] == 'alternate') {
+			$src = $attrs['href'];
+			break;
+		}
+	}
+
+	if (!empty($src)) {
+		$doc['id'] = $id;
+		$doc['title'] = preg_replace('/\<title\>(.*)\<\/title\>/', '$1', $item->title->asXML());
+		$doc['trunc_title'] = trunc_name($doc['title']);
+		$doc['href'] = preg_replace('/href=\"(.*)\"/', '$1', $src->asXML());
+		$doc['type'] = $type;
+		$doc['updated'] = strtotime($item->updated);
+		$doc['collaborators'] = $collaborators;
+		return $doc;
+	} else {
+		return FALSE;
+	}
 }
 
 /**

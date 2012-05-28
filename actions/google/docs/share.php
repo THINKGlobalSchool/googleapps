@@ -16,7 +16,6 @@ $document_url = get_input('document_url', null);
 $document_match = get_input('match_permissions', null);
 $document_container_guid = get_input('container_guid');
 
-
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $document_container_guid)) {
 	register_error(elgg_echo('googleapps:error:nopermission'));
@@ -27,16 +26,18 @@ if ($document_match && $access_level === null) {
 	$access_level = GOOGLEAPPS_ACCESS_MATCH;
 }
 
-
 // Check for a document url/id
 if (empty($document_id) && empty($document_url)) {
 	register_error(elgg_echo("googleapps:error:document_id_required"));
 	forward();
 }
 
-$google_docs = unserialize($_SESSION['oauth_google_docs']);
+// Grab document from API
+$client = authorized_client(TRUE);
+$document = googleapps_get_doc_from_id($client, $document_id);
 
 // If we have a URL find it in the list
+/*
 if ($document_url && !empty($document_url)) {
 	// Sanitize our input url, trims out trailing '#'s as well
 	$document_url = googleapps_santize_google_doc_input($document_url);
@@ -64,13 +65,13 @@ if ($document_url && !empty($document_url)) {
 		}
 	}
 }
+*/
 
 $document_info = array();
 $document_info['doc_id'] = $document_id;
 $document_info['description'] = $document_description;
 $document_info['access'] = $access_level;
 $document_info['tags'] = $document_tags;
-$_SESSION['google_docs_to_share_data'] = serialize($document_info); // remember data
 
 $collaborators = $document['collaborators'];
 
@@ -80,8 +81,11 @@ if (!check_document_permission($collaborators, $access_level)) {
 		'id' => 'google-docs-update-permissions',
 		'name' => 'google_docs_update_permissions',
 	);
-	
-	echo elgg_view_form('google/docs/permissions', $vars, array('container_guid' => $document_container_guid));
+
+	echo elgg_view_form('google/docs/permissions', $vars, array(
+		'container_guid' => $document_container_guid,
+		'document_info' => $document_info,
+	));
 	forward();
 } else {
 	// Share document and output success

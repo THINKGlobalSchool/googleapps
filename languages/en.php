@@ -121,6 +121,9 @@ $english = array(
 	'googleapps:label:wikisortby' => 'Sort',
 	'googleapps:label:sortasc' => 'Sort Ascending &#9650;',
 	'googleapps:label:sortdesc' => 'Sort Descending &#9660;',
+	'googleapps:label:nextpage' => 'Next page >>',
+	'googleapps:label:previouspage' => '<< Previous Page',
+	'googleapps:label:nodocuments' => 'You don\'t have any documents to share.', 
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

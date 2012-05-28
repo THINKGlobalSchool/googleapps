@@ -198,7 +198,57 @@ a.googleapps-tooltip:hover span {
 	color: inherit;
 }
 
-
 /** END OF SORT MENU **/
+
+/** GOOGLE DOCS SHARE **/
+
+#googledocsbrowser-previous,
+#googledocsbrowser-next {
+	font-weight: bold;
+	font-size: 120%;
+	color: #555 !important;
+}
+
+#googledocsbrowser-previous {
+	float: left;
+}
+
+#googledocsbrowser-next {
+	float: right;
+}
+
+#google-docs-paging {
+	padding: 10px;
+	text-align: center;
+}
+
+#google-docs-table th {
+	font-weight: bold;
+	color: #565656;
+}
+
+.google-docs-table-select {
+	width: 35px;
+}
+
+.google-docs-table-name {
+	width: 430px;
+}
+
+.google-docs-table-collaborators {
+	width: 115px;
+}
+
+.google-docs-table-updated {
+	width: 95px;
+}
+
+.google-docs-none {
+	text-align: center;
+	font-weight: bold;
+	color: #333;
+}
+
+/** END GOOGLE DOCS SHARE **/
 
 /*</style>*/

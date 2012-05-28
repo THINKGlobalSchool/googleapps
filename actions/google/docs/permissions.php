@@ -8,11 +8,10 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$data = unserialize($_SESSION['google_docs_to_share_data']);
-$description = $data['description'];
-$tags = $data['tags'];
-$access_id = $data['access'];
-$document_id = $data['doc_id'];
+$description = get_input('description');
+$tags = get_input('tags');
+$access_id = get_input('access');
+$document_id = get_input('doc_id');
 $container_guid = get_input('container_guid');
 
 // Make sure user can write to the container (group)
@@ -21,18 +20,9 @@ if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
 	forward();
 }
 
-// Get google docs from session
-$google_docs = unserialize($_SESSION['oauth_google_docs']);
-
-// Get the selected document
-foreach ($google_docs as $doc) {
-	if ($doc['id'] == $document_id) {
-		$document = $doc;
-		break;
-	}
-}
-
-$client = authorized_client(true);
+// Get google doc
+$client = authorized_client(TRUE);
+$document = googleapps_get_doc_from_id($client, $document_id);
 
 switch (get_input('answer')) {
 	case elgg_echo('googleapps:submit:grant'):
@@ -40,11 +30,11 @@ switch (get_input('answer')) {
 			// We've got a group ACL
 			$members_email = get_members_emails($members);
 			$share_to = get_members_not_shared($members_email, $document);
-			googleapps_change_doc_sharing($client, $document['id'], $share_to) ; // change permissions
+			googleapps_update_doc_permissions($client, $document['id'], $share_to) ; // change permissions
 			share_document($document, $description, $tags, $access_id, $container_guid);
 			break;
 		}
-		googleapps_change_doc_sharing($client, $document['id'], $access_id) ;
+		googleapps_update_doc_permissions($client, $document['id'], $access_id) ;
 		share_document($document, $description, $tags, $access_id, $container_guid);
 		break;
 	case elgg_echo('googleapps:submit:ignore'):

@@ -12,15 +12,13 @@
 $heading = elgg_echo('googleapps:label:action_required');
 $message = elgg_echo('googleapps:error:document_permissions_update');
 
+// Get local document info
+$document_info = elgg_extract('document_info', $vars);
+
+// Inputs
 $answer_input = elgg_view('input/hidden', array(
 	'id' => 'googleapps-docs-permissions-answer',
 	'name' => 'answer',
-));
-
-$container_input = elgg_view('input/hidden', array(
-	'id' => 'googleapps-docs-container-guid',
-	'name' => 'container_guid',
-	'value' => elgg_extract('container_guid', $vars),
 ));
 
 $grant_input = elgg_view('input/submit', array(
@@ -37,12 +35,47 @@ $ignore_input = elgg_view('input/submit', array(
 	'class' => 'permissions-update-input elgg-button-action',
 ));
 
+// Hidden/document info inputs
+$container_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-container-guid',
+	'name' => 'container_guid',
+	'value' => elgg_extract('container_guid', $vars),
+));
+
+$doc_id_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-id',
+	'name' => 'doc_id',
+	'value' => $document_info['doc_id'],
+));
+
+$description_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-description',
+	'name' => 'description',
+	'value' => $document_info['description'],
+));
+
+$access_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-access',
+	'name' => 'access',
+	'value' => $document_info['access'],
+));
+
+$tags_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-tags',
+	'name' => 'tags',
+	'value' => $document_info['tags'],
+));
+
 $form_body = <<<HTML
 	<h2>$heading</h2>
 	<p><label>$message</label></p>
 	$answer_input
 	$container_input
 	$grant_input $ignore_input
+	$doc_id_input
+	$description_input
+	$access_input
+	$tags_input
 HTML;
 
 echo $form_body;
