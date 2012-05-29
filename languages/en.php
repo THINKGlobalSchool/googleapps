@@ -123,6 +123,7 @@ $english = array(
 	'googleapps:label:sortdesc' => 'Sort Descending &#9660;',
 	'googleapps:label:nextpage' => 'Next page >>',
 	'googleapps:label:previouspage' => '<< Previous Page',
+	'googleapps:label:loadmore' => 'Load more',
 	'googleapps:label:nodocuments' => 'You don\'t have any documents to share.', 
 
 	// Tooltips

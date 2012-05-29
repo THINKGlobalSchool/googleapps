@@ -217,14 +217,22 @@ a.googleapps-tooltip:hover span {
 	float: right;
 }
 
+#googledocsbrowser-loadmore {
+	display: block;
+	margin-top: 4px;
+}
+
 #google-docs-paging {
-	padding: 10px;
 	text-align: center;
 }
 
 #google-docs-table th {
 	font-weight: bold;
 	color: #565656;
+}
+
+#google-docs-table-loader {
+	background: #FFFFFF !important;
 }
 
 .google-docs-table-select {

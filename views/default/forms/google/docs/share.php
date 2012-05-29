@@ -103,7 +103,7 @@ $form_body = <<<HTML
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
+					<tr id='google-docs-table-loader'>
 						<td colspan='4'>
 							<div class='elgg-ajax-loader'>
 							</div>

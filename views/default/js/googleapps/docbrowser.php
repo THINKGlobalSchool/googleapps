@@ -18,7 +18,7 @@ elgg.provide('elgg.googledocbrowser');
 elgg.googledocbrowser.DOCS_ENDPOINT = elgg.get_site_url() + "googleapps/docs/browser";
 
 // Limit per page
-elgg.googledocbrowser.LIMIT = 10;
+elgg.googledocbrowser.LIMIT = 15;
 
 // Local vars
 elgg.googledocbrowser.documents = [];
@@ -34,11 +34,16 @@ elgg.googledocbrowser.init = function() {
 	// Do an inital document load, calling the initial callback
 	elgg.googledocbrowser.loadDocuments(elgg.googledocbrowser.initialLoadCallBack);
 
+	/** NOT USING NEXT PREVIOUS
 	// Next link
 	$(document).delegate('a#googledocsbrowser-next', 'click', elgg.googledocbrowser.nextClick);
 
 	// Previous link
 	$(document).delegate('a#googledocsbrowser-previous', 'click', elgg.googledocbrowser.previousClick);
+	*/
+	
+	// Load more link
+	$(document).delegate('a#googledocsbrowser-loadmore', 'click', elgg.googledocbrowser.nextClick);
 }
 
 // Loads more documents from the api
@@ -78,9 +83,9 @@ elgg.googledocbrowser.populate = function(offset) {
 	var $table = elgg.googledocbrowser.container.find('#google-docs-table');
 	var $tbody = $table.find('tbody');
 	var $paging = elgg.googledocbrowser.container.find('#google-docs-paging');
-	$tbody.html('');
+	$tbody.find('#google-docs-table-loader').remove();
 	$paging.html('');
-	
+
 	// Initial limit
 	var limit = offset + elgg.googledocbrowser.LIMIT;
 	
@@ -141,7 +146,7 @@ elgg.googledocbrowser.populate = function(offset) {
 		$tbody.append($tr);
 	}
 	
-	// Don't display previous unless we have a proper offset
+	/**
 	if (offset != 0) {
 		var $prev_link = $(document.createElement('a'));
 		$prev_link.html(elgg.echo('googleapps:label:previouspage'));
@@ -149,13 +154,16 @@ elgg.googledocbrowser.populate = function(offset) {
 		$prev_link.attr('href', '#');
 		$paging.append($prev_link);
 	}
+	**/
 
 	// If we have a start key, or more items to display show next link
 	if (elgg.googledocbrowser.start_key || offset + elgg.googledocbrowser.LIMIT < elgg.googledocbrowser.documents.length) {
 		var $next_link = $(document.createElement('a'));
-		$next_link.html(elgg.echo('googleapps:label:nextpage'));
-		$next_link.attr('id', 'googledocsbrowser-next');
+		$next_link.html(elgg.echo('googleapps:label:loadmore'));
+		$next_link.attr('id', 'googledocsbrowser-loadmore');
 		$next_link.attr('href', '#');
+		$next_link.addClass('elgg-button');
+		$next_link.addClass('elgg-button-action');
 		$paging.append($next_link);
 	}
 }
@@ -169,7 +177,7 @@ elgg.googledocbrowser.pushDocuments = function(doc_array) {
 // Click handler for next button
 elgg.googledocbrowser.nextClick = function(event) {
 	elgg.googledocbrowser.showLoader();
-	$(this).replaceWith($("<span id='googledocsbrowser-next'>" + $(this).html() + "</span>"));
+	$(this).replaceWith($("<span class='elgg-button elgg-button-action' id='googledocsbrowser-loadmore'>" + $(this).html() + "</span>"));
 
 	// Only load more docs if we're at the limit, and we have a start key 
 	if (elgg.googledocbrowser.start_key 
@@ -204,7 +212,7 @@ elgg.googledocbrowser.previousClick = function(event) {
 // Show the ajax loader animation on the browser table
 elgg.googledocbrowser.showLoader = function() {
 	var $tbody = elgg.googledocbrowser.container.find('#google-docs-table > tbody');
-	$tbody.html("<tr><td colspan='4'><div class='elgg-ajax-loader'></div></td></tr>");
+	$tbody.append("<tr id='google-docs-table-loader'><td colspan='4'><div class='elgg-ajax-loader'></div></td></tr>");
 }
 
 // Helper function to create a nicely formatted permission string

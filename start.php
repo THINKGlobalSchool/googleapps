@@ -282,7 +282,7 @@ function googleapps_page_handler($page) {
 				case 'browser':
 					$client = authorized_client(true);
 					$start_key = get_input('start_key', null);
-					$result = googleapps_get_google_docs($client, null, 10, $start_key);
+					$result = googleapps_get_google_docs($client, null, 15, $start_key);
 					echo json_encode($result);
 					return true;
 					break;
