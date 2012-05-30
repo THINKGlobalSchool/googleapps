@@ -88,9 +88,19 @@ $menu = elgg_view_menu('googleapps-admin-menu', array(
 	'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default'
 ));
 
-$run_cron_input = elgg_view('input/button', array(
-	'value' => elgg_echo('googleapps:label:cronsites'),
-	'id' => 'googleapps-run-cron',
+$run_main_cron_input = elgg_view('input/button', array(
+	'value' => elgg_echo('googleapps:label:cronsyncsites'),
+	'id' => 'googleapps-run-sync-cron',
+));
+
+$run_group_cron_input = elgg_view('input/button', array(
+	'value' => elgg_echo('googleapps:label:crongroupsites'),
+	'id' => 'googleapps-run-group-cron',
+));
+
+$reset_activity_input = elgg_view('input/button', array(
+	'value' => elgg_echo('googleapps:label:resetsiteactivity'),
+	'id' => 'googleapps-reset-sites-activity',
 ));
 
 $list_options = array(
@@ -115,7 +125,9 @@ $content = <<<HTML
 		Reset
 	</div>
 	<div style='display: none;' id='googleapps-admin-cronsites' class='googleapps-menu-container'>
-		$run_cron_input
+		$run_main_cron_input
+		$run_group_cron_input
+		$reset_activity_input
 		<div id='googleapps-cron-output'>
 		</div>
 	</div>

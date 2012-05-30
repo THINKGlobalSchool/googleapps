@@ -44,9 +44,6 @@ $english = array(
    	'googleapps:admin:sync_docs' => 'Enable Google Docs',
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
-	'googleapps:admin:resetwikis' => 'Reset all learned Google Sites:',
-	'googleapps:admin:reset' => 'Reset',
-
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
@@ -72,7 +69,9 @@ $english = array(
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 	'googleapps:error:notfound' => 'Document not found',
 	'googleapps:error:nopermission' => 'You do not have permission to share this document to the group',
-	'googleapps:error:feature_error' => 'Invalid wiki',
+	'googleapps:error:invalidwiki' => 'Invalid wiki',
+	'googleapps:error:wikiconnectionfailed' => 'Could not connect wiki to group',
+	'googleapps:error:wikidisconnectionfailed' => 'Could not disconnect wiki from group',
 
 	// Success messages
 	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
@@ -81,6 +80,8 @@ $english = array(
 	'googleapps:success' => 'Success!',
 	'googleapps:success:feature' => 'Wiki Successfully Featured',
 	'googleapps:success:unfeature' => 'Wiki Successfully Unfeatured',
+	'googleapps:success:groupwikiconnected' => 'Successfully connected wiki to group',
+	'googleapps:success:groupwikidisconnected' => 'Successfully disconnected wiki from group',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
@@ -112,7 +113,9 @@ $english = array(
 	'googleapps:label:moredocs' => 'More Shared Docs',
 	'googleapps:label:listsites' => 'List Sites',
 	'googleapps:label:resetsites' => 'Reset Sites',
-	'googleapps:label:cronsites' => 'Run Cron',
+	'googleapps:label:cronsites' => 'Test/Run Cron',
+	'googleapps:label:cronsyncsites' => 'Run Sync Cron',
+	'googleapps:label:crongroupsites' => 'Run Group Activity Cron',
 	'googleapps:label:makefeatured' => 'Make featured',
 	'googleapps:label:unfeature' => 'Unfeature',
 	'googleapps:label:featuredsites' => 'Featured Wiki\'s',
@@ -124,7 +127,15 @@ $english = array(
 	'googleapps:label:nextpage' => 'Next page >>',
 	'googleapps:label:previouspage' => '<< Previous Page',
 	'googleapps:label:loadmore' => 'Load more',
-	'googleapps:label:nodocuments' => 'You don\'t have any documents to share.', 
+	'googleapps:label:nodocuments' => 'You don\'t have any documents to share.',
+	'googleapps:label:groupwikis' => 'Group Connected Wikis',
+	'googleapps:label:availablewikis' => 'Available Wikis',
+	'googleapps:label:connectwiki' => 'Connect',
+	'googleapps:label:disconnectwiki' => 'Disconnect',
+	'googleapps:label:connectedwikis' => 'Current Connected Wikis',
+	'googleapps:label:wikiconnectedto' => 'Connected to',
+	'googleapps:label:groupwikis' => 'Group Wikis',
+	'googleapps:label:resetsiteactivity' => 'Reset Site Activity',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',
@@ -142,6 +153,7 @@ $english = array(
 	'river:create:object:shared_doc' => '%s shared a Google Document titled %s',
 	'river:comment:object:shared_doc' => '%s commented on the Google Document %s',
 	'river:friend:user:googleapps' => "%s is now a friend with %s",
+	'river:create:object:site_activity' => "%s %s %s on the %s wiki",
 	
 	// Emails
 	'googleapps:email:created:subject' => 'Google Connected Spot Account Created',

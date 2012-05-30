@@ -14,7 +14,7 @@ $action = get_input('action_type');
 $site = get_entity($guid);
 
 if (!elgg_instanceof($site, 'object', 'site')) {
-	register_error(elgg_echo('googleapps:error:feature_error'));
+	register_error(elgg_echo('googleapps:error:invalidwiki'));
 	forward(REFERER);
 }
 

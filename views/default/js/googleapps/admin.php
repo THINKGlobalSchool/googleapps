@@ -17,12 +17,18 @@ elgg.google_admin.init = function() {
 	// Delegate click handler for admin menu items
 	$(document).delegate('.googleapps-admin-menu-item', 'click', elgg.google_admin.adminMenuClick);
 
-	// Delegate click handler for admin run cron
-	$(document).delegate('#googleapps-run-cron', 'click', elgg.google_admin.adminRunCronClick);
+	// Delegate click handler for admin run sync cron
+	$(document).delegate('#googleapps-run-sync-cron', 'click', elgg.google_admin.adminRunSyncCronClick);
+
+	// Delegate click handler for admin run group cron
+	$(document).delegate('#googleapps-run-group-cron', 'click', elgg.google_admin.adminRunGroupCronClick);
 	
-		$(document).delegate('#googleapps-test-one', 'click', elgg.google_admin.adminTestOneClick);
+	// Delegate click handler for admin reset site activity
+	$(document).delegate('#googleapps-reset-sites-activity', 'click', elgg.google_admin.adminResetSiteActivityClick);
+	
+	//$(document).delegate('#googleapps-test-one', 'click', elgg.google_admin.adminTestOneClick);
 		
-			$(document).delegate('#googleapps-test-two', 'click', elgg.google_admin.adminTestTwoClick);
+	//$(document).delegate('#googleapps-test-two', 'click', elgg.google_admin.adminTestTwoClick);
 }
 
 // Click handler for admin menu items
@@ -45,7 +51,8 @@ elgg.google_admin.adminMenuClick = function(event) {
 }
 
 // Admin run cron click handler 
-elgg.google_admin.adminRunCronClick = function(event) {
+elgg.google_admin.adminRunSyncCronClick = function(event) {
+	$("#googleapps-cron-output").html("<div class='elgg-ajax-loader'></div>");
 	elgg.get(elgg.get_site_url() + "googleapps/admin/wiki_cron", {
 		success: function(data) {
 			$("#googleapps-cron-output").html(data);
@@ -54,6 +61,37 @@ elgg.google_admin.adminRunCronClick = function(event) {
 			$("#googleapps-cron-output").html("There was an error loading output");
 		}
 	});
+	event.preventDefault();
+}
+
+// Admin run cron click handler 
+elgg.google_admin.adminRunGroupCronClick = function(event) {
+	$("#googleapps-cron-output").html("<div class='elgg-ajax-loader'></div>");
+	elgg.get(elgg.get_site_url() + "googleapps/admin/wiki_group_cron", {
+		success: function(data) {
+			$("#googleapps-cron-output").html(data);
+		},
+		error: function() {
+			$("#googleapps-cron-output").html("There was an error loading output");
+		}
+	});
+	event.preventDefault();
+}
+
+// Admin run cron click handler 
+elgg.google_admin.adminResetSiteActivityClick = function(event) {
+	if (confirm('Are you sure?')) {
+		$("#googleapps-cron-output").html("<div class='elgg-ajax-loader'></div>");
+		elgg.get(elgg.get_site_url() + "googleapps/admin/wiki_reset_activity", {
+			success: function(data) {
+				$("#googleapps-cron-output").html(data);
+			},
+			error: function() {
+				$("#googleapps-cron-output").html("There was an error loading output");
+			}
+		});
+	}
+	event.preventDefault();
 }
 
 elgg.register_hook_handler('init', 'system', elgg.google_admin.init);

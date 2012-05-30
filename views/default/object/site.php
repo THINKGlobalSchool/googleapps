@@ -50,12 +50,32 @@ if (!$owners) {
 
 $date = elgg_view_friendly_time($site->modified);
 
+// Get connected groups
+$options = array(
+	'type' => 'group',
+	'limit' => 1, // Should only be connected to one group
+	'full_view' => FALSE,
+	'relationship' => GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP, 
+	'relationship_guid' => $site->guid, 
+	'inverse_relationship' => FALSE,
+);
+
+$connected_groups = elgg_get_entities_from_relationship($options);
 
 if (elgg_in_context('sites_debug')) {
 	// Admin debug view
 	$date = date(DATE_ATOM, $site->modified);
 	
 	$access = elgg_view('output/access', array('entity' => $site));
+	
+	if (count($connected_groups)) {
+		$connected_to_group = elgg_view('output/url', array(
+			'text' => $connected_groups[0]->name,
+			'href' => $connected_groups[0]->getURL(),
+		));
+	} else {
+		$connected_to_group = 'n/a';
+	}
 	
 	$content = <<<HTML
 		<table class='googleapps-sites-debug'>
@@ -80,6 +100,10 @@ if (elgg_in_context('sites_debug')) {
 					<td style='padding-right: 10px;'><strong>Last modified:</strong></td>
 					<td>$date</td>
 				</tr>
+				<tr>
+					<td style='padding-right: 10px;'><strong>Connected to group:</strong></td>
+					<td>$connected_to_group</td>
+				</tr>
 			</tbody>
 		</table>
 		<br />
@@ -95,12 +119,25 @@ HTML;
 			'sort_by' => 'priority',
 			'class' => 'elgg-menu-hz',
 		));
-	} else {
+	}
+	
+	// Display which group this wiki is connected to (if any)
+	if (!elgg_in_context('group_connected_wikis')) {
+		if (count($connected_groups)) {
+			$group_link = elgg_view('output/url', array(
+				'text' => $connected_groups[0]->name,
+				'href' => $connected_groups[0]->getURL(),
+			));
 
+			$connected_text = elgg_echo('googleapps:label:wikiconnectedto');
+			$connected_text = "<br /><strong>{$connected_text}:</strong>&nbsp;{$group_link}";
+		}
 	}
 
 	$subtitle = "<p><strong>" . elgg_echo('googleapps:label:updated') . ":</strong> $date <br /> 
-					<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string</p>";
+					<strong>" . elgg_echo('googleapps:label:owners') . ":</strong> $owners_string
+				 	$connected_text
+				 </p>";
 	
 	// brief view
 	$params = array(

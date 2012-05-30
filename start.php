@@ -8,12 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-/******************************* @TODO *********************************
- *
- * - Check out the login/connection process
- * 
- ***********************************************************************/
-
 elgg_register_event_handler('init','system','googleapps_init');
 
 /**
@@ -36,6 +30,7 @@ function googleapps_init() {
 
 	// Constants
 	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
+	define('GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP', 'wiki_connected_to_group');
 
 	// Register JS
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
@@ -109,6 +104,9 @@ function googleapps_init() {
 
 	// register CRON hook to poll for Google Sites
 	elgg_register_plugin_hook_handler('cron', 'halfhour', 'googleapps_sites_cron_handler');
+
+	// register CRON hook to poll for Google Sites activity
+	elgg_register_plugin_hook_handler('cron', 'halfhour', 'googleapps_sites_activity_cron_handler');
 	
 	// Interrupt output/access view
 	elgg_register_plugin_hook_handler('view', 'output/access', 'googleapps_shared_doc_output_access_handler');
@@ -148,6 +146,12 @@ function googleapps_init() {
 
 	// Register widgets
 	elgg_register_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
+	
+	// Extend group options
+	elgg_extend_view('groups/edit', 'forms/google/wikis/group_connect', 900);
+	
+	// Extend group profile fields
+	elgg_extend_view('groups/profile/fields', 'googleapps/wiki_group_profile');
 
 	// Register actions
 
@@ -164,8 +168,9 @@ function googleapps_init() {
 	// Wiki related (wiki)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/wikis";
 	elgg_register_action('google/wikis/settings', "$action_base/settings.php", 'admin');
-	//elgg_register_action('google/wikis/reset', "$action_base/reset.php", 'admin');
 	elgg_register_action('google/wikis/featured', "$action_base/featured.php", 'admin');
+	elgg_register_action('google/wikis/group_connect', "$action_base/group_connect.php");
+	elgg_register_action('google/wikis/group_disconnect', "$action_base/group_disconnect.php");
 
 	// Shared Doc related (docs)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/docs";
@@ -332,8 +337,14 @@ function googleapps_page_handler($page) {
 						googleapps_process_sites();
 						return TRUE;
 						break;
-					case 'wiki_reset': // @TODO
-						echo "Wiki Reset";
+					case 'wiki_group_cron':
+						elgg_set_context('googleapps_sites_log');
+						googleapps_process_sites_activity();
+						return TRUE;
+						break;
+					case 'wiki_reset_activity':
+						elgg_set_context('googleapps_sites_log');
+						googleapps_reset_sites_activity();
 						return TRUE;
 						break;
 					default: 
@@ -416,6 +427,25 @@ function googleapps_sites_cron_handler($hook, $type, $value, $params) {
 	elgg_set_ignore_access(TRUE);
 	// Process sites
 	googleapps_process_sites();
+	elgg_set_ignore_access($ia);
+	return $value;
+}
+
+/**
+ * Cron handler to kick off google sites activity polling
+ * 
+ * @param string $hook   Name of hook
+ * @param string $type   Entity type
+ * @param mixed  $value  Return value
+ * @param array  $params Parameters
+ * @return mixed
+ */
+function googleapps_sites_activity_cron_handler($hook, $type, $value, $params) {
+	// Ignore access
+	$ia = elgg_get_ignore_access();
+	elgg_set_ignore_access(TRUE);
+	// Process sites
+	googleapps_process_sites_activity();
 	elgg_set_ignore_access($ia);
 	return $value;
 }
@@ -652,10 +682,26 @@ function googleapps_wiki_entity_menu_setup($hook, $type, $value, $params) {
 			'section' => 'info'
 		);
 		$value[] = ElggMenuItem::factory($options);
-		
-		
-	}
 
+		// Add a 'disconnect' menu item if viewing a list of group connected wiki's
+		if (elgg_in_context('group_connected_wikis')) {
+			$group = elgg_get_page_owner_entity();
+			// Check for group and permissions
+			if (elgg_instanceof($group, 'group') && $group->canEdit()) {
+				$url = "action/google/wikis/group_disconnect?group_guid={$group->guid}&wiki_guid={$entity->guid}";
+				$options = array(
+					'name' => 'wiki_group_disconnect',
+					'text' => elgg_echo('googleapps:label:disconnectwiki'),
+					'href' => $url,
+					'class' => 'elgg-button elgg-button-action',
+					'priority' => 400,
+					'section' => 'info',
+					'is_action' => true
+				);
+				$value[] = ElggMenuItem::factory($options);
+			}
+		}
+	}
 	return $value;
 }
 

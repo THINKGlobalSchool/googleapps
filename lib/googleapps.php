@@ -1075,6 +1075,296 @@ function googleapps_process_sites() {
 }
 
 /**
+ * Process Google Sites Activity
+ * - Creates new activity items for sites (group connected)
+ * 
+ * @return array|false
+ */
+function googleapps_process_sites_activity() {
+	// Don't do anything if sites are disabled
+	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
+		return FALSE;
+	}
+	
+	set_time_limit(0); // Long timeout, just in case
+
+	$log .= "Processing Google Sites Activity\n";
+	$log .= "--------------------------------\n";
+	
+	/** GET LOCAL WIKIS THAT ARE CONNECTED TO A GROUP **/
+	$options = array(
+		'type' => 'object', 
+		'subtype' => 'site',
+		'limit' => 0,
+	);
+
+	$relationship = GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP;
+	$dbprefix = elgg_get_config('dbprefix');
+	$group = elgg_extract('entity', $vars);
+
+	// Where clause to ignore wikis that already have a relationship with another group
+	$options['wheres'] = "EXISTS (
+			SELECT 1 FROM {$dbprefix}entity_relationships r2 
+			WHERE r2.guid_one = e.guid
+			AND r2.relationship = '{$relationship}')";
+			
+	// Get a count 
+	$options['count'] = TRUE;
+	$count = elgg_get_entities($options);
+	
+	if ($count >= 1) {
+		$log .= "Found {$count} connected site(s).\n";
+		
+		// Grab sites as a batch
+		unset($options['count']);
+		$sites = new ElggBatch('elgg_get_entities', $options);
+		
+		// Array to contain site->group relationship
+		$sites_groups = array();
+		
+		foreach ($sites as $site) {
+			$log .= "\n[{$site->title}]\n";
+			$log .= "ID: {$site->site_id}\n";
+			$log .= "URL: {$site->url}\n";
+			
+			// Get the connected group
+			$options = array(
+				'type' => 'group',
+				'limit' => 1, // Should only be connected to one group
+				'full_view' => FALSE,
+				'relationship' => GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP, 
+				'relationship_guid' => $site->guid, 
+				'inverse_relationship' => FALSE,
+			);
+
+			$connected_groups = elgg_get_entities_from_relationship($options);
+			
+			$log .= "GROUP: ";
+			
+			if (count($connected_groups)) {
+				// Store site/group
+				$sites_groups[] = array('site' => $site, 'group' => $connected_groups[0]);
+
+				$log .= $connected_groups[0]->name . " (" . $connected_groups[0]->guid . ")\n";
+				$log .= "Last Activity: {$site->last_activity_time}\n";
+			} else {
+				$log .= "Couldn't find group! Not processing!\n";
+			}
+		}
+
+		/* Build a 2-legged OAuth Client */
+		$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+		$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
+		$ADMIN_ACCOUNT = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
+
+		$params = array('max-results' => 500); 
+
+		$client = OAuthClient::create_2_legged_client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC, null, $ADMIN_ACCOUNT, $params);
+		
+		if ($client) {
+			$log .= "\nCreating 2-legged client for: {$ADMIN_ACCOUNT}\n";
+			
+			// Elgg site guid, for owner/container guid's
+			$site_guid = elgg_get_site_entity()->guid;
+			
+			// Loop over our connected sites
+			foreach ($sites_groups as $site_group) {
+				$site = $site_group['site'];   // Site entity
+	
+				$group = $site_group['group']; // Group entity
+
+				// Create feed url
+				$activity_feed = preg_replace('!(.*)feeds/site/(.*)!', '$1feeds/activity/$2', $site->site_id);
+
+				// Add params
+				$url = $activity_feed . '?' . implode_assoc('=', '&', $client->params);
+
+				$log .= "\nProcessing [{$site->title}]...\n\n	Request: {$url}\n\n";
+				
+				// Skip sites that have been set back to private
+				if ($site->access_id == ACCESS_PRIVATE) {
+					$log .= "	Site's access is PRIVATE, skipping.\n";
+					continue;
+				}
+
+				// Execute request
+				$result = $client->execute_without_token($url, '1.4', $client->params);
+
+				// Objectify that feed
+				$activity_xml = simplexml_load_string($result);
+
+				$last_activity_time = $site->last_activity_time;
+
+				$site_new_activity_count = 0;
+				
+				// Hold each activity items updated timestamp (to store later)
+				$activity_times = array();
+				
+				// Title for activity
+				$title = "Changes on {$site->title} site";
+
+				// Loop over each activity entry
+				foreach ($activity_xml->entry as $item) {
+					$activity_time = strtotime($item->updated);
+					
+					// If the sites activity time is less than the activity entry
+					// we need to post a new object
+					if ($last_activity_time < $activity_time) {
+						// Get activity info
+						$summary = $item->summary->div->asXML();
+						$summary_link = $item->summary->div->a->asXML();
+						$author_email = @$item->author->email[0];
+						$author_name = @$item->author->name[0];
+						
+						// Store activity timestamps
+						$activity_times[] = $activity_time;
+
+						if (empty($author_email)) {
+							$author_email = NULL;
+							$author_output = "(unknown)";
+						} else {
+							// Try to find elgg user
+							$users = get_user_by_email($author_email);
+							if (count($users) >= 1 && elgg_instanceof($users[0], 'user')) {
+								$local_user = $users[0];
+								$author_output = $local_user->username;
+							} else {
+								$author_output = $author_email;
+							}
+						}
+
+						// Use the api provided category terms to identify action type
+						$category_term = $item->category->attributes()->term;
+						$category_label = $item->category->attributes()->label;
+
+						$log .= "	Found new activity! $author_output $category_label @ $activity_time\n";
+						
+						// Create new site
+						$site_activity = new ElggObject();
+						$site_activity->subtype = 'site_activity';
+						
+						// If we have a local user for this entry, make them owner
+						if ($local_user) {
+							$site_activity->owner_guid = $local_user->guid;
+						} else { // Site otherwise
+							$site_activity->owner_guid = $group->guid;
+						}
+						
+						// Set container guid & access to that of the group
+						$site_activity->container_guid = $group->guid;
+						$site_activity->access_id = $group->group_acl;
+						
+						// Set other data/metadata
+						$site_activity->title = $title;
+						$site_activity->site_name = $site->title;
+						$site_activity->site_url = $site->url;
+						$site_activity->author_name = $author_name;
+						$site_activity->summary = $summary;           // Full 'summary' element
+						$site_activity->summary_link = $summary_link; // Just the targeted page that was edited
+						
+						// Category term/label
+						$site_activity->category_term = $category_term;
+						$site_activity->category_label = $category_label;
+						
+						$site_activity->updated = $activity_time;
+						
+						// Save the site activity item
+						if ($site_activity->save()) {
+							$log .= "	Created new activity entity: {$site_activity->guid}\n\n";
+							$site_new_activity_count++;
+							
+							if (add_to_river('river/object/site_activity/create', 'create', $site_activity->owner_guid, $site_activity->guid, "", $activity_time)) {
+								$log .= "	River entry created!\n\n";
+							} else {
+								$log .= "	River activity creation failed!!\n\n";
+							}
+						} else {
+							$log .= "	Site activity creation failed!!\n\n";
+						}
+					}				
+				}
+				
+				if ($site_new_activity_count) {
+					$log .= "	Created $site_new_activity_count new site_activity object(s)\n";
+					
+					// Update the site's last activity time
+					$site->last_activity_time = max($activity_times);
+				} else {
+					$log .= "	No new activity.\n";
+				}
+			}		
+		} else {
+			$log .= "Error creating client!\n";
+		}
+	} else {
+		$log .= "No connected sites found. Aborting.\n";
+	}
+	
+	
+	if (elgg_in_context('googleapps_sites_log')) {
+		echo "<pre>";
+		echo $log;
+		echo "</pre>";
+	}
+	
+	return TRUE;
+}
+
+/**
+ * Reset (delete) all site activity and revert site last updated times 
+ * back to connection time
+ */
+function googleapps_reset_sites_activity() {
+	$log = "Reset Site Activity\n------------------\n";
+
+	$sites_options = array(
+		'type' => 'object',
+		'subtype' => 'site',
+		'limit' => 0,
+	);
+
+	$sites = elgg_get_entities($sites_options);
+	
+	$sites_count = count($sites);
+
+	foreach ($sites as $site) {
+		$site->last_activity_time = $site->connected_time;
+		$site->save();
+	}
+
+	$log .= "\nReset update time for {$sites_count} site(s)\n";
+
+	$activity_options = array(
+		'type' => 'object',
+		'subtype' => 'site_activity',
+		'limit' => 0,
+		'count' => TRUE,
+	);
+
+	$activity_count = elgg_get_entities($activity_options);
+
+	unset($activity_options['count']);
+	
+	$activity_items = elgg_get_entities($activity_options);
+	
+	foreach ($activity_items as $activity) {
+		elgg_delete_river(array(
+			'object_guid' => $activity->guid,
+		));
+
+		$activity->delete();
+	}
+
+	$log .= "\nDeleted {$activity_count} site_activity items(s)\n";
+
+	if (elgg_in_context('googleapps_sites_log')) {
+		echo "<pre>";
+		echo $log;
+		echo "</pre>";
+	}
+}
+
+/**
  * Helper function to update a local site entities information
  * 
  * @param array $remote_site site info
@@ -1101,6 +1391,25 @@ function googleapps_update_local_site_info($remote_site) {
 	}
 
 	return FALSE;
+}
+
+/**
+ * Helper function to map a google site activity 'label' to a 
+ * friendly river verb
+ * 
+ * @param $label Human readable label from sites api, ie: deletion, move, etc
+ * @return string 
+ */
+function googleapps_get_river_verb_from_category_label($label) {
+	$api_labels = array(
+		'creation' => 'created',
+		'deletion' => 'deleted',
+		'edit' => 'edited',
+		'move' => 'moved',
+		'recovery' => 'recovered',
+	);
+
+	return $api_labels[$label] ? $api_labels[$label] : 'updated';
 }
   
 /** 
