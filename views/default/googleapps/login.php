@@ -12,9 +12,12 @@ global $CONFIG;
 
 $googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
 
+$login_label = elgg_echo('googleapps:label:googlelogin');
+
 ?>
-<div id="googleapps-icon">
-	<a href="<?php echo $googleapps_url;?>"> <img
-		src="<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/login_with_google_apps.gif"
-		alt="googleapps" /> </a>
-</div>
+<hr class='google-hr' />
+<center>
+	<div class='google-login-or'><?php echo $login_label; ?></div>
+	<a class='btn-auth btn-google' href="<?php echo $googleapps_url;?>">Google Apps</a>
+</center>
+

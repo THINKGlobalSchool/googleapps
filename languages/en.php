@@ -136,6 +136,7 @@ $english = array(
 	'googleapps:label:wikiconnectedto' => 'Connected to',
 	'googleapps:label:groupwikis' => 'Group Wikis',
 	'googleapps:label:resetsiteactivity' => 'Reset Site Activity',
+	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

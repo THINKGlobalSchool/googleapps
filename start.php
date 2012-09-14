@@ -51,7 +51,7 @@ function googleapps_init() {
 	elgg_extend_view('js/admin', 'js/googleapps/admin');
 
 	// Extend login view google login button
-	elgg_extend_view('login/extend', 'googleapps/login');
+	elgg_extend_view('forms/login', 'googleapps/login');
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css/elgg','css/googleapps/css');
