@@ -1100,7 +1100,6 @@ function googleapps_process_sites_activity() {
 
 	$relationship = GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP;
 	$dbprefix = elgg_get_config('dbprefix');
-	$group = elgg_extract('entity', $vars);
 
 	// Where clause to ignore wikis that already have a relationship with another group
 	$options['wheres'] = "EXISTS (
