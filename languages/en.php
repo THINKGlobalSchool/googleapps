@@ -154,7 +154,7 @@ $english = array(
 	'river:create:object:shared_doc' => '%s shared a Google Document titled %s',
 	'river:comment:object:shared_doc' => '%s commented on the Google Document %s',
 	'river:friend:user:googleapps' => "%s is now a friend with %s",
-	'river:create:object:site_activity' => "%s %s %s on the %s wiki",
+	'river:create:object:site_activity_custom' => "%s %s %s on the %s wiki",
 	
 	// Emails
 	'googleapps:email:created:subject' => 'Google Connected Spot Account Created',

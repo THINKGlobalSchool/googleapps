@@ -26,7 +26,7 @@ if ($object->category_term) {
 	
 	$site_text = "<a target='_blank' href='" . $object->site_url . "'>" . $object->site_name . "</a>";
 
-	$string = elgg_echo('river:create:object:site_activity', array(
+	$string = elgg_echo('river:create:object:site_activity_custom', array(
 		$owner_text, $action, $summary_link, $site_text
 	));
 	
