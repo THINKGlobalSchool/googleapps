@@ -7,7 +7,7 @@
  * @copyright FlatSourcing 2010
  * @link http://www.thinkglobalschool.org
  */
-
+elgg_load_css('elgg.social_login');
 global $CONFIG;
 
 $googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);

@@ -41,6 +41,11 @@ function googleapps_init() {
 	$gd_js = elgg_get_simplecache_url('js', 'googleapps/docbrowser');
 	elgg_register_simplecache_view('js/googleapps/docbrowser');
 	elgg_register_js('elgg.googledocbrowser', $gd_js);
+	
+	// Register CSS for social login
+	$s_css = elgg_get_simplecache_url('css', 'social_login');
+	elgg_register_simplecache_view('css/social_login');
+	elgg_register_css('elgg.social_login', $s_css);
 
 	// Load JS lib, only if logged in and not in admin context
 	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
