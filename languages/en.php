@@ -18,9 +18,8 @@ $english = array(
 	'shared_doc' => 'Google Docs',
 	'googleapps:googleshareddoc' => 'Google Shared Docs',
 	'googleapps/docs:add' => 'Share New Google Doc',
+	'googleapps:docs:edit' => 'Edit',
 	'googleapps:docs:none' => 'No Shared Documents',
-	//'admin:administer_utilities' => 'Utilities',
-	//'admin:administer_utilities:debug_sites' => 'Google Sites Debug',
 	'admin:google_apps:sites_settings' => 'Sites Settings',
 	'admin:google_apps:sites_debug' => 'Sites Debug',
 	'admin:google_apps' => 'Google Apps',
@@ -63,13 +62,16 @@ $english = array(
 	'googleapps:error:noemail' => 'No email', 
 	'googleapps:error:emailexists' => 'Email address: %s is already in use by another user.',
 	'googleapps:error:share_doc' => 'There was an error sharing the document.',
+	'googleapps:error:share_doc_save' => 'There was an error editing the document.',
 	'googleapps:error:document_id_required' => 'You need to select a document first',
    	'googleapps:error:document_permissions_update' => 'Document permissions need to be updated',
 	'googleapps:error:invalid_url' => 'Invalid Google Document URL',
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 	'googleapps:error:notfound' => 'Document not found',
+	'googleapps:error:requiredfields' => 'One or more required fields are missing',
 	'googleapps:error:nopermission' => 'You do not have permission to share this document to the group',
 	'googleapps:error:invalidwiki' => 'Invalid wiki',
+	'googleapps:error:invaliddoc' => 'Invalid Google Doc',
 	'googleapps:error:wikiconnectionfailed' => 'Could not connect wiki to group',
 	'googleapps:error:wikidisconnectionfailed' => 'Could not disconnect wiki from group',
 
@@ -82,6 +84,7 @@ $english = array(
 	'googleapps:success:unfeature' => 'Wiki Successfully Unfeatured',
 	'googleapps:success:groupwikiconnected' => 'Successfully connected wiki to group',
 	'googleapps:success:groupwikidisconnected' => 'Successfully disconnected wiki from group',
+	'googleapps:success:share_doc_save' => 'Successfully edited Google Doc',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
@@ -137,6 +140,7 @@ $english = array(
 	'googleapps:label:groupwikis' => 'Group Wikis',
 	'googleapps:label:resetsiteactivity' => 'Reset Site Activity',
 	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
+	'googleapps:label:editdoc' => 'Edit Google Doc: %s',
 
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',

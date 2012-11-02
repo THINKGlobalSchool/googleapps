@@ -182,6 +182,7 @@ function googleapps_init() {
 	elgg_register_action('google/docs/share', "$action_base/share.php");
 	elgg_register_action('google/docs/permissions', "$action_base/permissions.php");
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
+	elgg_register_action('google/docs/edit', "$action_base/edit.php");
 }
 
 /**	
@@ -303,6 +304,9 @@ function googleapps_page_handler($page) {
 						elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
 					}
 					$params = googleapps_get_page_content_docs_share();
+					break;
+				case 'edit':
+					$params = googleapps_get_page_content_docs_edit($page[2]);
 					break;
 				case 'owner':
 					$user = get_user_by_username($page[2]);
@@ -627,9 +631,9 @@ function googleapps_shared_doc_entity_menu_setup($hook, $type, $value, $params) 
 	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
 		foreach ($value as $idx => $menu) {
 			if ($menu->getName() == 'edit') {
-				unset ($value[$idx]);
+				$menu->setHref(elgg_get_site_url() . "googleapps/docs/edit/" . $entity->guid);
 			}
-			
+
 			if ($menu->getName() == 'access') {
 				$text = $menu->getText();
 				$menu->setText(elgg_get_excerpt($text, 45));

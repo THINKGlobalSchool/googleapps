@@ -10,7 +10,7 @@
 
 $document_id = get_input('document_id', null);
 $document_description = get_input('description', '');
-$document_tags = string_to_tag_array(get_input('tags', ''));
+$document_tags = get_input('tags', '');
 $access_level = get_input('access_id', null);
 $document_url = get_input('document_url', null);
 $document_match = get_input('match_permissions', null);

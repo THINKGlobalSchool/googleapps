@@ -17,6 +17,7 @@ $google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/google
 
 $googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
+
 if ($googleapps_domain) {
 	$google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
 } else {

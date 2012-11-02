@@ -28,9 +28,7 @@ if (!$client->authorized() && !empty($user) && ($oauth_sync_email != 'no' || $oa
 		header('Location: ' . $result);
 		exit;
 	} else {
-
 		$token = $client->oauth_fetch_access_token($oauth_verifier, $_SESSION['request_key'], $_SESSION['request_secret']);
-
 
 		$_SESSION['access_token'] = $token->key;
 		$_SESSION['access_secret'] = $token->secret;
@@ -49,7 +47,6 @@ if (!empty($_SESSION['oauth_connect'])) {
 	unset($_SESSION['oauth_connect']);
 	forward('googleapps/settings/account');
 }
-
 
 $googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
@@ -183,7 +180,7 @@ if (!$google->is_authorized()) {
 			$user->name = (!empty($firstname) || !empty($lastname)) ? ($firstname . ' ' . $lastname) : $email;
 			$user->save();
 		}
-
+		error_log($user->access_token);
 		login($user, $rememberme);
 		if (isset($_SESSION['last_forward_from']) && $_SESSION['last_forward_from']) {
 			$forward_url = $_SESSION['last_forward_from'];

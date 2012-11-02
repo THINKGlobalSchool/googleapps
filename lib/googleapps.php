@@ -160,6 +160,40 @@ function googleapps_get_page_content_docs_share() {
 }
 
 /**
+ * Get google docs share content
+ */
+function googleapps_get_page_content_docs_edit($guid) {
+	$google_doc = get_entity($guid);
+	
+	if (elgg_instanceof($google_doc, 'object', 'shared_doc') && $google_doc->canEdit()) {
+		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
+		elgg_push_breadcrumb($google_doc->title, $google_doc->getURL());
+		elgg_push_breadcrumb(elgg_echo('googleapps:docs:edit'));
+	} else {
+		register_error(elgg_echo('googleapps:error:invaliddoc'));
+		forward(REFERER);
+	}
+
+	$params = array(
+		'filter' => '',
+	);
+	$params['title'] = elgg_echo('googleapps:label:editdoc', array($google_doc->title));
+		
+	// Form vars
+	$vars = array();
+	$vars['id'] = 'google-docs-edit-form';
+	$vars['name'] = 'google-docs-edit-form';
+	
+	// Form body vars
+	$body_vars = google_doc_prepare_form_vars($google_doc);
+	
+	// View share form
+	$params['content'] = elgg_view_form('google/docs/edit', $vars, $body_vars);
+	
+	return $params;
+}
+
+/**
  * Get google sites/wiki content
  */
 function googleapps_get_page_content_wikis_list($container_guid = NULL) {
@@ -217,6 +251,42 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 	
 	$params['filter'] = ' ';
 	return $params;
+}
+
+/**
+ * Pull together google doc variables for the edit form
+ *
+ * @param ElggObject       $google_doc
+ * @return array
+ */
+function google_doc_prepare_form_vars($google_doc = NULL) {
+	// input names => defaults
+	$values = array(
+		'title' => NULL,
+		'description' => NULL,
+		'tags' => NULL,
+		'container_guid' => NULL,
+		'guid' => NULL,
+	);
+
+	if ($google_doc) {
+		foreach (array_keys($values) as $field) {
+			if (isset($google_doc->$field)) {
+				$values[$field] = $google_doc->$field;
+			}
+		}
+	}
+
+	if (elgg_is_sticky_form('google-docs-edit-form')) {
+		$sticky_values = elgg_get_sticky_values('google-docs-edit-form');
+		foreach ($sticky_values as $key => $value) {
+			$values[$key] = $value;
+		}
+	}
+	
+	elgg_clear_sticky_form('google-docs-edit-form');
+
+	return $values;
 }
 
 /**
@@ -833,7 +903,7 @@ function share_document($document, $description, $tags, $access_id, $container_g
 	$shared_doc->trunc_title 	= $document['trunc_title'];
 	$shared_doc->description 	= $description;
 	$shared_doc->res_id			= $document['id'];
-	$shared_doc->tags			= $tags;
+	$shared_doc->tags			= string_to_tag_array($tags);
 	$shared_doc->updated		= $document['updated'];
 	$shared_doc->access_id 		= $access_id;
 	$shared_doc->collaborators	= $document['collaborators'];
