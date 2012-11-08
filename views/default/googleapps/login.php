@@ -12,7 +12,11 @@ global $CONFIG;
 
 $googleapps_url = elgg_add_action_tokens_to_url($CONFIG->sslroot . 'action/google/auth/login', FALSE);
 
-$login_label = elgg_echo('googleapps:label:googlelogin');
+$login_label = elgg_get_plugin_setting('google_login_label', 'googleapps');
+
+if (!$login_label) {
+	$login_label = elgg_echo('googleapps:label:googlelogin');
+}
 
 ?>
 <hr class='google-hr' />

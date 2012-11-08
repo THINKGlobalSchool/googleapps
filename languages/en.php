@@ -37,12 +37,12 @@ $english = array(
 	'googleapps:admin:secret' => 'Secret Key (to use with OAuth)',
 	'googleapps:admin:yes' => 'Yes',
 	'googleapps:admin:no' => 'No',
-	'googleapps:admin:details' => 'To use Sign in with Google Apps, you have to enter your Google Apps (hosted) domain in the field below. Also you can leave it blank to use with username@gmail.com accounts.<br />If you want to provide futher integration with Google you need to register your site with Google Apps and obtain consumer key and secret. Your site should be registered with a high level of security (with a X.509 certificate). You also should enter your Secret in the text field below.',
 	'googleapps:admin:sync_email' => 'Enable Google Mail',
 	'googleapps:admin:sync_sites' => 'Enable Google Sites ',
    	'googleapps:admin:sync_docs' => 'Enable Google Docs',
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
+	'googleapps:admin:loginlabel' => 'Log in with Google Text',
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
