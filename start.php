@@ -153,11 +153,14 @@ function googleapps_init() {
 	// Register widgets
 	elgg_register_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 	
-	// Extend group options
-	elgg_extend_view('groups/edit', 'forms/google/wikis/group_connect', 900);
-	
-	// Extend group profile fields
-	elgg_extend_view('groups/profile/fields', 'googleapps/wiki_group_profile');
+	// Add wikis edit options, and group wiki view if enabled
+	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
+		// Extend group options
+		elgg_extend_view('groups/edit', 'forms/google/wikis/group_connect', 900);
+
+		// Extend group profile fields
+		elgg_extend_view('groups/profile/fields', 'googleapps/wiki_group_profile');
+	}
 
 	// Register actions
 
@@ -755,7 +758,7 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
 		$item = new ElggMenuItem('googledocs', elgg_echo('shared_doc'), $url);
 		$value[] = $item;
 	} else {
-		if ($params['entity']->shared_doc_enable != "no") {
+		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes' && $params['entity']->shared_doc_enable != "no") {
 			$url = "googleapps/docs/group/{$params['entity']->guid}/owner";
 			$item = new ElggMenuItem('googledocs', elgg_echo('googleapps:label:groupdocs'), $url);
 			$value[] = $item;
