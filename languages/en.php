@@ -142,6 +142,11 @@ $english = array(
 	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
 	'googleapps:label:editdoc' => 'Edit Google Doc: %s',
 
+	// Notifications
+	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
+	'googleapps:shared_doc:body' => "%s shared a google doc titled: %s\n\n%s\n\nTo view the document click here:\n%s
+",
+
 	// Tooltips
 	'googleapps:tooltip:match' => 'When selecting \'Match Permissions\', only those Spot users who have already been given access to the document via Google Docs will be able to see it.',
 

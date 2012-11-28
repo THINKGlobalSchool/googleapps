@@ -162,6 +162,10 @@ function googleapps_init() {
 		elgg_extend_view('groups/profile/fields', 'googleapps/wiki_group_profile');
 	}
 
+	// Notifications
+	register_notification_object('object', 'shared_doc', elgg_echo('googleapps:shared_doc:subject'));
+	elgg_register_plugin_hook_handler('notify:entity:message', 'object', 'googleapps_shared_doc_notify_message');
+
 	// Register actions
 
 	// Login Related (auth)
@@ -830,6 +834,34 @@ function googleapps_public_pages_handler($hook, $type, $value, $params) {
 	$value[] = 'action/google/auth/return_with_connect';
 
 	return $value;
+}
+
+
+/**
+ * Set the notification message for google shared docs
+ * 
+ * @param string $hook    Hook name
+ * @param string $type    Hook type
+ * @param string $message The current message body
+ * @param array  $params  Parameters about the blog posted
+ * @return string
+ */
+function googleapps_shared_doc_notify_message($hook, $type, $message, $params) {
+	$entity = $params['entity'];
+	$to_entity = $params['to_entity'];
+	$method = $params['method'];
+	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
+		$descr = $entity->description;
+		$title = $entity->title;
+		$owner = $entity->getOwnerEntity();
+		return elgg_echo('googleapps:shared_doc:body', array(
+			$owner->name,
+			$title,
+			$descr,
+			$entity->getURL()
+		));
+	}
+	return null;
 }
 
 /**
