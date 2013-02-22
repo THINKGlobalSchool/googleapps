@@ -148,6 +148,9 @@ if (!$google->is_authorized()) {
 				// for newly created users in Elgg 1.5
 				$subtype = 'googleapps';
 				$user->google = 1;
+
+				// Turn on email notifications by default
+				set_user_notification_setting($user->getGUID(), 'email', true);
 			} else {
 				register_error(elgg_echo("googleapps:error:account_create"));
 			}

@@ -107,6 +107,10 @@ elgg.google.loadDocumentChooser = function(id) {
 		success: function(html) {
 			$('#' + id).html(html);
 		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			console.log(xrh.status);
+			console.log(thrownError);
+		}
 	});
 }
 
