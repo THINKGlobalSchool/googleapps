@@ -70,7 +70,6 @@ if (!$google->is_authorized()) {
 	$firstname = $google->get_firstname();
 	$lastname = $google->get_lastname();
 	$_SESSION['logged_with_openid'] = 1;
-	//echo "user is authorized\n<br>";
 
 	$do_login = false;
 	$duplicate_account = false;
@@ -87,19 +86,16 @@ if (!$google->is_authorized()) {
 		$username = $email;
 		$username = preg_replace("/\@[a-zA-Z\.0-9\-]+$/", "", $username);
 
-		/* 
-			Don't know why the heck this is here, if there is an existing username
-			we don't want to create a new one!
-
-		if (get_user_by_username($username)) {
-			$username = preg_replace("/\@([a-zA-Z\.0-9\-]+)/", ".$1", $email);
-		}
-		*/
+		// Check username against hidden user entities
+		$access = access_get_show_hidden_status();
+		access_show_hidden_entities(TRUE);
 
 		if (get_user_by_username($username)) {
 			$duplicate_account = true;
 			register_error(sprintf(elgg_echo("googleapps:error:account_duplicate"), $username));
 		}
+
+		access_show_hidden_entities(FALSE);
 
 		if (!$duplicate_account) {
 			$firstname = $google->get_firstname();
