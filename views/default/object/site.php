@@ -144,9 +144,10 @@ HTML;
 		'entity' => $site,
 		'metadata' => $metadata,
 		'subtitle' => $subtitle,
-		'tags' => 'false',
+		'tags' => false,
 	);
 	$list_body = elgg_view('object/elements/summary', $params);
+
 
 	echo elgg_view_image_block($site_icon, $list_body);
 }
