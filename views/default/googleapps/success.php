@@ -16,10 +16,7 @@ if (elgg_instanceof($owner, 'group')) {
 	$forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
 }
 
-$header = elgg_echo('googleapps:success');
-
 echo <<<HTML
-	<h2>$header</h3>
 	<p><label>Document shared</label></p>
 	<a href='$forward_url'><span class='elgg-button elgg-button-action'>Ok</span></a>
 	<style>

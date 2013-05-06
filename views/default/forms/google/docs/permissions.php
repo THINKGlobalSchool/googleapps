@@ -9,7 +9,6 @@
  * @link http://www.thinkglobalschool.com/
  */
 
-$heading = elgg_echo('googleapps:label:action_required');
 $message = elgg_echo('googleapps:error:document_permissions_update');
 
 // Get local document info
@@ -25,14 +24,14 @@ $grant_input = elgg_view('input/submit', array(
 	'id' => 'googleapps-docs-permissions-update-grant',
 	'name' => 'googleapps_docs_permissions_update_grant',
 	'value' => elgg_echo('googleapps:submit:grant'),
-	'class' => 'permissions-update-input elgg-button-action',
+	'class' => 'permissions-update-input elgg-button-submit',
 ));
 
 $ignore_input = elgg_view('input/submit', array(
 	'id' => 'googleapps-docs-permissions-update-ignore',
 	'name' => 'googleapps_docs_permissions_update_ignore',
 	'value' => elgg_echo('googleapps:submit:ignore'),
-	'class' => 'permissions-update-input elgg-button-action',
+	'class' => 'permissions-update-input elgg-button-delete',
 ));
 
 // Hidden/document info inputs
@@ -67,8 +66,8 @@ $tags_input = elgg_view('input/hidden', array(
 ));
 
 $form_body = <<<HTML
-	<h2>$heading</h2>
 	<p><label>$message</label></p>
+	<a href="" tabindex="1"></a>
 	$answer_input
 	$container_input
 	$grant_input $ignore_input
@@ -76,6 +75,7 @@ $form_body = <<<HTML
 	$description_input
 	$access_input
 	$tags_input
+
 HTML;
 
 echo $form_body;

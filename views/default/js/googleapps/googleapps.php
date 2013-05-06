@@ -129,6 +129,18 @@ elgg.google.docsSubmit = function(event) {
 		}
 	});
 
+
+	// Switch title based on action
+	if (this.action.lastIndexOf('share') != -1) {
+		var show_close = true;
+		var title = elgg.echo('googleapps:label:action_required');
+	}
+
+	if (this.action.lastIndexOf('permissions') != -1) {
+		var show_close = false;
+		var title = elgg.echo('googleapps:success');
+	}
+
 	
 	elgg.action(this.action, {
 		data: data,
@@ -137,20 +149,20 @@ elgg.google.docsSubmit = function(event) {
 			if (json.status == -1) {
 				return false;
 			}
-			
+
 			// Show dialog
-			var dlg = $("<div id='googleapps-dialog'></div>").html(json.output).dialog({
-				dialogClass: 'googleapps-dialog',
-				width: 450, 
+			var dlg = $("<div></div>").html(json.output).dialog({
+				width: 450,
+				height: 125,
 				modal: true,
-				closeOnEscape: false, 
-				open: function(event, ui) { 
-					$(".ui-dialog-titlebar-close").hide(); 	
-				},
-				buttons: {
-					"X": function() { 
-						$(this).dialog("close"); 
-					} 
+				title: title,
+				draggable: false,
+				resizable: false,
+				closeOnEscape: false,
+				open: function(event, ui) {
+					if (!show_close) {
+						$(".ui-dialog-titlebar-close").remove();
+					}
 				}
 			});
 			

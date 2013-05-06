@@ -116,54 +116,18 @@ a.googleapps-tooltip:hover span {
 	width: 200px;		
 }
 
-/** jQuery Custom Dialog **/
-.ui-widget-overlay
-{
-	position: fixed;
-	top: 0px;
-	left: 0px;
-    background-color: #000000 !important;
-    opacity: 0.5;
-	-moz-opacity: 0.5; 
+/* Fix stripe in overlay */
+.ui-widget-overlay { 
+	background: #000000 !important;
 }
 
-#googleapps-dialog  {
-	padding: 10px;
-	border: 8px solid #555555;
-	background: #ffffff;
-	-moz-border-radius:5px 5px 5px 5px;
-	-webkit-border-radius: 5px 5px 5px 5px;
-}
+/* Permissions Form */
+.elgg-form-google-docs-permissions {
 
-.googleapps-dialog.ui-dialog .ui-dialog-buttonpane {
-	position: absolute; 
-	right: .3em; 
-	top: 30px; 
-	width: 19px; 
-	margin: -10px 0 0 0; 
-	padding: 1px; height: 18px; 
-}
+} 
 
-.googleapps-dialog.ui-dialog .ui-dialog-buttonpane button { 
-	cursor: pointer; 
-	padding: .2em .6em .3em .6em; 
-	line-height: 1.4em; 
-	width:auto; 
-	overflow:visible; 
-}
+.elgg-form-google-docs-permissions .permissions-update-input {
 
-.googleapps-dialog.ui-dialog .ui-dialog-buttonpane button {
-	-moz-border-radius:4px 4px 4px 4px;
-	-webkit-border-radius: 5px 5px 5px 5px;
-	background:none repeat scroll 0 0 #000000;
-	border:1px solid #000000;
-	color:#FFFFFF;
-	cursor:pointer;
-	font:bold 12px/100% Arial,Helvetica,sans-serif;
-	height:25px;
-	float: right; margin: .5em .4em .5em 0; 
-	padding:2px 6px;
-	width:auto;
 }
 
 /** WIKI FILTER/SORT MENU **/

@@ -11,6 +11,7 @@
  */
 
 elgg_load_js('elgg.googledocbrowser');
+elgg_load_css('googleapps-jquery-ui');
 
 // Check if we've got an entity, if so, we're editing.
 if (isset($vars['entity'])) {
