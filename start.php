@@ -48,6 +48,11 @@ function googleapps_init() {
 	elgg_register_simplecache_view('css/social_login');
 	elgg_register_css('elgg.social_login', $s_css);
 
+	// Load social login css for non-logged in users
+	if (!elgg_is_logged_in()) {
+		elgg_load_css('elgg.social_login');
+	}
+
 	// Register jquery ui css
 	$css = elgg_get_simplecache_url('css', 'jquery.ui_1.8.16');
 	elgg_register_simplecache_view('css/jquery.ui_1.8.16');
