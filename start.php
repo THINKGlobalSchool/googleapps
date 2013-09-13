@@ -290,7 +290,8 @@ function googleapps_page_handler($page) {
 		// Settings subhandler
 		case 'settings':
 			gatekeeper();
-			elgg_set_context('settings');
+			elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
+			elgg_push_context('settings');
 			switch ($page_type) {
 				default:
 				case 'account':
