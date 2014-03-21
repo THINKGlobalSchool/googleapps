@@ -19,6 +19,8 @@ $oauth_sync_sites      = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps
 $oauth_sync_docs       = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 $oauth_admin_account   = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
 $login_label           = elgg_get_plugin_setting('google_login_label', 'googleapps');
+$drive_api_client_id   = elgg_get_plugin_setting('google_drive_api_client_id', 'googleapps');
+$drive_api_key         = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 
 // Set defaults for oauth sync options
 if (!$oauth_sync_email) {
@@ -61,6 +63,18 @@ $admin_account_input = elgg_view('input/text', array(
 	'value' => $oauth_admin_account
 ));
 
+$drive_client_label = elgg_echo('googleapps:admin:drive_client');
+$drive_client_input = elgg_view('input/text', array(
+	'name' => 'params[google_drive_api_client_id]',
+	'value' => $drive_api_client_id
+));
+
+$drive_key_label = elgg_echo('googleapps:admin:drive_key');
+$drive_key_input = elgg_view('input/text', array(
+	'name' => 'params[google_drive_api_key]',
+	'value' => $drive_api_key
+));
+
 // Reusable yes/no options
 $yes_no = array(
 	elgg_echo('googleapps:admin:yes') => 'yes',
@@ -94,39 +108,62 @@ $login_text_input = elgg_view('input/text', array(
 	'value' => $login_label
 ));
 
-$content = <<<HTML
+// Authentication/Authorization Module
+$auth_title = elgg_echo('googleapps:admin:authentication');
+
+$auth_body = <<<HTML
 	<div>
 		<label>$google_domain_label</label><br />
 		$google_domain_input
-	</div>
+	</div><br />
 	<div>
 		<label>$oauth_secret_label</label><br />
 		$oauth_secret_input
-	</div>
+	</div><br />
 	<div>
 		<label>$oauth_update_label</label><br />
 		$oauth_update_input
-	</div>
+	</div><br />
 	<div>
 		<label>$admin_account_label</label><br />
 		$admin_account_input
-	</div>
+	</div><br />
+	<div>
+		<label>$drive_client_label</label><br />
+		$drive_client_input
+	</div><br />
+	<div>
+		<label>$drive_key_label</label><br />
+		$drive_key_input
+	</div><br />
+HTML;
+
+$auth_module = elgg_view_module('inline', $auth_title, $auth_body);
+
+echo $auth_module;
+
+// General module
+$general_title = elgg_echo('googleapps:admin:pluginsettings');
+
+$general_body = <<<HTML
 	<div>
 		<label>$sync_email_label</label><br />
 		$sync_email_input
-	</div>
+	</div><br />
 	<div>
 		<label>$sync_sites_label</label><br />
 		$sync_sites_input
-	</div>
+	</div><br />
 	<div>
 		<label>$sync_docs_label</label><br />
 		$sync_docs_input
-	</div>
+	</div><br />
 	<div>
 		<label>$login_text_label</label><br />
 		$login_text_input
-	</div>
+	</div><br />
 HTML;
 
-echo $content;
+$general_module = elgg_view_module('inline', $general_title, $general_body);
+
+echo $general_module;

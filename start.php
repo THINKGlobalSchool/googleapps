@@ -38,11 +38,21 @@ function googleapps_init() {
 	elgg_register_simplecache_view('js/googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
 	
+	// // Register doc chooser JS
+	// $gd_js = elgg_get_simplecache_url('js', 'googleapps/docbrowser');
+	// elgg_register_simplecache_view('js/googleapps/docbrowser');
+	// elgg_register_js('elgg.googledocbrowser', $gd_js);
+
 	// Register doc chooser JS
-	$gd_js = elgg_get_simplecache_url('js', 'googleapps/docbrowser');
-	elgg_register_simplecache_view('js/googleapps/docbrowser');
-	elgg_register_js('elgg.googledocbrowser', $gd_js);
-	
+	$fp_js = elgg_get_simplecache_url('js', 'googleapps/filepicker');
+	elgg_register_simplecache_view('js/googleapps/filepicker');
+	elgg_register_js('elgg.googlefilepicker', $fp_js);
+
+	// Register google apis for doc picker
+	$drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
+	elgg_register_js('google-js-api', "https://www.google.com/jsapi?key={$drive_api_key}");
+	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js");
+
 	// Register CSS for social login
 	$s_css = elgg_get_simplecache_url('css', 'social_login');
 	elgg_register_simplecache_view('css/social_login');

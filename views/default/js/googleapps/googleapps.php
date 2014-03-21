@@ -18,6 +18,10 @@ $oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 $interval = elgg_get_plugin_setting('oauth_update_interval', 'googleapps');
 $oauth_update_interval = $interval ? $interval : 3;
 
+// Doc picker
+$drive_api_client = elgg_get_plugin_setting('google_drive_api_client_id', 'googleapps');
+$drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
+
 ?>
 //<script>
 elgg.provide('elgg.google');
@@ -27,11 +31,26 @@ elgg.google.SYNC_EMAIL = "<?php echo $oauth_sync_email; ?>";
 elgg.google.SYNC_SITES = "<?php echo $oauth_sync_sites; ?>";
 elgg.google.SYNC_DOCS = "<?php echo $oauth_sync_docs; ?>";
 elgg.google.UPDATE_INTERVAL = "<?php echo $oauth_update_interval; ?>";
+elgg.google.DRIVE_API_CLIENT = "<?php echo $drive_api_client; ?>";
+elgg.google.DRIVE_API_KEY = "<?php echo $drive_api_key; ?>";
 
 // Ajax URL's
 elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
 elgg.google.init = function() {	
+
+	// Init doc pickers
+	$('#google-doc-picker').each(function() {
+		var picker = new FilePicker({
+				apiKey: elgg.google.DRIVE_API_KEY,
+				clientId: elgg.google.DRIVE_API_CLIENT,
+				buttonEl: this,
+				onSelect: function(file) {
+					console.log(file);
+				}
+		});	
+	});
+
 	// Register interval for future updates
 	//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
 	

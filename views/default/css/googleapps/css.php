@@ -241,4 +241,18 @@ div.google-login-or {
 
 /***** END LOGIN BUTTON *****/
 
+/*** GOOGLE DOCS PICKER **/
+#google-doc-picker {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.picker.modal-dialog-bg {
+	z-index: 9005; /* Override modal bg */
+}
+
+.picker.modal-dialog {
+	z-index: 9006 !important; /* Override modal dialog */
+}
+
 /*</style>*/

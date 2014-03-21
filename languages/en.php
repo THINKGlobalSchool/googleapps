@@ -43,6 +43,10 @@ $english = array(
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
 	'googleapps:admin:loginlabel' => 'Log in with Google Text',
+	'googleapps:admin:drive_client' => 'Google Drive Client ID',
+	'googleapps:admin:drive_key' => 'Google Drive API Key',
+	'googleapps:admin:authentication' => 'Authentication/Authorization Settings',
+	'googleapps:admin:pluginsettings' => 'General Plugin Settings',
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
@@ -141,6 +145,7 @@ $english = array(
 	'googleapps:label:resetsiteactivity' => 'Reset Site Activity',
 	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
 	'googleapps:label:editdoc' => 'Edit Google Doc: %s',
+	'googleapps:label:selectfile' => 'Select Google Doc',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',

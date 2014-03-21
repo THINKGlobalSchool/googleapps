@@ -5,12 +5,14 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.com/
  * 
  */
 
-elgg_load_js('elgg.googledocbrowser');
+elgg_load_js('elgg.googlefilepicker');
+elgg_load_js('google-js-api');
+elgg_load_js('google-doc-picker-client');
 elgg_load_css('googleapps-jquery-ui');
 
 // Check if we've got an entity, if so, we're editing.
@@ -39,6 +41,13 @@ $container_guid = get_input('container_guid', elgg_get_page_owner_guid());
 $container_hidden = elgg_view('input/hidden', array('name' => 'container_guid', 'value' => $container_guid));
 
 // Labels/Input
+$choose_input = elgg_view('input/button', array(
+	'name' => 'google-doc-picker',
+	'value' => elgg_echo('googleapps:label:selectfile'),
+	'id' => 'google-doc-picker',
+	'class' => 'elgg-button elgg-button-action'
+));
+
 $description_label = elgg_echo("description");
 $description_input = elgg_view("input/longtext", array(
 	'id' => 'description', 
@@ -83,38 +92,12 @@ $submit_input = elgg_view('input/submit', array(
 	'value' => elgg_echo('save')
 ));	
 
-// Table labels
-$select_label = elgg_echo('googleapps:label:table_select');
-$name_label = elgg_echo('googleapps:label:table_name');
-$collaborators_label = elgg_echo('googleapps:label:table_collaborators');
-$updated_label = elgg_echo('googleapps:label:table_updated');
-
 // Build Form Body
 $form_body = <<<HTML
 <div>
-	<div id="googleapps-docs-container">
-		<div id="google-docs-browser">
-			<table id='google-docs-table' class="elgg-table" width="100%">
-				<thead>
-					<tr>
-						<th class='google-docs-table-select'>$select_label</th>
-						<th class='google-docs-table-name'>$name_label</th>
-						<th class='google-docs-table-collaborators'>$collaborators_label</th>
-						<th class='google-docs-table-updated'>$updated_label</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr id='google-docs-table-loader'>
-						<td colspan='4'>
-							<div class='elgg-ajax-loader'>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div id='google-docs-paging'></div>
-		</div>
-	</div><br />
+	<div>
+		$choose_input
+	</div>
 	<div>
 		<label>$description_label</label><br />
         $description_input
