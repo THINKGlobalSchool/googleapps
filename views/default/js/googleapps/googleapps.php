@@ -46,7 +46,16 @@ elgg.google.init = function() {
 				clientId: elgg.google.DRIVE_API_CLIENT,
 				buttonEl: this,
 				onSelect: function(file) {
-					console.log(file);
+					// Set selected file info
+					var $selected_container = $('#google-docs-selected');
+					$selected_container.find('img#google-docs-selected-icon').attr('src', file.iconLink);
+					$selected_container.find('input[name="document_id"]').val(file.id);
+					$selected_container.find('span#google-docs-selected-title').html(file.title);
+
+					var friendly_date = new Date(file.modifiedDate);
+
+					$selected_container.find('span#google-docs-selected-modified').html(elgg.google.formatDate(friendly_date));
+					$selected_container.fadeIn();
 				}
 		});	
 	});
@@ -238,6 +247,22 @@ elgg.google.wikiOrderByChange = function(event) {
 	window.location = (location);
 	
 	event.preventDefault();
+}
+
+/**
+ * Helper date format function
+ */
+elgg.google.formatDate = function(date) {
+	var m_names = new Array(
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	);
+
+	var curr_date = date.getDate();
+	var curr_month = date.getMonth();
+	var curr_year = date.getFullYear();
+	return curr_date + " " + m_names[curr_month] 
+	+ " " + curr_year;
 }
 
 elgg.register_hook_handler('init', 'system', elgg.google.init);

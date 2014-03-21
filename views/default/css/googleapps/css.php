@@ -247,6 +247,35 @@ div.google-login-or {
 	margin-bottom: 10px;
 }
 
+#google-docs-selected {
+	display: none;
+	text-align: center;
+}
+
+#google-docs-selected-inner {
+	display: inline-block;
+	box-shadow: 0 0 6px #666666;
+	padding: 5px;
+}
+
+#google-docs-selected-icon {
+	position: relative;
+    top: 2px;
+}
+
+#google-docs-selected-title {
+	color: #444444;
+	font-weight: bold;
+	padding-left: 1px;
+	vertical-align: top;
+}
+
+#google-docs-selected-modified {
+	color: #666666;
+	padding-left: 20px;
+	vertical-align: top;
+}
+
 .picker.modal-dialog-bg {
 	z-index: 9005; /* Override modal bg */
 }

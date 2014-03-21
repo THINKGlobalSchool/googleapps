@@ -48,6 +48,16 @@ $choose_input = elgg_view('input/button', array(
 	'class' => 'elgg-button elgg-button-action'
 ));
 
+$document_id_input = elgg_view('input/hidden', array(
+	'name' => 'document_id',
+	'value' => null
+));
+
+$document_icon = elgg_view('output/img', array(
+	'src' => null,
+	'id' => 'google-docs-selected-icon'
+));
+
 $description_label = elgg_echo("description");
 $description_input = elgg_view("input/longtext", array(
 	'id' => 'description', 
@@ -97,6 +107,15 @@ $form_body = <<<HTML
 <div>
 	<div>
 		$choose_input
+	</div>
+	<div id='google-docs-selected'>
+		<div id='google-docs-selected-inner'>
+			$document_icon
+			<span id="google-docs-selected-title"></span>
+			<span id="google-docs-selected-modified"></span>
+			$document_id_input
+		</div>
+		<br />
 	</div>
 	<div>
 		<label>$description_label</label><br />
