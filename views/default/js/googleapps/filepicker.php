@@ -69,7 +69,7 @@ elgg.provide('elgg.googlefilepicker');
 		_showPicker: function() {
 			var accessToken = gapi.auth.getToken().access_token;
 			this.picker = new google.picker.PickerBuilder().
-				addView(google.picker.ViewId.DOCUMENTS).
+				addView(google.picker.ViewId.DOCS).
 				setAppId(this.clientId).
 				setOAuthToken(accessToken).
 				setCallback(this._pickerCallback.bind(this)).
