@@ -85,18 +85,6 @@ $access_input = elgg_view('input/access', array(
 
 elgg_set_context($context);
 
-$match_label = elgg_echo('googleapps:label:match_permissions');
-$match_input = elgg_view('input/dropdown', array(
-	'name' => 'match_permissions',
-	'id' => 'google-docs-match-permissions',
-	'options_values' =>	array(
-							0 => 'No',
-							1 => 'Yes'
-						)		
-));
-													
-$match_tooltip = "<a class='googleapps-tooltip' href='#'>" . elgg_echo('googleapps:label:tooltipname') . "<span>" . elgg_echo('googleapps:tooltip:match') . "</span></a>";
-
 $submit_input = elgg_view('input/submit', array(
 	'name' => 'submit', 
 	'value' => elgg_echo('save')

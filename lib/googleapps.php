@@ -5,7 +5,7 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.com/
  *
  */
@@ -474,63 +474,28 @@ function googleapps_get_google_docs_folders($client) {
  *
  * @param OAuthClient 	$client 	OAUTH client
  * @param string 		$doc_id 	Document id
- * @param mixed 		$access		Either an access_id, or an array of user's emails
+ * @param string 		$access		public | domain
  */
 function googleapps_update_doc_permissions($client, $doc_id, $access) {
-	// If we have a single access id
-	if (!is_array($access) )  {
-		switch ($access) {
-			case ACCESS_PUBLIC:
-				$access_type='default';
-				break;
-			case ACCESS_LOGGED_IN:
-				$access_type='domain';
-				break;
-		}
 
-		$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
+	$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
 
-		$data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
-				<category scheme='http://schemas.google.com/g/2005#kind'
-				term='http://schemas.google.com/acl/2007#accessRule'/>
-		        <gAcl:role value='reader'/> ";
+	$data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
+			<category scheme='http://schemas.google.com/g/2005#kind'
+			term='http://schemas.google.com/acl/2007#accessRule'/>
+	        <gAcl:role value='reader'/> ";
 
-		if ($access_type == "domain") {
-			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-			$data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
-		} else {
-			$data .= "<gAcl:scope type=\"default\"/>";
-		}
-
-		$data .= "</entry>";
-
-		$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
-
-	} else { // Batching ACL requests
-
-		$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
-
-		$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
-					xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
-					<category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>';
-			
-		$data .= '<entry>
-					<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.$user->email.'</id>
-					<batch:operation type="query"/>
-				</entry>';
-
-		$i=1;
-		foreach ($access as $member) {
-			$data .= '<entry>
-					<batch:id>'.$i.'</batch:id>
-					<batch:operation type=\'insert\'/>
-					<gAcl:role value=\'reader\'/>
-					<gAcl:scope type=\'user\' value=\''.$member.'\'/>
-					</entry>';
-			$i++;
-		}
-		$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
+	if ($access == "domain") {
+		$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+		$data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
+	} else if ($access == 'public') {
+		$data .= "<gAcl:scope type=\"default\"/>";
 	}
+	
+
+	$data .= "</entry>";
+
+	$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
 }
 
 
@@ -643,8 +608,8 @@ function googleapps_parse_doc_from_xml_element($item) {
 	// Could be public or everyone
 	if (in_array('default', $collaborators)) {
 		$collaborators = 'public'; // Public document
-	} else if (in_array('everyone', $collaborators)) {
-		$collaborators = 'everyone_in_domain'; // Shared with domain
+	} else if (in_array(elgg_get_plugin_setting('googleapps_domain', 'googleapps'), $collaborators)) {
+		$collaborators = 'domain'; // Shared with domain
 	}
 
 	$links = $item->link;
@@ -865,28 +830,6 @@ function trunc_name($string = '') {
 	return $string;
 }
 
-function get_permission_str($collaborators) {
-	if(is_array($collaborators)) {
-		$collaborators = count($collaborators);
-	}
-
-	$str = '';
-
-	switch ($collaborators) {
-		case 'everyone_in_domain' :
-			$str = 'Everyone in domain';
-			break;
-		case 'public':
-			$str = 'Public';
-			break;
-		default:
-			if($collaborators > 1) $str = ($collaborators -1) . ' collaborators'; // minus owner
-			else $str='me';
-			break;
-	}
-	return $str;
-}
-
 /**
  * Create the shared google document
  *
@@ -918,36 +861,6 @@ function share_document($document, $description, $tags, $access_id, $container_g
 	// Add to river
 	add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
 	return true;
-}
-
-/**
- * Determine if the google doc's permissions need to be updated
- *
- * @param mixed	$collaborators	either everyone_in_domain, public, or array of email addresses
- * @param mixed $access_level	access level contants, or 'match'
- */
-function check_document_permission($collaborators, $access_level) {
-	if ($collaborators == 'public') {
-		return true;	// Document is public on Google, don't need to make any changes
-	} else if ($collaborators == 'everyone_in_domain' && $access_level != ACCESS_PUBLIC) {
-		return true; 	// Document is available to domain, as long as the elgg access isn't public, we're good
-	} else if ($access_level == GOOGLEAPPS_ACCESS_MATCH)  {
-		return true; 	// All good, just need to create a ACL in Elgg.. nothing to see here
-	} else if ($members = get_members_of_access_collection($access_level)) {
-		// We've got a group ACL, check if members have permission
-		$collaborators = array_flip($collaborators);
-		$permission = true;
-		$members_email = get_members_emails($members);
-		foreach ($members_email as $member) {
-			if (is_null($collaborators[$member])) {
-				$permission=false;
-				break;
-			}
-		}
-		return $permission;
-	} else {
-		return false; // All other cases need a change in permissions
-	}
 }
 
 function get_members_emails($members) {

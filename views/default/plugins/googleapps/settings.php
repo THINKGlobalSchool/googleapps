@@ -5,7 +5,7 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2012
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
@@ -19,6 +19,7 @@ $oauth_sync_sites      = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps
 $oauth_sync_docs       = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
 $oauth_admin_account   = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
 $login_label           = elgg_get_plugin_setting('google_login_label', 'googleapps');
+$domain_label          = elgg_get_plugin_setting('google_domain_label', 'googleapps');
 $drive_api_client_id   = elgg_get_plugin_setting('google_drive_api_client_id', 'googleapps');
 $drive_api_key         = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 
@@ -108,6 +109,13 @@ $login_text_input = elgg_view('input/text', array(
 	'value' => $login_label
 ));
 
+// Friendy domain label
+$domain_text_label = elgg_echo('googleapps:admin:domainlabel');
+$domain_text_input = elgg_view('input/text', array(
+	'name' => 'params[google_domain_label]',
+	'value' => $domain_label
+));
+
 // Authentication/Authorization Module
 $auth_title = elgg_echo('googleapps:admin:authentication');
 
@@ -161,6 +169,10 @@ $general_body = <<<HTML
 	<div>
 		<label>$login_text_label</label><br />
 		$login_text_input
+	</div><br />
+	<div>
+		<label>$domain_text_label</label><br />
+		$domain_text_input
 	</div><br />
 HTML;
 

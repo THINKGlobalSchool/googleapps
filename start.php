@@ -37,11 +37,6 @@ function googleapps_init() {
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
 	elgg_register_simplecache_view('js/googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
-	
-	// // Register doc chooser JS
-	// $gd_js = elgg_get_simplecache_url('js', 'googleapps/docbrowser');
-	// elgg_register_simplecache_view('js/googleapps/docbrowser');
-	// elgg_register_js('elgg.googledocbrowser', $gd_js);
 
 	// Register doc chooser JS
 	$fp_js = elgg_get_simplecache_url('js', 'googleapps/filepicker');
@@ -109,9 +104,6 @@ function googleapps_init() {
 	// Register river menu
 	elgg_register_plugin_hook_handler('register', 'menu:river', 'googleapps_wiki_activity_menu');
 	
-	// Register a handler for creating shared docs
-	//elgg_register_event_handler('create', 'object', 'google_apps_shared_doc_create_event_listener');
-
 	elgg_register_plugin_hook_handler('permissions_check','user','googleapps_can_edit');
 
 	elgg_register_plugin_hook_handler('entity:icon:url','user','googleapps_icon_url');
@@ -560,54 +552,6 @@ function googleapps_subtype_heading_handler($hook, $type, $value, $params) {
 	if ($type == 'shared_doc') {
 		return 'Shared Docs';
 	}
-}
-
-/**
- * Shared doc created, create new ACL if access is set to match doc permissions
- * 
- * @param string     $event       Event name
- * @param string     $object_type Object type
- * @param ElggObject $object      Object acted upon
- * @return bool
- */
-function google_apps_shared_doc_create_event_listener($event, $object_type, $object) {
-	if ($object->getSubtype() == 'shared_doc' && $object->access_id == GOOGLEAPPS_ACCESS_MATCH) {
-		if ($object->collaborators != 'public' && $object->collaborators != 'everyone_in_domain') { // Might be public or domain
-			$shared_doc_acl = create_access_collection(elgg_echo('item:object:shared_doc') . ": " . $object->title, $object->getGUID());
-			if ($shared_doc_acl) {
-				$object->shared_acl = $shared_doc_acl;
-				$context = elgg_get_context();
-				elgg_set_context('shared_doc_acl');
-				foreach ($object->collaborators as $collaborator) {
-					if ($user = get_user_by_email($collaborator)) {
-						try {
-							$result = add_user_to_access_collection($user[0]->getGUID(), $shared_doc_acl);
-						} catch (DatabaseException $e) {
-							$result = FALSE;
-						}
-					}
-				}
-				elgg_set_context($context);
-				$object->access_id = $shared_doc_acl;
-				$object->save();
-			} else {
-				return false;
-			}
-		} else {
-			// Google doc has public or domain permissions, assign accordingly
-			switch ($object->collaborators) {
-				case 'public':
-					$object->access_id = ACCESS_PUBLIC;
-					break;
-				case 'everyone_in_domain':
-					$object->access_id = ACCESS_LOGGED_IN;
-					break;
-
-			}
-			$object->save();
-		}
-	}
-	return true;
 }
 
 /**

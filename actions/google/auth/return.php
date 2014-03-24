@@ -4,7 +4,7 @@
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
@@ -179,7 +179,7 @@ if (!$google->is_authorized()) {
 			$user->name = (!empty($firstname) || !empty($lastname)) ? ($firstname . ' ' . $lastname) : $email;
 			$user->save();
 		}
-		error_log($user->access_token);
+
 		login($user, $rememberme);
 		if (isset($_SESSION['last_forward_from']) && $_SESSION['last_forward_from']) {
 			$forward_url = $_SESSION['last_forward_from'];

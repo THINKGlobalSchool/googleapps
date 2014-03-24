@@ -127,7 +127,12 @@ a.googleapps-tooltip:hover span {
 } 
 
 .elgg-form-google-docs-permissions .permissions-update-input {
+	display: block;
+	margin-bottom: 4px;
+}
 
+.elgg-form-google-docs-permissions .permissions-update-input span {
+	vertical-align: bottom;
 }
 
 /** WIKI FILTER/SORT MENU **/

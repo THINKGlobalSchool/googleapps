@@ -5,7 +5,7 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.com/
  *
  */
@@ -65,7 +65,11 @@ elgg.google.init = function() {
 	
 	// Google Docs Form Stuff
 	$('.permissions-update-input').live('click', function(event) {
-		$(this).closest('form').find('#googleapps-docs-permissions-answer').val($(this).val());
+		var $form = $(this).closest('form');
+
+		$form.find('#googleapps-docs-permissions-action').val($(this).data('action'));
+		$form.trigger('submit');
+		event.preventDefault();
 	})
 	
 	// Match permissions UI
@@ -128,20 +132,6 @@ elgg.google.updateGoogleApps = function() {
 	});	
 }
 
-// Load the document chooser
-elgg.google.loadDocumentChooser = function(id) {
-	// Load
-	elgg.get(elgg.google.CHOOSER_URL, {
-		success: function(html) {
-			$('#' + id).html(html);
-		},
-		error: function(xhr, ajaxOptions, thrownError) {
-			console.log(xrh.status);
-			console.log(thrownError);
-		}
-	});
-}
-
 // Submit handler
 elgg.google.docsSubmit = function(event) {			
 	var data = {};
@@ -157,11 +147,10 @@ elgg.google.docsSubmit = function(event) {
 		}
 	});
 
-
 	// Switch title based on action
 	if (this.action.lastIndexOf('share') != -1) {
 		var show_close = true;
-		var title = elgg.echo('googleapps:label:action_required');
+		var title = elgg.echo('googleapps:label:permissions_warning_title');
 	}
 
 	if (this.action.lastIndexOf('permissions') != -1) {
@@ -169,7 +158,6 @@ elgg.google.docsSubmit = function(event) {
 		var title = elgg.echo('googleapps:success');
 	}
 
-	
 	elgg.action(this.action, {
 		data: data,
 		success: function(json) {			
@@ -181,7 +169,7 @@ elgg.google.docsSubmit = function(event) {
 			// Show dialog
 			var dlg = $("<div></div>").html(json.output).dialog({
 				width: 450,
-				height: 125,
+				height: 'auto',
 				modal: true,
 				title: title,
 				draggable: false,
@@ -197,10 +185,6 @@ elgg.google.docsSubmit = function(event) {
 			dlg.find('form').submit(function () {
 				dlg.parents('.ui-dialog').remove();
 			});
-				
-			if (json.output.toUpperCase() === 'OK') {
-				elgg.google.loadDocumentChooser('googleapps-docs-container');
-			}	
 		}
 	});
 	

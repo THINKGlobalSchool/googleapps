@@ -5,10 +5,12 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.com/
  *
  */
+
+$domain_label = elgg_get_plugin_setting('google_domain_label', 'googleapps');
 
 $english = array(
 	// General/Built In
@@ -43,6 +45,7 @@ $english = array(
 	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
 	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
 	'googleapps:admin:loginlabel' => 'Log in with Google Text',
+	'googleapps:admin:domainlabel' => 'Domain label (ie: Our Friendly Site)',
 	'googleapps:admin:drive_client' => 'Google Drive Client ID',
 	'googleapps:admin:drive_key' => 'Google Drive API Key',
 	'googleapps:admin:authentication' => 'Authentication/Authorization Settings',
@@ -68,7 +71,6 @@ $english = array(
 	'googleapps:error:share_doc' => 'There was an error sharing the document.',
 	'googleapps:error:share_doc_save' => 'There was an error editing the document.',
 	'googleapps:error:document_id_required' => 'You need to select a document first',
-   	'googleapps:error:document_permissions_update' => 'Document permissions need to be updated',
 	'googleapps:error:invalid_url' => 'Invalid Google Document URL',
 	'googleapps:error:delete' => 'There was an error deleting the shared Google Document',
 	'googleapps:error:notfound' => 'Document not found',
@@ -97,8 +99,8 @@ $english = array(
 	'googleapps:label:google_docs_description' => '',
 	'googleapps:label:site' => 'Wiki',
 	'googleapps:label:access_level' => 'Access Level',
-	'googleapps:label:match_permissions' => 'Match permissions of Google Document?',
 	'googleapps:label:action_required' => 'Action Required',
+	'googleapps:label:permissions_warning_title' => 'Document Permissions',
 	'googleapps:label:shared_by' => 'Shared by %s',
 	'googleapps:label:deleteconfirm' => 'Remove Shared Doc? (This will not delete the document from Google Documents, only from Spot)',
 	'googleapps:label:enableshareddoc' => 'Enable group shared google docs',
@@ -146,6 +148,8 @@ $english = array(
 	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
 	'googleapps:label:editdoc' => 'Edit Google Doc: %s',
 	'googleapps:label:selectfile' => 'Select Google Doc',
+	'googleapps:label:access_other' => 'This document is not shared publicly or shared with ' . $domain_label . '. Choose one of the following options:',
+	'googleapps:label:access_domain' => 'This document is shared with ' . $domain_label . '. Choose one of the following options:',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
@@ -160,9 +164,9 @@ $english = array(
 	'googleapps:tab:share_browse' => 'Browse Documents',
 
 	// Permissions submit buttons
-	'googleapps:submit:grant' => 'Grant view permissons',
+	'googleapps:submit:public' => 'Share publicly',
+	'googleapps:submit:domain' => 'Share with '  . $domain_label,
 	'googleapps:submit:ignore' => 'Ignore and continue',
-	'googleapps:submit:cancel' => 'Cancel',
 
 	// River
 	'river:create:object:shared_doc' => '%s shared a Google Document titled %s',
