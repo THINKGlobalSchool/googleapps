@@ -16,47 +16,81 @@ elgg_load_js('google-doc-picker-client');
 elgg_load_css('googleapps-jquery-ui');
 
 // Check if we've got an entity, if so, we're editing.
-if (isset($vars['entity'])) {
-	/* We don't really edit these.. I suppose we could.. 
-	
-	if (!$vars['entity']) {
-		forward();
+$entity = get_entity(elgg_extract('guid', $vars, false));
+if ($entity) {
+	if (!elgg_instanceof($entity, 'object', 'shared_doc')) {
+		forward(REFERER);
 	}
-	
-	$action 			= ''; // do something here
-	$title 		 		= $vars['entity']->title;
-	$description 		= $vars['entity']->description;
-	$tags 				= $vars['entity']->tags;
-	$access_id			= $vars['entity']->access_id;
-	$entity_hidden  = elgg_view('input/hidden', array('name' => 'document_guid', 'value' => $vars['entity']->getGUID()));
-	*/
+
+	$description = $entity->description;
+	$tags = $entity->tags;
+	$access_id = $entity->access_id;
+	$document_id = $entity->res_id;
+	$icon = $entity->icon;
+
+	$title = elgg_view('output/url', array(
+		'text' => $entity->title,
+		'href' => $entity->href,
+		'target' => '_blank'
+	));
+
+	$modified = date('j M Y', $entity->updated);
+
+	$entity_hidden = elgg_view('input/hidden', array(
+		'name' => 'entity_guid',
+		'value' => $entity->guid
+	));
 
 } else {
-// No entity, creating new one
+	// No entity, creating new one
 	$description = "";
 	$entity_hidden = "";
+
+	// Get shared doc post vars
+	$icon = get_input('icon');
+	$document_id = get_input('document_id');
+	$title = get_input('title');
+	$modified = get_input('modified');
+}
+
+if (!$document_id) {
+	$select_text = elgg_echo('googleapps:label:selectfile');
+	$div_class = 'hidden';
+	$link_class = 'elgg-button elgg-button-action';
+} else {
+	$select_text = elgg_echo('googleapps:label:change');
 }
 
 $container_guid = get_input('container_guid', elgg_get_page_owner_guid());
 $container_hidden = elgg_view('input/hidden', array('name' => 'container_guid', 'value' => $container_guid));
 
 // Labels/Input
-$choose_input = elgg_view('input/button', array(
-	'name' => 'google-doc-picker',
-	'value' => elgg_echo('googleapps:label:selectfile'),
-	'id' => 'google-doc-picker',
-	'class' => 'elgg-button elgg-button-action'
+$choose_input = elgg_view('output/url', array(
+	'text' => $select_text,
+	'class' => "google-doc-picker google-doc-picker-change {$link_class}",
+	'href' => '#'
 ));
 
 $document_id_input = elgg_view('input/hidden', array(
 	'name' => 'document_id',
-	'value' => null
+	'value' => $document_id
 ));
 
+
+if (!$icon) {
+	$icon = elgg_get_site_url() . 'mod/googleapps/graphics/drive_icon.png';
+}
 $document_icon = elgg_view('output/img', array(
-	'src' => null,
-	'id' => 'google-docs-selected-icon'
+	'src' => $icon,
+	'id' => 'google-docs-selected-icon',
+	'class' => $icon_class
 ));
+
+if (!$modified) {
+	$modified_class = 'hidden';
+}
+
+$modified = '<span id="google-docs-selected-modified" class="' . $modified_class .'">' . $modified . '</span>';
 
 $description_label = elgg_echo("description");
 $description_input = elgg_view("input/longtext", array(
@@ -93,17 +127,14 @@ $submit_input = elgg_view('input/submit', array(
 // Build Form Body
 $form_body = <<<HTML
 <div>
-	<div>
-		$choose_input
-	</div>
 	<div id='google-docs-selected'>
-		<div id='google-docs-selected-inner'>
+		<div id='google-docs-selected-inner' class='$div_class'>
 			$document_icon
-			<span id="google-docs-selected-title"></span>
-			<span id="google-docs-selected-modified"></span>
+			<span id="google-docs-selected-title">$title</span>
+			$modified
 			$document_id_input
 		</div>
-		<br />
+		$choose_input
 	</div>
 	<div>
 		<label>$description_label</label><br />

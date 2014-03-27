@@ -42,6 +42,10 @@ function googleapps_get_page_content_settings_account() {
  * Get google docs listing content
  */
 function googleapps_get_page_content_docs_list($container_guid = NULL) {
+	elgg_load_js('elgg.googlefilepicker');
+	elgg_load_js('google-js-api');
+	elgg_load_js('google-doc-picker-client');
+	
 	$params['filter_context'] = $container_guid ? 'mine' : 'all';
 	
 	if ($container_guid) {
@@ -53,16 +57,11 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 			forward('googleapps/docs/all');
 		}
 		
-		if ($container != elgg_get_logged_in_user_entity()) {
+		if ($container != elgg_get_logged_in_user_entity() || elgg_instanceof($container, 'group')) {
 			$params['filter_context'] = FALSE;
-		} else {
-			elgg_register_title_button('googleapps/docs');
 		}
-		
-		if (elgg_instanceof($container, 'group')) {
-			elgg_register_title_button('googleapps/docs');
-			$params['filter'] = FALSE;
-		}
+
+	
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
 		elgg_push_breadcrumb($container->name);
 		
@@ -75,7 +74,6 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 
 		$params['title'] = elgg_echo('googleapps:label:user_docs', array($container->name));
 	} else {
-		elgg_register_title_button('googleapps/docs');
 		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
 
 		$content = elgg_list_entities(array(
@@ -85,6 +83,21 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 		));
 
 		$params['title'] = elgg_echo('googleapps:menu:allshareddocs');
+	}
+
+	$owner = elgg_get_page_owner_entity();
+	if (!$owner) {
+		$owner = elgg_get_logged_in_user_entity();
+	}
+
+	if ($owner && $owner->canWriteToContainer()) {
+		$guid = $owner->getGUID();
+		elgg_register_menu_item('title', array(
+			'name' => 'googleapps_docs_add',
+			'href' => "googleapps/docs/add/{$guid}",
+			'text' => elgg_echo("googleapps/docs:add"),
+			'link_class' => 'elgg-button elgg-button-action google-doc-picker',
+		));
 	}
 
 	// If theres no content, display a nice message
@@ -135,61 +148,42 @@ function googleapps_get_page_content_docs_friends($user_guid) {
 }
 
 /**
- * Get google docs share content
+ * Get google docs share/edit content
+ *
+ * @param  int $guid Document guid (for editing)
+ * @return array
  */
-function googleapps_get_page_content_docs_share() {
+function googleapps_get_page_content_docs_share($guid = null) {
+	$google_doc = get_entity($guid);
+
 	elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
-	elgg_push_breadcrumb(elgg_echo('googleapps/docs:add'));
+
+	if (elgg_instanceof($google_doc, 'object', 'shared_doc')) {
+		elgg_push_breadcrumb($google_doc->title);
+		elgg_push_breadcrumb(elgg_echo('googleapps:docs:edit'));
+		$body_vars = google_doc_prepare_form_vars($google_doc);
+		$title = elgg_echo('googleapps:label:editdoc', array($google_doc->title));
+	} else {
+		elgg_push_breadcrumb(elgg_echo('googleapps/docs:add'));
+		$body_vars = array();
+		$title = elgg_echo('googleapps:label:google_docs');
+	}
+
+
+	
 	$params = array(
 		'filter' => '',
 	);
-	$params['title'] = elgg_echo('googleapps:label:google_docs');
+	$params['title'] = $title;
 		
 	// Form vars
 	$vars = array();
 	$vars['id'] = 'google-docs-share-form';
 	$vars['name'] = 'google_docs_share_form';
-	
-	// Form body vars
-	$body_vars = array();
-	
-	// View share form
-	$params['content'] = elgg_view_form('google/docs/share', $vars);
-		
-	return $params;
-}
 
-/**
- * Get google docs share content
- */
-function googleapps_get_page_content_docs_edit($guid) {
-	$google_doc = get_entity($guid);
-	
-	if (elgg_instanceof($google_doc, 'object', 'shared_doc') && $google_doc->canEdit()) {
-		elgg_push_breadcrumb(elgg_echo('googleapps:googleshareddoc'), elgg_get_site_url() . 'googleapps/docs/all');
-		elgg_push_breadcrumb($google_doc->title, $google_doc->getURL());
-		elgg_push_breadcrumb(elgg_echo('googleapps:docs:edit'));
-	} else {
-		register_error(elgg_echo('googleapps:error:invaliddoc'));
-		forward(REFERER);
-	}
-
-	$params = array(
-		'filter' => '',
-	);
-	$params['title'] = elgg_echo('googleapps:label:editdoc', array($google_doc->title));
-		
-	// Form vars
-	$vars = array();
-	$vars['id'] = 'google-docs-edit-form';
-	$vars['name'] = 'google-docs-edit-form';
-	
-	// Form body vars
-	$body_vars = google_doc_prepare_form_vars($google_doc);
-	
 	// View share form
-	$params['content'] = elgg_view_form('google/docs/edit', $vars, $body_vars);
-	
+	$params['content'] = elgg_view_form('google/docs/share', $vars, $body_vars);
+		
 	return $params;
 }
 
@@ -633,9 +627,20 @@ function googleapps_parse_doc_from_xml_element($item) {
 		foreach ($link->attributes() as $a => $value) {
 			$attrs[$a] = $value[0];
 		}
-		if (!empty ($attrs['rel']) && $attrs['rel'] == 'alternate') {
-			$src = $attrs['href'];
-			break;
+
+		if (!empty ($attrs['rel'])) {
+			if ($attrs['rel'] == 'alternate') {
+				$src = $attrs['href'];	
+			}
+
+			if ($attrs['rel'] == 'http://schemas.google.com/docs/2007#icon') {
+				foreach ($link->attributes() as $la => $lv) {
+					if ($la == 'href') {
+						$icon = "{$lv}"; 
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -647,6 +652,7 @@ function googleapps_parse_doc_from_xml_element($item) {
 		$doc['type'] = $type;
 		$doc['updated'] = strtotime($item->updated);
 		$doc['collaborators'] = $collaborators;
+		$doc['icon'] = $icon;
 		return $doc;
 	} else {
 		return FALSE;
@@ -833,15 +839,28 @@ function trunc_name($string = '') {
 /**
  * Create the shared google document
  *
- * @param array 	$document 		Array reprentation of the google document
- * @param string 	$description 	Description to add
- * @param array 	$tags			Elgg tag array to add to document
- * @param mixed		$access_id		Access id, either elgg contants or 'match'
+ * @param array  $document       Array reprentation of the google document
+ * @param string $description    Description to add
+ * @param array  $tags           Elgg tag array to add to document
+ * @param mixed  $access_id      Access id
+ * @param int    $container_guid Container guid for the entity
+ * @param int    $entity_guid    Optional entity guid (determines wether or not to create new)
  * @return bool
  */
-function share_document($document, $description, $tags, $access_id, $container_guid) {
-	$shared_doc = new ElggObject();
-	$shared_doc->subtype 		= "shared_doc";
+function share_document($document, $description, $tags, $access_id, $container_guid, $entity_guid = FALSE) {
+	// Check for entity
+	if ($entity_guid) {
+		$shared_doc = get_entity($entity_guid);
+		if (!elgg_instanceof($shared_doc, 'object', 'shared_doc')) {
+			register_error(elgg_echo('googleapps:error:invaliddoc'));
+			exit;
+		}
+	} else {
+		// No guid, make a new one
+		$shared_doc = new ElggObject();
+		$shared_doc->subtype 		= "shared_doc";
+	}
+
 	$shared_doc->title 			= $document['title'];
 	$shared_doc->trunc_title 	= $document['trunc_title'];
 	$shared_doc->description 	= $description;
@@ -852,14 +871,18 @@ function share_document($document, $description, $tags, $access_id, $container_g
 	$shared_doc->collaborators	= $document['collaborators'];
 	$shared_doc->href			= $document['href'];
 	$shared_doc->container_guid	= $container_guid;
+	$shared_doc->icon           = $document['icon'];
 
 	if (!$shared_doc->save()) {
 		register_error(elgg_echo('googleapps:error:share_doc'));
 		exit;
 	}
 
-	// Add to river
-	add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
+	if (!$entity_guid) {
+		// Add to river
+		add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
+	}
+	
 	return true;
 }
 

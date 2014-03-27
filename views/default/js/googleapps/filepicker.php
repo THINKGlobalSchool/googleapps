@@ -23,8 +23,13 @@ elgg.provide('elgg.googlefilepicker');
 	 * Initialise a Google Driver file picker
 	 */
 	var FilePicker = window.FilePicker = function(options) {
+		var defaults = {
+			onPickerApiLoaded: this._pickerApiLoaded,
+			onDriveApiLoaded: this._driveApiLoaded
+		}
+
 		// Merge options
-		//var options = $.extend(defaults, options);
+		var options = $.extend(defaults, options);
 
 		// Config
 		this.apiKey = options.apiKey;
@@ -42,8 +47,8 @@ elgg.provide('elgg.googlefilepicker');
  
 		// Load the drive API
 		gapi.client.setApiKey(this.apiKey);
-		gapi.client.load('drive', 'v2', this._driveApiLoaded.bind(this));
-		google.load('picker', '1', { callback: this._pickerApiLoaded.bind(this) });
+		gapi.client.load('drive', 'v2', options.onDriveApiLoaded.bind(this));
+		google.load('picker', '1', { callback: options.onPickerApiLoaded.bind(this) });
 	}
  
 	FilePicker.prototype = {

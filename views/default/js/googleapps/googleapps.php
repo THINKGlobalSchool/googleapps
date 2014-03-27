@@ -38,26 +38,74 @@ elgg.google.DRIVE_API_KEY = "<?php echo $drive_api_key; ?>";
 elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
 elgg.google.init = function() {	
-
 	// Init doc pickers
-	$('#google-doc-picker').each(function() {
+	$('.google-doc-picker').each(function() {
+		$(this).bind('click', function(event) {
+			event.preventDefault();
+		});
+
+		var post_url = $(this).attr('href');
+
 		var picker = new FilePicker({
 				apiKey: elgg.google.DRIVE_API_KEY,
 				clientId: elgg.google.DRIVE_API_CLIENT,
 				buttonEl: this,
 				onSelect: function(file) {
-					// Set selected file info
-					var $selected_container = $('#google-docs-selected');
-					$selected_container.find('img#google-docs-selected-icon').attr('src', file.iconLink);
-					$selected_container.find('input[name="document_id"]').val(file.id);
-					$selected_container.find('span#google-docs-selected-title').html(file.title);
+					if ($(this.buttonEl).hasClass('google-doc-picker-change')) {
+						// Set selected file info
+						var $selected_container = $('#google-docs-selected');
+						$selected_container.find('img#google-docs-selected-icon').attr('src', file.iconLink).show();
+						$selected_container.find('input[name="document_id"]').val(file.id);
 
-					var friendly_date = new Date(file.modifiedDate);
+						var $link = $(document.createElement('a'));
+						$link.attr('href', file.alternateLink);
+						$link.attr('target', '_blank');
+						$link.html(file.title);
 
-					$selected_container.find('span#google-docs-selected-modified').html(elgg.google.formatDate(friendly_date));
-					$selected_container.fadeIn();
+						$selected_container.find('span#google-docs-selected-title').html($link);
+
+						var friendly_date = new Date(file.modifiedDate);
+
+						$selected_container.find('span#google-docs-selected-modified').html(elgg.google.formatDate(friendly_date)).show();
+						$selected_container.find('#google-docs-selected-inner').css('display','inline-block');
+
+						if ($(this.buttonEl).hasClass('elgg-button')) {
+							$(this.buttonEl)
+								.removeClass('elgg-button')
+								.removeClass('elgg-button-action')
+								.html(elgg.echo('googleapps:label:change'));
+						}
+					} else {
+						var form = document.createElement("form");
+						form.setAttribute("method", 'post');
+						form.setAttribute("action", post_url);
+
+						var friendly_date = new Date(file.modifiedDate);
+
+						var params = {
+							'icon': file.iconLink,
+							'document_id': file.id,
+							'title': file.title,
+							'modified': elgg.google.formatDate(friendly_date),
+							'link': file.alternateLink
+						};
+
+						for(var key in params) {
+							if(params.hasOwnProperty(key)) {
+								var hiddenField = document.createElement("input");
+								hiddenField.setAttribute("type", "hidden");
+								hiddenField.setAttribute("name", key);
+								hiddenField.setAttribute("value", params[key]);
+
+								form.appendChild(hiddenField);
+							}
+						}
+
+						document.body.appendChild(form);
+	   					form.submit();
+					}
 				}
-		});	
+		});
 	});
 
 	// Register interval for future updates

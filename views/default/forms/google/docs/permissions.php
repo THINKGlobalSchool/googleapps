@@ -14,6 +14,7 @@ $document_access = elgg_extract('access', $vars);
 $document_info = elgg_extract('document_info', $vars);
 $container_guid = elgg_extract('container_guid', $vars);
 $options = elgg_extract('options', $vars);
+$entity_guid = elgg_extract('entity_guid', $vars, FALSE);
 
 $message = elgg_echo('googleapps:label:access_' . $document_access);
 
@@ -56,6 +57,12 @@ $container_input = elgg_view('input/hidden', array(
 	'value' => $container_guid,
 ));
 
+$entity_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-entity-guid',
+	'name' => 'entity_guid',
+	'value' => $entity_guid,
+));
+
 $action_input = elgg_view('input/hidden', array(
 	'id' => 'googleapps-docs-permissions-action',
 	'name' => 'permissions_action',
@@ -90,6 +97,7 @@ $form_body = <<<HTML
 	<p><label>$message</label></p>
 	<a href="" tabindex="1"></a>
 	$container_input
+	$entity_input
 	$action_input
 	$buttons
 	$doc_id_input

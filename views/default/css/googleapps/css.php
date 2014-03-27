@@ -247,23 +247,33 @@ div.google-login-or {
 /***** END LOGIN BUTTON *****/
 
 /*** GOOGLE DOCS PICKER **/
-#google-doc-picker {
-	width: 100%;
-	margin-bottom: 10px;
+#google-docs-selected {
+	margin: 10px 0;
 }
 
-#google-docs-selected {
-	display: none;
-	text-align: center;
+.google-doc-picker-change {
+
 }
 
 #google-docs-selected-inner {
 	display: inline-block;
 	box-shadow: 0 0 6px #666666;
 	padding: 5px;
+	margin-right: 15px;
 }
 
-#google-docs-selected-icon {
+#google-docs-selected-inner.hidden {
+	display: none;
+}
+
+#google-docs-selected-inner img,
+.google-docs-file-icon {
+	width: 16px;
+	height: 16px;
+}
+
+#google-docs-selected-icon,
+#google-docs-selected-inner .elgg-icon {
 	position: relative;
     top: 2px;
 }

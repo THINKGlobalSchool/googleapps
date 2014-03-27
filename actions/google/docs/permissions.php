@@ -14,6 +14,7 @@ $access_id = get_input('access');
 $document_id = get_input('doc_id');
 $container_guid = get_input('container_guid');
 $action = get_input('permissions_action');
+$entity_guid = get_input('entity_guid', FALSE);
 
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
@@ -31,7 +32,7 @@ if ($action == 'public' || $action == 'domain') {
 }
 
 // Share the doc
-share_document($document, $description, $tags, $access_id, $container_guid);
+share_document($document, $description, $tags, $access_id, $container_guid, $entity_guid);
 
 echo elgg_view('googleapps/success', array('container_guid' => $container_guid));
 

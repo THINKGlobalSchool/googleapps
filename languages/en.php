@@ -147,9 +147,10 @@ $english = array(
 	'googleapps:label:resetsiteactivity' => 'Reset Site Activity',
 	'googleapps:label:googlelogin' => 'Or, sign in automatically with..',
 	'googleapps:label:editdoc' => 'Edit Google Doc: %s',
-	'googleapps:label:selectfile' => 'Select Google Doc',
-	'googleapps:label:access_other' => 'This document is not shared publicly or shared with ' . $domain_label . '. Choose one of the following options:',
-	'googleapps:label:access_domain' => 'This document is shared with ' . $domain_label . '. Choose one of the following options:',
+	'googleapps:label:selectfile' => 'Select File',
+	'googleapps:label:change' => 'Change..',
+	'googleapps:label:access_other' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
+	'googleapps:label:access_domain' => 'This document is shared only with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',

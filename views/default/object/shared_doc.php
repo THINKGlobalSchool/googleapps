@@ -23,6 +23,18 @@ $categories = elgg_view('output/categories', $vars);
 $excerpt = elgg_get_excerpt($doc->description);
 
 $owner_icon = elgg_view_entity_icon($owner, 'tiny');
+
+if ($doc->icon) {
+	$icon_src = $doc->icon; 
+} else {
+	$icon_src = elgg_get_site_url() . 'mod/googleapps/graphics/drive_icon.png';
+}
+
+$icon = elgg_view('output/img', array(
+	'src' => $icon_src,
+	'class' => 'google-docs-file-icon'
+));
+
 $owner_link = elgg_view('output/url', array(
 	'href' => "googleapps/docs/owner/$owner->username",
 	'text' => $owner->name,
@@ -57,4 +69,4 @@ $params = array(
 );
 $list_body = elgg_view('object/elements/summary', $params);
 
-echo elgg_view_image_block($owner_icon, $list_body);
+echo elgg_view_image_block($icon, $list_body);

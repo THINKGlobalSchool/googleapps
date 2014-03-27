@@ -327,7 +327,7 @@ function googleapps_page_handler($page) {
 					$params = googleapps_get_page_content_docs_share();
 					break;
 				case 'edit':
-					$params = googleapps_get_page_content_docs_edit($page[2]);
+					$params = googleapps_get_page_content_docs_share($page[2]);
 					break;
 				case 'owner':
 					$user = get_user_by_username($page[2]);

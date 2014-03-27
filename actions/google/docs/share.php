@@ -14,6 +14,7 @@ $document_tags = get_input('tags', '');
 $access_level = get_input('access_id', null);
 $document_url = get_input('document_url', null);
 $document_container_guid = get_input('container_guid');
+$document_entity_guid = get_input('entity_guid', FALSE);
 
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $document_container_guid)) {
@@ -42,13 +43,14 @@ $collaborators = $document['collaborators'];
 // If the document is public, go ahead and share it
 if ($collaborators == 'public') {
 	// Share document and output success
-	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid); // Share and public document activity
+	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid, $document_entity_guid);
 	echo elgg_view('googleapps/success', array('container_guid' => $document_container_guid));
 	forward(REFERER);
 } else {
 	//Not public, need to warn/update permissions
 	$form_vars = array(
 		'container_guid' => $document_container_guid,
+		'entity_guid' => $document_entity_guid,
 		'document_info' => $document_info
 	);
 
