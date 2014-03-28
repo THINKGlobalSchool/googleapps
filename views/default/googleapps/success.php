@@ -10,6 +10,8 @@
 
 $owner = get_entity($vars['container_guid']);
 
+$success_class = elgg_extract('success_class', $vars);
+
 if (elgg_instanceof($owner, 'group')) {
 	$forward_url = elgg_get_site_url() . "googleapps/docs/group/{$owner->guid}/owner";
 } else {
@@ -18,7 +20,7 @@ if (elgg_instanceof($owner, 'group')) {
 
 echo <<<HTML
 	<p><label>Document shared</label></p>
-	<a href='$forward_url'><span class='elgg-button elgg-button-action'>Ok</span></a>
+	<a href='$forward_url' class="$success_class"><span class='elgg-button elgg-button-action'>Ok</span></a>
 	<style>
 		button.ui-corner-all {
 			display: none;

@@ -51,6 +51,7 @@ elgg.google.init = function() {
 				clientId: elgg.google.DRIVE_API_CLIENT,
 				buttonEl: this,
 				onSelect: function(file) {
+					// Change handler
 					if ($(this.buttonEl).hasClass('google-doc-picker-change')) {
 						// Set selected file info
 						var $selected_container = $('#google-docs-selected');
@@ -75,6 +76,64 @@ elgg.google.init = function() {
 								.removeClass('elgg-button-action')
 								.html(elgg.echo('googleapps:label:change'));
 						}
+					// Insert link handler
+					} else if ($(this.buttonEl).hasClass('google-doc-picker-insert')) {
+						var classes = $(this.buttonEl).attr('class');
+						var insertClass = classes.split(/[, ]+/).pop();
+						var textAreaId = insertClass.substr(insertClass.indexOf('google-doc-picker-insert-') + "google-doc-picker-insert-".length);
+
+						elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
+							data: {
+								'doc_link': file.alternateLink,
+								'doc_id': file.id
+							},
+							success: function(json) {
+								// Check for errors
+								if (json.status == -1) {
+									return false;
+								}
+
+								var $link = $(document.createElement('a'));
+								$link.attr('href', file.alternateLink);
+								$link.html(file.title);
+
+								$(document).undelegate('.googleapps-docs-insert-success', 'click');
+								$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
+									$(this).parents('.ui-dialog').remove();
+									console.log($link.get(0).outerHTML);
+									elgg.google.insert(textAreaId, $link.get(0).outerHTML);
+									event.preventDefault();
+								});
+
+								// Check insert status
+								if (json.output.insert_status !== 1) {
+									var title = elgg.echo('googleapps:label:permissions_warning_title');
+
+									// Need to update permissions
+									var dlg = $("<div></div>").html(json.output.form).dialog({
+										width: 450,
+										height: 'auto',
+										modal: true,
+										title: title,
+										draggable: false,
+										resizable: false,
+										closeOnEscape: false,
+										open: function(event, ui) {
+										
+										}
+									});
+									
+									dlg.find('form').submit(function () {
+										dlg.parents('.ui-dialog').remove();
+									});
+								} else {
+									// Good to go! Insert..
+									elgg.google.insert(textAreaId, $link.get(0).outerHTML);
+								}
+							}
+						});
+
+					// Share new doc handler
 					} else {
 						var form = document.createElement("form");
 						form.setAttribute("method", 'post');
@@ -280,6 +339,20 @@ elgg.google.wikiOrderByChange = function(event) {
 	
 	event.preventDefault();
 }
+
+/**
+ * Inserts data into a text area
+ *
+ * @param string textAreaId 
+ * @param string content
+ *
+ * @return void
+ */
+elgg.google.insert = function(textAreaId, content) {
+	$('#' + textAreaId).val($('#' + textAreaId).val() + ' ' + content + ' ');
+	<?php echo elgg_view('embed/custom_insert_js'); ?>
+}
+
 
 /**
  * Helper date format function

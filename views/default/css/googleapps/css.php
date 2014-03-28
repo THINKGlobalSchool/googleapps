@@ -248,7 +248,8 @@ div.google-login-or {
 
 /*** GOOGLE DOCS PICKER **/
 #google-docs-selected {
-	margin: 10px 0;
+    margin: 10px auto;
+    text-align: center;
 }
 
 .google-doc-picker-change {

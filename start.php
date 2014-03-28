@@ -127,6 +127,9 @@ function googleapps_init() {
 	// Hook into walled garden public pages to allow logging in with a google account
 	elgg_register_plugin_hook_handler('public_pages', 'walled_garden', 'googleapps_public_pages_handler');
 
+	// Hook into longtext menu
+	elgg_register_plugin_hook_handler('register', 'menu:longtext', 'googleapps_longtext_menu');
+
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
 
@@ -197,6 +200,7 @@ function googleapps_init() {
 	elgg_register_action('google/docs/share', "$action_base/share.php");
 	elgg_register_action('google/docs/permissions', "$action_base/permissions.php");
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
+	elgg_register_action('google/docs/insert', "$action_base/insert.php");
 	elgg_register_action('google/docs/edit', "$action_base/edit.php");
 }
 
@@ -796,6 +800,33 @@ function googleapps_public_pages_handler($hook, $type, $value, $params) {
 	return $value;
 }
 
+/**
+ * Add the embed image menu item to the long text menu
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $items
+ * @param array $vars
+ * @return array
+ */
+function googleapps_longtext_menu($hook, $type, $items, $vars) {
+
+	$items[] = ElggMenuItem::factory(array(
+		'name' => 'google_doc',
+		'href' => "#",
+		'text' => elgg_echo('googleapps:label:insertlink'),
+		'link_class' => "elgg-longtext-control google-doc-picker google-doc-picker-insert google-doc-picker-insert-{$vars['id']}",
+		'priority' => 1,
+		'title' => elgg_view_title(elgg_echo('googleapps:label:insertlink')),
+	));
+
+	elgg_load_js('elgg.googlefilepicker');
+	elgg_load_js('google-js-api');
+	elgg_load_js('google-doc-picker-client');
+	elgg_load_css('elgg.jquery.ui'); // Assuming this is registered elsewhere
+
+	return $items;
+}
 
 /**
  * Set the notification message for google shared docs

@@ -151,6 +151,7 @@ $english = array(
 	'googleapps:label:change' => 'Change..',
 	'googleapps:label:access_other' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
 	'googleapps:label:access_domain' => 'This document is shared only with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
+	'googleapps:label:insertlink' => 'Insert Google Doc link',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
