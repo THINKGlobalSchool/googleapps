@@ -138,14 +138,7 @@ elgg.google.init = function() {
 						if ($('#google-overlay-shade').length == 0) {
 							$('body').prepend('<div id="google-overlay-shade" class="elgg-ajax-loader"></div>');
 
-							$('#google-overlay-shade').fadeTo(300, 0.8, function() {
-								var props = {
-									scrTop          : $(window).scrollTop(),
-									viewPortWidth   : $(window).width()
-								};
-
-								var leftPos = (props.viewPortWidth - props.oLayWidth) / 2;
-							});
+							$('#google-overlay-shade').fadeTo(300, 0.8);
 						}
 
 						var form = document.createElement("form");
