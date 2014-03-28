@@ -140,7 +140,6 @@ elgg.google.init = function() {
 
 							$('#google-overlay-shade').fadeTo(300, 0.8, function() {
 								var props = {
-									oLayWidth       : $oLay.width(),
 									scrTop          : $(window).scrollTop(),
 									viewPortWidth   : $(window).width()
 								};
