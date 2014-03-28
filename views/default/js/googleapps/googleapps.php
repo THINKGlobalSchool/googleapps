@@ -135,6 +135,20 @@ elgg.google.init = function() {
 
 					// Share new doc handler
 					} else {
+						if ($('#google-overlay-shade').length == 0) {
+							$('body').prepend('<div id="google-overlay-shade" class="elgg-ajax-loader"></div>');
+
+							$('#google-overlay-shade').fadeTo(300, 0.8, function() {
+								var props = {
+									oLayWidth       : $oLay.width(),
+									scrTop          : $(window).scrollTop(),
+									viewPortWidth   : $(window).width()
+								};
+
+								var leftPos = (props.viewPortWidth - props.oLayWidth) / 2;
+							});
+						}
+
 						var form = document.createElement("form");
 						form.setAttribute("method", 'post');
 						form.setAttribute("action", post_url);

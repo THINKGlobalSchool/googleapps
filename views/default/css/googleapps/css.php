@@ -300,4 +300,17 @@ div.google-login-or {
 	z-index: 9006 !important; /* Override modal dialog */
 }
 
+#google-overlay-shade {
+    display: none;
+}
+
+#google-overlay-shade {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background-color: #FFF;
+}
 /*</style>*/
