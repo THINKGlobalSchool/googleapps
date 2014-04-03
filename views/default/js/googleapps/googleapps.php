@@ -37,8 +37,46 @@ elgg.google.DRIVE_API_KEY = "<?php echo $drive_api_key; ?>";
 // Ajax URL's
 elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
+/**
+ * Main init function
+ */
 elgg.google.init = function() {	
-	// Init doc pickers
+	// Register interval for future updates
+	//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
+	
+	// Google Docs Form Stuff
+	$('.permissions-update-input').live('click', function(event) {
+		var $form = $(this).closest('form');
+
+		$form.find('#googleapps-docs-permissions-action').val($(this).data('action'));
+		$form.trigger('submit');
+		event.preventDefault();
+	})
+	
+	// Match permissions UI
+	$('#google-docs-match-permissions').change(function() {
+		if ($(this).val() == 0) {
+			$('#google-docs-access-id').removeAttr('disabled');
+			$('#google-docs-access-id-label').removeAttr('style');
+		} else {
+			$('#google-docs-access-id').attr('disabled', 'disabled');
+			$('#google-docs-access-id-label').attr('style', 'color: #999999');
+		}
+	});
+	
+	// Bind docsSubmit function to forms
+	$('#google-docs-update-permissions').live('submit', elgg.google.docsSubmit);
+	$('#google-docs-share-form').live('submit', elgg.google.docsSubmit);
+	
+	// Change handler for wiki menu orderby change
+	$(document).delegate('#googlapps-wiki-orderby', 'change', elgg.google.wikiOrderByChange);
+}
+
+/**
+ * Init google doc pickers
+ */
+elgg.google.initPickers = function() {
+		// Init doc pickers
 	$('.google-doc-picker').each(function() {
 		$(this).bind('click', function(event) {
 			event.preventDefault();
@@ -172,42 +210,11 @@ elgg.google.init = function() {
 				}
 		});
 	});
-
-	// Register interval for future updates
-	//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
-	
-	// Google Docs Form Stuff
-	$('.permissions-update-input').live('click', function(event) {
-		var $form = $(this).closest('form');
-
-		$form.find('#googleapps-docs-permissions-action').val($(this).data('action'));
-		$form.trigger('submit');
-		event.preventDefault();
-	})
-	
-	// Match permissions UI
-	$('#google-docs-match-permissions').change(function() {
-		if ($(this).val() == 0) {
-			$('#google-docs-access-id').removeAttr('disabled');
-			$('#google-docs-access-id-label').removeAttr('style');
-		} else {
-			$('#google-docs-access-id').attr('disabled', 'disabled');
-			$('#google-docs-access-id-label').attr('style', 'color: #999999');
-		}
-	});
-	
-	// Bind docsSubmit function to forms
-	$('#google-docs-update-permissions').live('submit', elgg.google.docsSubmit);
-	$('#google-docs-share-form').live('submit', elgg.google.docsSubmit);
-	
-	// Switch share form click event (makes tabs clickable)
-	$('.googleapps-docs-share-switch').live('click', elgg.google.showTab);
-	
-	// Change handler for wiki menu orderby change
-	$(document).delegate('#googlapps-wiki-orderby', 'change', elgg.google.wikiOrderByChange);
 }
 
-// Call the oauth_update action 
+/**
+ * Call the oauth_update action
+ */
 elgg.google.updateGoogleApps = function() {	
 	elgg.action('google/auth/oauth_update', {
 		error: function(e) {
@@ -227,25 +234,13 @@ elgg.google.updateGoogleApps = function() {
 					anchor.append("<span class='messages-new'>" + json.output.mail_count + "</span>")
 				} 
 			}
-			
-			// Do something with docs 
-			if (elgg.google.SYNC_DOCS == 'yes') {
-				/*
-				The original oauth_script calls the following code.. I'm not sure what
-				it was indended to do, as I haven't seen widgets working. Its calling a couple 
-				functions that live in that view (widgets/google_docs).. I'm leaving that code there
-				and this here.. just in case
-		
-				
-				var widget_id = search_widget_id($("#google_docs_widget"));
-				setTimeout(function(){update_widget(widget_id, '<?=$user->username?>')}, '100');
-				*/
-			}
 		}
 	});	
 }
 
-// Submit handler
+/**
+ * Google Doc Submit handler
+ */
 elgg.google.docsSubmit = function(event) {			
 	var data = {};
 	
@@ -304,24 +299,9 @@ elgg.google.docsSubmit = function(event) {
 	event.preventDefault();
 }
 
-// Tab click handler, shows the tab id supplied as HREF
-elgg.google.showTab = function(event) {
-	// Remove selected states
-	$(this).parent().parent().find('li').removeClass('elgg-state-selected');
-	
-	// Add selected state to this item
-	$(this).parent().addClass('elgg-state-selected');
-	
-	// Hide all the divs
-	$('.googleapps-docs-share-div').hide()
-	
-	// Show this HREF's div
-	$($(this).attr('href')).show();
-	
-	event.preventDefault();
-}
-
-// Change handler for wiki sort by change
+/**
+ *  Change handler for wiki sort by change
+ */
 elgg.google.wikiOrderByChange = function(event) {
 	var order_by = $(this).val();
 	var href = $('#googleapps-wiki-order').attr('href');
@@ -377,3 +357,11 @@ elgg.google.formatDate = function(date) {
 }
 
 elgg.register_hook_handler('init', 'system', elgg.google.init);
+
+/**
+ * Called when google js api is loaded
+ */
+function gapiLoaded() {
+	// Register initPicker hook
+	elgg.register_hook_handler('init', 'system', elgg.google.initPickers);	
+}

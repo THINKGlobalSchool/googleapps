@@ -46,7 +46,7 @@ function googleapps_init() {
 	// Register google apis for doc picker
 	$drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 	elgg_register_js('google-js-api', "https://www.google.com/jsapi?key={$drive_api_key}");
-	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js");
+	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js?onload=gapiLoaded");
 
 	// Register CSS for social login
 	$s_css = elgg_get_simplecache_url('css', 'social_login');
