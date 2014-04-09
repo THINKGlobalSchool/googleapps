@@ -76,7 +76,7 @@ elgg.google.init = function() {
  * Init google doc pickers
  */
 elgg.google.initPickers = function() {
-		// Init doc pickers
+	// Init doc pickers
 	$('.google-doc-picker').each(function() {
 		$(this).bind('click', function(event) {
 			event.preventDefault();
@@ -363,5 +363,6 @@ elgg.register_hook_handler('init', 'system', elgg.google.init);
  */
 function gapiLoaded() {
 	// Register initPicker hook
+	console.log('Google JS API Callback');
 	elgg.register_hook_handler('init', 'system', elgg.google.initPickers);	
 }

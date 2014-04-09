@@ -131,7 +131,7 @@ elgg.provide('elgg.googlefilepicker');
 		_doAuth: function(immediate, callback) {	
 			gapi.auth.authorize({
 				client_id: this.clientId + '.apps.googleusercontent.com',
-				scope: 'https://www.googleapis.com/auth/drive.readonly',
+				scope: 'https://www.googleapis.com/auth/drive',
 				immediate: immediate
 			}, callback);
 		}
