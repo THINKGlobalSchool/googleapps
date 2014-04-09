@@ -45,8 +45,8 @@ function googleapps_init() {
 
 	// Register google apis for doc picker
 	$drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
-	elgg_register_js('google-js-api', "https://www.google.com/jsapi?key={$drive_api_key}");
-	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js?onload=gapiLoaded");
+	elgg_register_js('google-js-api', "https://www.google.com/jsapi?key={$drive_api_key}", 'footer');
+	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js?onload=gapiLoaded", 'footer');
 
 	// Register CSS for social login
 	$s_css = elgg_get_simplecache_url('css', 'social_login');
@@ -288,6 +288,43 @@ function googleapps_page_handler($page) {
 	$page_type = $page[1];
 	
 	switch ($sub_handler) {
+		case 'test':
+			// TESTING
+			elgg_load_library('gapc:Client');
+			elgg_load_library('gapc:Drive');
+			elgg_load_library('gapc:Spreadsheet');
+
+			$token = 'ya29.1.AADtN_Vn0Zjw7T2iIVI4SzmC97C-lTPDnOINog6i7HSbacNjecLpK5_Gvd8vQAU';
+			$request = new Google\Spreadsheet\Request($token);
+			$serviceRequest = new Google\Spreadsheet\DefaultServiceRequest($request);
+			Google\Spreadsheet\ServiceRequestFactory::setInstance($serviceRequest);
+
+			$spreadsheetService = new Google\Spreadsheet\SpreadsheetService();
+			$spreadsheetFeed = $spreadsheetService->getSpreadsheets();
+
+			$spreadsheet = $spreadsheetFeed->getByTitle('Fitness');
+
+			$worksheetFeed = $spreadsheet->getWorksheets();
+			$worksheet = $worksheetFeed->getByTitle('Fitness');
+			$listFeed = $worksheet->getListFeed();
+
+			$row = array(
+				'sheetid' => uniqid(),
+				'employeename' =>  'Jeff', 
+				'submissiondate' => '3/31/2014', 
+				'monthperiodstart' => 'None', 
+				'monthperiodend' => 'None',
+				'monthlycostofmembership' => 'None',
+				'nameoffacility' => 'None',
+				'proofofvisit' => 'None',
+				'createdby' => 'jtilson@thinkglobalschool.com',
+				'createdat' => '3/31/2014 16:46:49',
+				'modifiedat'=> '3/31/2014 16:47:06',
+				'attachments' => 'None'
+			);
+
+			$listFeed->insert($row);
+			break;
 		// Settings subhandler
 		case 'settings':
 			gatekeeper();
