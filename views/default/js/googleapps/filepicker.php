@@ -74,11 +74,18 @@ elgg.provide('elgg.googlefilepicker');
 		_showPicker: function() {
 			var accessToken = gapi.auth.getToken().access_token;
 			this.picker = new google.picker.PickerBuilder().
-				addView(google.picker.ViewId.DOCS).
+				addViewGroup(
+					new google.picker.ViewGroup(google.picker.ViewId.DOCS).
+					addView(google.picker.ViewId.DOCUMENTS).
+					addView(google.picker.ViewId.SPREADSHEETS).
+					addView(google.picker.ViewId.DOCS_IMAGES_AND_VIDEOS).
+					addView(google.picker.ViewId.PRESENTATIONS).
+					addView(google.picker.ViewId.PDFS)).
+				addViewGroup(new google.picker.ViewGroup(new google.picker.DocsUploadView())).
 				setAppId(this.clientId).
 				setOAuthToken(accessToken).
 				setCallback(this._pickerCallback.bind(this)).
-				enableFeature(google.picker.Feature.MINE_ONLY).
+				//enableFeature(google.picker.Feature.MINE_ONLY).
 				build().
 				setVisible(true);
 		},

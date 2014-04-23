@@ -574,6 +574,8 @@ function googleapps_get_doc_from_id($client, $id) {
 
 /**
  * Parse and document array from SimpleXMLElement
+ * 
+ * @TODO fix this mess.
  *
  * @param SimpleXMLElement $item
  * @return array
@@ -585,7 +587,8 @@ function googleapps_parse_doc_from_xml_element($item) {
 
 	$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
 	$title = $item['title'];
-
+	$author_info = $item['author'];
+	
 	$collaborators = array();
 
 	// Sort out collaborators
@@ -653,6 +656,8 @@ function googleapps_parse_doc_from_xml_element($item) {
 		$doc['updated'] = strtotime($item->updated);
 		$doc['collaborators'] = $collaborators;
 		$doc['icon'] = $icon;
+		$doc['owner_name'] = (string)$item->author->name;
+		$doc['owner_email'] = (string)$item->author->email;
 		return $doc;
 	} else {
 		return FALSE;

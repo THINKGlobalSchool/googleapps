@@ -30,7 +30,7 @@ $document = googleapps_get_doc_from_id($client, $document_id);
 
 // Update permissions if action is either public or domain
 if ($action == 'public' || $action == 'domain') {
-	googleapps_update_doc_permissions($client, $document['id'], $action) ;
+	googleapps_update_doc_permissions($client, $document['id'], $action);
 }
 
 // Check if we're going to create a new entity 

@@ -54,14 +54,21 @@ if ($collaborators == 'public') {
 		'document_info' => $document_info
 	);
 
-	// If this document is shared to the domain, warn and give the option to share publicly
-	if ($collaborators == 'domain') {
-		$form_vars['access'] = $collaborators;
-		$form_vars['options'] = array('public', 'ignore');
+	// Check ownership. Note: this will only work for connected google accounts as user email addresses
+	// must match the google account address
+	if ($document['owner_email'] == elgg_get_logged_in_user_entity()->email) {
+		// If this document is shared to the domain, warn and give the option to share publicly
+		if ($collaborators == 'domain') {
+			$form_vars['access'] = $collaborators;
+			$form_vars['options'] = array('public', 'ignore');
+		} else {
+			// Unshared or shared to specific folks, warn and allow sharing with domain/public
+			$form_vars['access'] = 'other';
+			$form_vars['options'] = array('domain', 'public', 'ignore');
+		}
 	} else {
-		// Unshared or shared to specific folks, warn and allow sharing with domain/public
-		$form_vars['access'] = 'other';
-		$form_vars['options'] = array('domain', 'public', 'ignore');
+		$form_vars['access'] = 'unowned';
+		$form_vars['options'] = array('ignore');
 	}
 
 	// Output permissions form	
