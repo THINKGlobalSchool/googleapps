@@ -37,6 +37,8 @@ elgg.google.DRIVE_API_KEY = "<?php echo $drive_api_key; ?>";
 // Ajax URL's
 elgg.google.CHOOSER_URL = 'googleapps/docs/chooser';
 
+elgg.google.apiLoaded = false;
+
 /**
  * Main init function
  */
@@ -364,5 +366,6 @@ elgg.register_hook_handler('init', 'system', elgg.google.init);
 function gapiLoaded() {
 	// Register initPicker hook
 	console.log('Google JS API Callback');
+	elgg.google.apiLoaded = true;
 	elgg.register_hook_handler('init', 'system', elgg.google.initPickers);	
 }
