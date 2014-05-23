@@ -464,13 +464,13 @@ function googleapps_get_google_docs_folders($client) {
 }
 
 /**
- * Change the google docs permissions based on chosen elgg permissions
+ * Set a documents sharing acl to either public or domain
  *
  * @param OAuthClient 	$client 	OAUTH client
  * @param string 		$doc_id 	Document id
  * @param string 		$access		public | domain
  */
-function googleapps_update_doc_permissions($client, $doc_id, $access) {
+function googleapps_update_document_share_scope($client, $doc_id, $access) {
 
 	$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
 
@@ -489,6 +489,38 @@ function googleapps_update_doc_permissions($client, $doc_id, $access) {
 
 	$data .= "</entry>";
 
+	$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
+}
+
+/**
+ * Add users to a google document
+ *
+ * @param OAuthClient 	$client 	OAUTH client
+ * @param string 		$doc_id 	Document id
+ * @param array 		$users		array of ElggUsers
+ */
+function googleapps_document_add_user_permissions($client, $doc_id, $users) {
+	$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
+
+	$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
+				xmlns:batch=\'http://schemas.google.com/gdata/batch\'>
+				<category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>';
+
+	$data .= '<entry>
+				<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.elgg_get_logged_in_user_entity()->email.'</id>
+				<batch:operation type="query"/>
+			</entry>';
+
+	$i=1;
+	foreach ($users as $user) {
+		$data .= '<entry>
+				<batch:id>'.$i.'</batch:id>
+				<batch:operation type=\'insert\'/>
+				<gAcl:role value=\'reader\'/>
+				<gAcl:scope type=\'user\' value=\''.$user->email.'\'/>
+				</entry>';
+		$i++;
+	}
 	$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
 }
 

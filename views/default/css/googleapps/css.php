@@ -313,4 +313,10 @@ div.google-login-or {
     z-index: 9999;
     background-color: #FFF;
 }
+
+.google-doc-submission-icon {
+	padding-right: 4px;
+	position: relative;
+	top: 2px;
+}
 /*</style>*/

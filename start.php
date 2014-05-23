@@ -1,11 +1,11 @@
 <?php
 /**
- * Elgg googlelogin plugin
+ * Elgg Google Apps Plugin
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2012
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
@@ -129,6 +129,11 @@ function googleapps_init() {
 
 	// Hook into longtext menu
 	elgg_register_plugin_hook_handler('register', 'menu:longtext', 'googleapps_longtext_menu');
+
+	// Add a todo submission content type handlers
+	elgg_register_plugin_hook_handler('get_submission_content_types', 'todo', 'googleapps_todo_submission_content_type_handler');
+	elgg_register_plugin_hook_handler('handle_submission_content', 'todo', 'googleapps_todo_submission_content_handler');
+	elgg_register_plugin_hook_handler('handle_submission_content_create', 'todo', 'googleapps_todo_submission_content_create_handler');
 
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
@@ -288,43 +293,6 @@ function googleapps_page_handler($page) {
 	$page_type = $page[1];
 	
 	switch ($sub_handler) {
-		case 'test':
-			// TESTING
-			elgg_load_library('gapc:Client');
-			elgg_load_library('gapc:Drive');
-			elgg_load_library('gapc:Spreadsheet');
-
-			$token = 'ya29.1.AADtN_Vn0Zjw7T2iIVI4SzmC97C-lTPDnOINog6i7HSbacNjecLpK5_Gvd8vQAU';
-			$request = new Google\Spreadsheet\Request($token);
-			$serviceRequest = new Google\Spreadsheet\DefaultServiceRequest($request);
-			Google\Spreadsheet\ServiceRequestFactory::setInstance($serviceRequest);
-
-			$spreadsheetService = new Google\Spreadsheet\SpreadsheetService();
-			$spreadsheetFeed = $spreadsheetService->getSpreadsheets();
-
-			$spreadsheet = $spreadsheetFeed->getByTitle('Fitness');
-
-			$worksheetFeed = $spreadsheet->getWorksheets();
-			$worksheet = $worksheetFeed->getByTitle('Fitness');
-			$listFeed = $worksheet->getListFeed();
-
-			$row = array(
-				'sheetid' => uniqid(),
-				'employeename' =>  'Jeff', 
-				'submissiondate' => '3/31/2014', 
-				'monthperiodstart' => 'None', 
-				'monthperiodend' => 'None',
-				'monthlycostofmembership' => 'None',
-				'nameoffacility' => 'None',
-				'proofofvisit' => 'None',
-				'createdby' => 'jtilson@thinkglobalschool.com',
-				'createdat' => '3/31/2014 16:46:49',
-				'modifiedat'=> '3/31/2014 16:47:06',
-				'attachments' => 'None'
-			);
-
-			$listFeed->insert($row);
-			break;
 		// Settings subhandler
 		case 'settings':
 			gatekeeper();
@@ -864,6 +832,79 @@ function googleapps_longtext_menu($hook, $type, $items, $vars) {
 
 	return $items;
 }
+
+/**
+ * Add a google doc todo submission content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $items
+ * @param array $vars
+ * @return array
+ */
+function googleapps_todo_submission_content_type_handler($hook, $type, $items, $vars) {
+	$items[400] = 'googledoc';
+
+	return $items;
+}
+
+/**
+ * Handle output of google content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $return
+ * @param array $content
+ * @return array
+ */
+function googleapps_todo_submission_content_handler($hook, $type, $return, $content) {
+	$content = json_decode($content);
+
+	// Check if we can json_decode this value, and that it has a type value of 'googledoc'
+	if ($content && $content->type == 'googledoc') {
+		return array(
+			'icon' => elgg_normalize_url('googleapps/docs/add/' . elgg_get_logged_in_user_guid()) . "?document_id={$content->id}&title={$content->title}&icon={$content->icon}&modified={$content->modified}",
+			'icon_content' => elgg_view('output/img', array(
+					'src' => elgg_get_site_url() . 'mod/todos/graphics/copy_content.png'
+			)) . "<span>" . elgg_echo('todo:label:copytoprofile') . "</span>",
+			'url' => $content->url,
+			'title' => $content->title,
+			'target' => false,
+			'text' => elgg_view('output/img', array('class' => 'google-doc-submission-icon', 'src' => $content->icon)) . $content->title
+		);
+	}	
+
+	return false;
+}
+
+/**
+ * Handle output of google content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $return
+ * @param array $params
+ * @return array
+ */
+function googleapps_todo_submission_content_create_handler($hook, $type, $return, $params) {
+	$content = json_decode($params['content']);
+
+	// Check if we can json_decode this value, and that it has a type value of 'googledoc'
+	if ($content && $content->type == 'googledoc') {
+		$todo = get_entity($params['todo_guid']);
+
+		// Make sure we have a valid todo
+		if (elgg_instanceof($todo, 'object', 'todo')) {
+			// Update permissions!
+			googleapps_document_add_user_permissions(authorized_client(TRUE), $content->id, array($todo->getOwnerEntity()));
+		} else {
+			return false;
+		}
+	}	
+
+	return false;
+}
+
 
 /**
  * Set the notification message for google shared docs

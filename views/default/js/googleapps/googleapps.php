@@ -358,7 +358,37 @@ elgg.google.formatDate = function(date) {
 	+ " " + curr_year;
 }
 
+/**
+ * Init todo submission google doc picker
+ */
+elgg.google.initTodoSubmissionPicker = function (hook, type, params, options) {
+	// Init doc picker for todo submissions
+	$('#add-googledoc').each(function() {
+		var post_url = $(this).attr('href');
+
+		var picker = new FilePicker({
+				apiKey: elgg.google.DRIVE_API_KEY,
+				clientId: elgg.google.DRIVE_API_CLIENT,
+				buttonEl: this,
+				onSelect: function(file) {
+					// Build a json string for this google doc
+					var google_json = '{"type": "googledoc", "icon": "' + file.iconLink +'", "title": "'+ file.title + '", "url": "' + file.alternateLink + '", "id": "' + file.id + '", "modified": "' + elgg.google.formatDate(new Date(file.modifiedDate)) + '"}';
+					
+					$('#submission-content-select').append(
+						$('<option></option>').attr('selected', 'selected').val(google_json).html(file.title)
+					);
+					elgg.todo.submissionFormDefault();
+				},
+				onCancel: function() {
+					elgg.todo.submissionFormDefault();
+				}
+		});
+	});
+	return true;
+}
+
 elgg.register_hook_handler('init', 'system', elgg.google.init);
+elgg.register_hook_handler('apiloaded', 'google', elgg.google.initTodoSubmissionPicker);
 
 /**
  * Called when google js api is loaded
@@ -367,5 +397,7 @@ function gapiLoaded() {
 	// Register initPicker hook
 	console.log('Google JS API Callback');
 	elgg.google.apiLoaded = true;
+	// Trigger a hook here for plugins to do something when the google api is loaded
+	elgg.trigger_hook('apiloaded', 'google');
 	elgg.register_hook_handler('init', 'system', elgg.google.initPickers);	
 }

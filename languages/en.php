@@ -189,6 +189,9 @@ $english = array(
 	Password: %s
 	
 	You can change your password here: %s",
+
+	// Todo submission content type
+	'todo:label:addgoogledoc' => 'Add Google Doc',
 );
 
 add_translation('en',$english);
