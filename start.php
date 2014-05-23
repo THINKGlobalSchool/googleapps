@@ -896,7 +896,7 @@ function googleapps_todo_submission_content_create_handler($hook, $type, $return
 		// Make sure we have a valid todo
 		if (elgg_instanceof($todo, 'object', 'todo')) {
 			// Update permissions!
-			googleapps_document_add_user_permissions(authorized_client(TRUE), $content->id, array($todo->getOwnerEntity()));
+			googleapps_document_add_user_permissions(authorized_client(TRUE), $content->id, array($todo->getOwnerEntity()), false);
 		} else {
 			return false;
 		}

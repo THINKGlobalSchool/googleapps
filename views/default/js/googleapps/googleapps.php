@@ -378,6 +378,8 @@ elgg.google.initTodoSubmissionPicker = function (hook, type, params, options) {
 						$('<option></option>').attr('selected', 'selected').val(google_json).html(file.title)
 					);
 					elgg.todo.submissionFormDefault();
+
+					$('#submission-notice-message').html(elgg.echo('googleapps:label:submissionnotice')).show();
 				},
 				onCancel: function() {
 					elgg.todo.submissionFormDefault();

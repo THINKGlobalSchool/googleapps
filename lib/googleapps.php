@@ -499,7 +499,13 @@ function googleapps_update_document_share_scope($client, $doc_id, $access) {
  * @param string 		$doc_id 	Document id
  * @param array 		$users		array of ElggUsers
  */
-function googleapps_document_add_user_permissions($client, $doc_id, $users) {
+function googleapps_document_add_user_permissions($client, $doc_id, $users, $notify = true) {
+	if (!$notify) {
+		$endpoint_params['send-notification-emails'] = 'false';
+	}
+
+	$notify = $notify ? 'true' : 'false';
+
 	$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl/batch';
 
 	$data .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl=\'http://schemas.google.com/acl/2007\'
@@ -507,7 +513,7 @@ function googleapps_document_add_user_permissions($client, $doc_id, $users) {
 				<category scheme=\'http://schemas.google.com/g/2005#kind\' term=\'http://schemas.google.com/acl/2007#accessRule\'/>';
 
 	$data .= '<entry>
-				<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.elgg_get_logged_in_user_entity()->email.'</id>
+				<id>https://docs.google.com/feeds/default/private/full/'.$doc_id.'/acl/user%3A'.elgg_get_logged_in_user_entity()->email.'?send-notification-emails=' . $notify . '</id>
 				<batch:operation type="query"/>
 			</entry>';
 
@@ -521,9 +527,8 @@ function googleapps_document_add_user_permissions($client, $doc_id, $users) {
 				</entry>';
 		$i++;
 	}
-	$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
+	$result = $client->execute_post($feed, '3.0', $endpoint_params, 'POST', $data, $endpoint_params);
 }
-
 
 /**
  * Get google docs for authorized client and folder

@@ -226,7 +226,7 @@ class OAuthClient {
 
 	}
 
-	public function execute_post($endpoint, $version = '2.0', $params = null, $method= 'GET', $data=null) {
+	public function execute_post($endpoint, $version = '2.0', $params = null, $method= 'GET', $data=null, $endpoint_params = null) {
 
 		if (empty($this->access_token) || empty($this->access_secret)) {
 			return false;
@@ -239,13 +239,14 @@ class OAuthClient {
 		$echo_req = GAOAuthRequest::from_consumer_and_token($this->consumer, $access_token,
 		$method, $endpoint, $params);
 
-		 
 		$echo_req->sign_request($this->signature_method, $this->consumer, $access_token);
-
-
 
 		$content_type = 'Content-Type: application/atom+xml';
 		$gdataVersion = 'GData-Version: ' . $version;
+
+		if ($endpoint_params) {
+			$endpoint .= '?' . http_build_query($endpoint_params);
+		}
 
 		return $this->send_signed_request($method, $endpoint,
 		array($echo_req->to_header(), $content_type, $gdataVersion),
