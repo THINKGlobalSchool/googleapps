@@ -15,6 +15,8 @@ $user = elgg_extract('user', $vars);
 $user_sync_settings = unserialize($user->sync_settings);
 $enabled = array();
 
+$sync_label = elgg_echo('googleapps:usersettings:sync_description');
+
 // If the sync name settings doesn't exist, set it here (default off)
 if(!is_array($user_sync_settings)) {
 	$user_sync_settings['sync_name'] = 0;
@@ -31,7 +33,7 @@ foreach ($user_sync_settings as $setting => $v) {
 $sync_name_input = elgg_view('input/checkboxes', array(
 	'name' => "sync_settings", 
 	'value' => $enabled,  
-	'options' => array('Syncing name upon login' => 'sync_name')
+	'options' => array(elgg_echo('googleapps:label:syncname') => 'sync_name')
 ));
 
 $submit_input = elgg_view('input/submit', array(
@@ -41,6 +43,7 @@ $submit_input = elgg_view('input/submit', array(
 
 $form_body = <<<HTML
 	<div>
+		<label>$sync_label</label><br /><br />
 		$sync_name_input
 	</div>
 	<div>

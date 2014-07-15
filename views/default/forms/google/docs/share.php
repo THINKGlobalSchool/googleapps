@@ -13,7 +13,6 @@
 elgg_load_js('elgg.googlefilepicker');
 elgg_load_js('google-js-api');
 elgg_load_js('google-doc-picker-client');
-elgg_load_css('elgg.jquery.ui'); // Assuming this is registered elsewhere
 
 // Check if we've got an entity, if so, we're editing.
 $entity = get_entity(elgg_extract('guid', $vars, false));

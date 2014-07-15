@@ -12,7 +12,7 @@
 
 $domain_label = elgg_get_plugin_setting('google_domain_label', 'googleapps');
 
-$english = array(
+return array(
 	// General/Built In
 	'item:object:site_activity' => 'Wiki activity',
    	'item:object:shared_doc' => 'Google Shared Document',
@@ -39,15 +39,14 @@ $english = array(
 	'googleapps:admin:secret' => 'Secret Key (to use with OAuth)',
 	'googleapps:admin:yes' => 'Yes',
 	'googleapps:admin:no' => 'No',
-	'googleapps:admin:sync_email' => 'Enable Google Mail',
-	'googleapps:admin:sync_sites' => 'Enable Google Sites ',
-   	'googleapps:admin:sync_docs' => 'Enable Google Docs',
-	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
-	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
+	'googleapps:admin:enable_google_sites' => 'Enable Google Sites ',
+   	'googleapps:admin:enable_google_docs' => 'Enable Google Docs',
+	'googleapps:admin:admin_username' => 'Google admin username',
 	'googleapps:admin:loginlabel' => 'Log in with Google Text',
 	'googleapps:admin:domainlabel' => 'Domain label (ie: Our Friendly Site)',
-	'googleapps:admin:drive_client' => 'Google Drive Client ID',
-	'googleapps:admin:drive_key' => 'Google Drive API Key',
+	'googleapps:admin:api_client_id' => 'Google API Client ID',
+	'googleapps:admin:api_client_secret' => 'Google API Client Secret',
+	'googleapps:admin:drive_api_key' => 'Google Drive API Key',
 	'googleapps:admin:authentication' => 'Authentication/Authorization Settings',
 	'googleapps:admin:pluginsettings' => 'General Plugin Settings',
 
@@ -80,9 +79,18 @@ $english = array(
 	'googleapps:error:invaliddoc' => 'Invalid Google Doc',
 	'googleapps:error:wikiconnectionfailed' => 'Could not connect wiki to group',
 	'googleapps:error:wikidisconnectionfailed' => 'Could not disconnect wiki from group',
+	'googleapps:error:invalidstate' => 'Invalid Login State',
+	'googleapps:error:loginerror' => 'Error: %s',
+	'googleapps:error:missinglogin' => 'Missing login authentication date',
+	'googleapps:error:accesstokens' => 'There was an error retrieving access tokens',
+	'googleapps:error:notconnected' => 'No Google connected account found',
+	'googleapps:error:existing_account' => 'It appears that email address is already registered and is not connected to Google. If you are the email owner, please log in to Spot and connect manually.',
+	'googleapps:error:disconnect' => 'There was an error disconnecting your Google account',
 
 	// Success messages
-	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
+	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from Google.', 
+	'googleapps:success:connect' => 'Google connected account created! Welcome to Spot %s!',
+	'googleapps:success:manual_connect' => 'Google account connected!',
 	'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 	'googleapps:success' => 'Success!',
@@ -114,7 +122,7 @@ $english = array(
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
 	'googleapps:label:viewdocument' => 'View Document',
-	'googleapps:label:connect' => 'Connect with Google Account',
+	'googleapps:label:connect' => 'Connect Google Account',
 	'googleapps:label:disconnect' => 'Disconnect Google Account',
 	'googleapps:label:documentsdisplay' => 'Documents to display',
 	'googleapps:label:allfolders' => 'All Folders',
@@ -153,6 +161,7 @@ $english = array(
 	'googleapps:label:access_domain' => 'This document is shared only with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
 	'googleapps:label:access_unowned' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Contact the document owner if you wish to update it\'s permissions.',
 	'googleapps:label:insertlink' => 'Insert Google Doc link',
+	'googleapps:label:syncname' => 'Sync your Google account name upon login',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
@@ -190,5 +199,3 @@ $english = array(
 	
 	You can change your password here: %s",
 );
-
-add_translation('en',$english);

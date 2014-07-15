@@ -11,23 +11,27 @@
 $document_link = get_input('doc_link');
 $document_id = get_input('doc_id');
 
-// Get google doc
-$client = authorized_client(TRUE);
-$document = googleapps_get_doc_from_id($client, $document_id);
+// Get google doc and permissions
+$client = googleapps_get_client();
+$client->setAccessToken(googleapps_get_user_access_tokens());
+$permissions = googleapps_get_file_permissions_from_id($client, $document_id);
+$document = googleapps_get_file_from_id($client, $document_id);
 
 $document_info = array();
 $document_info['doc_id'] = $document_id;
 
-$collaborators = $document['collaborators'];
-
-// echo json_encode(array(
-// 	'id' => $document_id,
-// 	'link' => $document_link
-// ));
+// Determine if this document is available to the public
+foreach ($permissions as $permission) {
+	if ($permission->getType() == 'anyone') {
+		$is_public = TRUE;
+	} else if ($permission->getType() == 'domain') {
+		$is_domain = TRUE;
+	}
+}
 
 // If the document is public, go ahead and insert the link
-if ($collaborators == 'public') {
-	echo json_encode(array('insert_status' => 1, 'form' => $form));
+if ($is_public) {
+	echo json_encode(array('insert_status' => 1));
 	forward(REFERER);
 } else {
 	//Not public, need to warn/update permissions
@@ -38,8 +42,8 @@ if ($collaborators == 'public') {
 	);
 
 	// If this document is shared to the domain, warn and give the option to share publicly
-	if ($collaborators == 'domain') {
-		$form_vars['access'] = $collaborators;
+	if ($is_domain) {
+		$form_vars['access'] = 'domain';
 		$form_vars['options'] = array('public', 'ignore');
 	} else {
 		// Unshared or shared to specific folks, warn and allow sharing with domain/public
@@ -55,6 +59,5 @@ if ($collaborators == 'public') {
 
 	$form = elgg_view_form('google/docs/permissions', $vars, $form_vars);
 	echo json_encode(array('insert_status' => 'need_update', 'form' => $form));
-
 	forward(REFERER);
 }

@@ -28,22 +28,39 @@ if (empty($document_id) && empty($document_url)) {
 	forward(REFERER);
 }
 
-// Grab document from API
-$client = authorized_client(TRUE);
-$document = googleapps_get_doc_from_id($client, $document_id);
+// Get client
+$client = googleapps_get_client();
+$client->setAccessToken(googleapps_get_user_access_tokens());
 
+// Get file and permissions from document
+$permissions = googleapps_get_file_permissions_from_id($client, $document_id);
+$document = googleapps_get_file_from_id($client, $document_id);
+
+// Determine if this document is available to the public
+foreach ($permissions as $permission) {
+	if ($permission->getType() == 'anyone') {
+		$is_public = TRUE;
+	} else if ($permission->getType() == 'domain') {
+		$is_domain = TRUE;
+	}
+}
 $document_info = array();
 $document_info['doc_id'] = $document_id;
 $document_info['description'] = $document_description;
 $document_info['access'] = $access_level;
 $document_info['tags'] = $document_tags;
 
-$collaborators = $document['collaborators'];
-
 // If the document is public, go ahead and share it
-if ($collaborators == 'public') {
+if ($is_public) {
 	// Share document and output success
-	share_document($document, $document_description, $document_tags, $access_level, $document_container_guid, $document_entity_guid);
+	googleapps_save_shared_document($document, array(
+		'description' => $document_description, 
+		'access_id' => $access_level,
+		'tags' => $document_tags,
+		'container_guid' =>  $document_container_guid,
+		'entity_guid' => $document_entity_guid
+	));
+
 	echo elgg_view('googleapps/success', array('container_guid' => $document_container_guid));
 	forward(REFERER);
 } else {
@@ -56,10 +73,16 @@ if ($collaborators == 'public') {
 
 	// Check ownership. Note: this will only work for connected google accounts as user email addresses
 	// must match the google account address
-	if ($document['owner_email'] == elgg_get_logged_in_user_entity()->email) {
+	foreach ($document->getOwners() as $owner) {
+		if ($owner->getEmailAddress() == elgg_get_logged_in_user_entity()->email) {
+			$is_owner = TRUE;
+		}
+		break;
+	}
+	if ($is_owner) {
 		// If this document is shared to the domain, warn and give the option to share publicly
-		if ($collaborators == 'domain') {
-			$form_vars['access'] = $collaborators;
+		if ($is_domain) {
+			$form_vars['access'] = 'domain';
 			$form_vars['options'] = array('public', 'ignore');
 		} else {
 			// Unshared or shared to specific folks, warn and allow sharing with domain/public

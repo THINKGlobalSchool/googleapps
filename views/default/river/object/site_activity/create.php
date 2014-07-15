@@ -2,10 +2,12 @@
 /**
  * Googleapps create site/wiki river item
  *
- * @package googleapps
+ * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
- * @link http://www.thinkglobalschool.org
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010 - 2014
+ * @link http://www.thinkglobalschool.com/
+ *
  */
 
 $object = $vars['item']->getObjectEntity();

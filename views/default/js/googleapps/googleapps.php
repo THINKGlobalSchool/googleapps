@@ -10,16 +10,10 @@
  *
  */
 
-// Get some plugin settings
-$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
-
-$interval = elgg_get_plugin_setting('oauth_update_interval', 'googleapps');
-$oauth_update_interval = $interval ? $interval : 3;
-
 // Doc picker
-$drive_api_client = elgg_get_plugin_setting('google_drive_api_client_id', 'googleapps');
+$drive_api_client = elgg_get_plugin_setting('google_api_client_id', 'googleapps');
+// Strip out the '.apps.googleusercontent.com'
+$drive_api_client = str_replace(".apps.googleusercontent.com", '', $drive_api_client);
 $drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 
 ?>
@@ -27,10 +21,6 @@ $drive_api_key = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 elgg.provide('elgg.google');
 
 // Get php vars
-elgg.google.SYNC_EMAIL = "<?php echo $oauth_sync_email; ?>";
-elgg.google.SYNC_SITES = "<?php echo $oauth_sync_sites; ?>";
-elgg.google.SYNC_DOCS = "<?php echo $oauth_sync_docs; ?>";
-elgg.google.UPDATE_INTERVAL = "<?php echo $oauth_update_interval; ?>";
 elgg.google.DRIVE_API_CLIENT = "<?php echo $drive_api_client; ?>";
 elgg.google.DRIVE_API_KEY = "<?php echo $drive_api_key; ?>";
 
@@ -43,9 +33,6 @@ elgg.google.apiLoaded = false;
  * Main init function
  */
 elgg.google.init = function() {	
-	// Register interval for future updates
-	//setInterval(elgg.google.updateGoogleApps, (elgg.google.UPDATE_INTERVAL * 60 * 1000));
-	
 	// Google Docs Form Stuff
 	$('.permissions-update-input').live('click', function(event) {
 		var $form = $(this).closest('form');
@@ -212,32 +199,6 @@ elgg.google.initPickers = function() {
 				}
 		});
 	});
-}
-
-/**
- * Call the oauth_update action
- */
-elgg.google.updateGoogleApps = function() {	
-	elgg.action('google/auth/oauth_update', {
-		error: function(e) {
-			console.log(e);
-		},
-		success: function(json) {
-			
-			// Check if grabbing email count is enabled
-			if (elgg.google.SYNC_EMAIL == 'yes') {
-				var anchor = $('.google-email-container a');
-				
-				// Nuke the messages-new span if no messages
-				anchor.find('.messages-new').remove();
-				
-				// Add mail count if it exists
-				if (json.output.mail_count && json.output.mail_count != 0) {
-					anchor.append("<span class='messages-new'>" + json.output.mail_count + "</span>")
-				} 
-			}
-		}
-	});	
 }
 
 /**

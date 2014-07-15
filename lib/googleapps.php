@@ -10,9 +10,6 @@
  *
  */
 
-// Throwing this in here for now
-require_once(elgg_get_plugins_path() . 'googleapps/lib/GAOAuth.php');
-
 /**
  * Get account settings content
  */
@@ -21,17 +18,15 @@ function googleapps_get_page_content_settings_account() {
 	
 	$user = elgg_get_logged_in_user_entity();
 
-	if ($user->google == 1) {
-		$params['content'] = "<div>" . elgg_echo('googleapps:usersettings:sync_description') . "</div><br />";
+	if ($user->google_connected == TRUE) {
 		$vars = array(
 			'id' => 'google-auth-settings-form',
 			'forms' => 'google_auth_settings_form',
 		);
-		$params['content'] .= elgg_view_form('google/auth/settings', $vars, array('user' => $user));
-		$params['content'] .= elgg_view_form('google/auth/disconnect');
+		$params['content'] = elgg_view_form('google/auth/settings', $vars, array('user' => $user));
+		$params['content'] .= elgg_view_form('google/auth/disconnect', array('class' => 'elgg-form-alt'));
 	} else {
-		$params['content'] .= "<div>" . elgg_echo('googleapps:usersettings:login_description') . "</div><br />";
-		$params['content'] .= elgg_view_form('google/auth/connect');
+		$params['content'] = elgg_view_form('google/auth/connect');
 	}
 	
 	$params['layout'] = 'one_sidebar';
@@ -169,8 +164,6 @@ function googleapps_get_page_content_docs_share($guid = null) {
 		$title = elgg_echo('googleapps:label:google_docs');
 	}
 
-
-	
 	$params = array(
 		'filter' => '',
 	);
@@ -283,31 +276,38 @@ function google_doc_prepare_form_vars($google_doc = NULL) {
 	return $values;
 }
 
+
 /**
- * Sanitize/normalize the google doc url
- * When you load up a google doc in the browser, sometimes you'll get:
- * docs1.google.com/... or spreadsheets2.google.com/...
- *
- * Need to normalize the url to be just plain docs or spreadsheets.. or whatever
+ * Generate google client
+ * 
+ * @return Google_Client
  */
-function googleapps_santize_google_doc_input($string) {
-	// Strip out http:// and https://, trim whitespace and '#'s
-	$string = str_replace(array('http://','https://'), '', trim(strtolower($string), " #"));
+function googleapps_get_client() {
+	elgg_load_library('gapc:Client'); // Main client
+	elgg_load_library('gapc:Plus'); // Plus
+	
+	// Get client id/secret from plugin settings
+	$client_id = elgg_get_plugin_setting('google_api_client_id', 'googleapps');
+	$client_secret = elgg_get_plugin_setting('google_api_client_secret', 'googleapps');
+	$redirect_uri = elgg_get_site_url() . "googleapps/auth/callback";
 
-	$prefix = substr($string, 0, strpos($string, '.'));
-	$new_prefix = trim($prefix, '1234567890');
-
-	$string = str_replace($prefix, $new_prefix, $string);
-	return $string;
+	$client = new Google_Client();
+	$client->setClientId($client_id);
+	$client->setClientSecret($client_secret);
+	$client->setRedirectUri($redirect_uri);
+	$client->setScopes(array('email', 'profile', 'https://sites.google.com/feeds/', 'https://www.googleapis.com/auth/drive'));
+	$client->setAccessType('offline');
+	$client->setApplicationName(elgg_get_plugin_setting('google_domain_label', 'googleapps'));
+	return $client;
 }
 
 /**
- * Delete all site entities
+ * Delete all site entities (debug)
  */
 function googleapps_delete_all_site_entities() {
 	$site_entities = elgg_get_entities(array(
 		'type'=>'object', 
-		'subtype'=>'site', 
+		'subtype'=>'site',
 		'limit'=>0
 	));
 
@@ -319,599 +319,193 @@ function googleapps_delete_all_site_entities() {
 }
 
 /**
- * Functions for use OAuth
- */
-
-function calc_access($access) {
-	if ($access == 22) return 2; // public
-	if ($access == 2) return 1; // logged-in
-	return $access; // 0 = private site
-}
-
-/**
- * Returns the client object with the given $user access token
- *
- * @param object $user
- * @return object
- */
-function get_client($user) {
-	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
-
-	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
-	$client->access_token = $user->access_token;
-	$client->access_secret = $user->token_secret;
-
-	return $client;
-}
-
-/**
- * Returns the authorized client for request google data
- *
- * @param bool $ajax
- * @return object|false
- */
-function authorized_client($ajax = false) {
-	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
-
-	$user = $_SESSION['user'];
-	if (!empty($user->access_token)) {
-		$_SESSION['access_token'] = $user->access_token;
-	}
-	if (!empty($user->token_secret)) {
-		$_SESSION['token_secret'] = $user->token_secret;
-	}
-
-	$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
-
-	if (!empty($client->access_token)) {
-		$_SESSION['access_token'] = $client->access_token;
-	}
-	if (!empty($client->access_secret)) {
-		$_SESSION['access_secret'] = $client->access_secret;
-	}
-
-	if ($client->authorized()) {
-		return $client;
-	} else {
-		if (!$ajax) {
-			// Authorise user in google for access to data
-			$url = $client->oauth_authorize();
-			header('Location: ' . $url);
-			exit;
-		} else {
-			return false;
-		}
-	}
-}
-
-/**
- * Returns the google data
- *
- * @param bool $ajax
- * @return object
- */
-function googleapps_get_oauth_data($ajax = false) {
-	$client = authorized_client($ajax);
-	if ($client) {
-		$x = googleapps_fetch_oauth_data($client, $ajax);
-		if ($ajax) {
-			return $x;
-		}
-	}
-}
-
-/**
- * Parse the google request data
- *
- * @todo not sure what this function needs to be now.. pretty much just handles email at this point
- * @param object $client
- * @param bool $ajax
- * @param string $scope
- * @return object|false
- */
-function googleapps_fetch_oauth_data($client, $ajax = false, $scope = null) {
-	set_time_limit(0); // No timeout until this is sped up
-
-	if (!is_object($client)) {
-		return false;
-	}
-
-	$all = true;
-
-	if (!empty($scope)) {
-		$scope = explode(' ', $scope);
-		$all = false;
-	}
-
-	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-
-	$count = 0;
-	$user = $_SESSION['user'];
-	if ($oauth_sync_email != 'no' &&
-	((!$all && in_array('mail', $scope)) || $all)) {
-		// Get count unread messages of gmail
-		$count = $client->unread_messages();
-		$_SESSION['google_mail_count'] = $count;
-	}
-
-	if ($ajax) {
-		$response = array();
-		$response['mail_count'] = !empty($count) ? $count : 0;
-		//$response['new_activity'] = !empty($is_new_activity) ? 1 : 0;
-		$response['new_docs'] = 0; //!empty($is_new_docs) ? 1 : 0;
-		return json_encode($response);
-	}
-}
-
-/**
- * Get google docs folders for authorised client
+ * Change the google drive file permissions based on chosen elgg permissions
  *
  * @param object $client
- * @return object
+ * @param string $doc_id Document id
+ * @param string $access public | domain
+ * @return bool
  */
-function googleapps_get_google_docs_folders($client) {
+function googleapps_update_file_permissions($client, $doc_id, $access) {
+	if (empty($doc_id) || !$doc_id) {
+		return FALSE;
+	}
 
-	$feed = 'https://docs.google.com/feeds/default/private/full/-/folder';
-	$result = $client->execute($feed, '3.0');
-	$folders_rss = simplexml_load_string($result);
+	elgg_load_library('gapc:Drive'); // Load drive lib
 
-	$folders = folders_from_rss($folders_rss);
+	$service = new Google_Service_Drive($client);
+	
+	$new_permission = new Google_Service_Drive_Permission();
+	$new_permission->setRole('reader');
 
-	return $folders;
-
-}
-
-/**
- * Change the google docs permissions based on chosen elgg permissions
- *
- * @param OAuthClient 	$client 	OAUTH client
- * @param string 		$doc_id 	Document id
- * @param string 		$access		public | domain
- */
-function googleapps_update_doc_permissions($client, $doc_id, $access) {
-
-	$feed = 'https://docs.google.com/feeds/default/private/full/'. $doc_id.'/acl';
-
-	$data = "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:gAcl='http://schemas.google.com/acl/2007'>
-			<category scheme='http://schemas.google.com/g/2005#kind'
-			term='http://schemas.google.com/acl/2007#accessRule'/>
-	        <gAcl:role value='reader'/> ";
-
+	// Set new permission based on access requested
 	if ($access == "domain") {
 		$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-		$data .= "<gAcl:scope type=\"domain\" value=\"" . $domain . "\" />";
+		$new_permission->setType('domain');
+		$new_permission->setDomain($domain);
+		$new_permission->setValue($domain);
 	} else if ($access == 'public') {
-		$data .= "<gAcl:scope type=\"default\"/>";
+		$new_permission->setType('anyone');
+		$new_permission->setValue('anyone');
 	}
 	
-
-	$data .= "</entry>";
-
-	$result = $client->execute_post($feed, '3.0', null, 'POST', $data);
-}
-
-
-/**
- * Get google docs for authorized client and folder
- *
- * @param object $client
- * @param string $folder
- * @return object
- */
-function googleapps_get_google_docs($client, $folder = null, $limit = 50, $start_key = NULL) {
-	$params = array('max-results' => $limit, 'expand-acl' => 'true'); 
-	
-	if ($start_key) {
-		$params['start-key'] = $start_key;
+	try {
+		return $service->permissions->insert($doc_id, $new_permission);
+	} catch (Exception $e) {
+		//var_dump($e);
+		return FALSE;
 	}
-
-	// Get google docs feeds list
-	if (empty($folder)) {
-		$feed = 'https://docs.google.com/feeds/default/private/full/-/mine';
-	} else {
-		$feed = 'https://docs.google.com/feeds/default/private/full/' . $folder . '/contents';
-	}
-	$feed = $feed . '?' . implode_assoc('=', '&', $params);
-
-	$result = $client->execute($feed, '3.0', $params);
-
-	$rss = simplexml_load_string($result);
-
-	$documents = array();
-	
-	// Get next feed link
-	foreach ($rss->link as $link) {
-		if ($link->attributes()->rel == 'next') {
-			$next_feed = (string)$link->attributes()->href;
-		}
-	}
-	
-	if ($next_feed) {
-		// Need to parse out the 'start-key' param
-		$url_bits = parse_url($next_feed);
-		parse_str($url_bits['query'], $query);
-		$next_start_key = $query['start-key'];
-	}
-
-	// Parse entries for each google document
-	foreach ($rss->entry as $item) {
-		$doc = googleapps_parse_doc_from_xml_element($item);
-		$documents[] = $doc;
-	}
-	return array(
-		'list' => $documents,
-		'start_key' => $next_start_key,
-	);
-
 }
 
 /**
- * Get a single google doc from supplied ID
+ * Get a single google drive file from supplied ID
  * 
  * @param object $client
  * @param string $id
- * @return array
+ * @return Google_Service_Drive_DriveFile
  */
-function googleapps_get_doc_from_id($client, $id) {
+function googleapps_get_file_from_id($client, $id) {
 	if (empty($id) || !$id) {
 		return FALSE;
 	}
 
-	$params = array('expand-acl' => 'true'); 
+	elgg_load_library('gapc:Drive'); // Load drive lib
 
-	$feed = "https://docs.google.com/feeds/default/private/full/{$id}?expand-acl=true";
+	$service = new Google_Service_Drive($client);
 
-	$result = $client->execute($feed, '3.0', $params);
+	$file = $service->files->get($id);
 
-	$rss = simplexml_load_string($result);
-
-	$doc = googleapps_parse_doc_from_xml_element($rss);
-
-	return $doc;
+	return $file;
 }
 
 /**
- * Parse and document array from SimpleXMLElement
+ * Get permissions for a single google drive file from supplied ID
  * 
- * @TODO fix this mess.
- *
- * @param SimpleXMLElement $item
- * @return array
+ * @param object $client
+ * @param string $id
+ * @return array Google_Service_Drive_Permission
  */
-function googleapps_parse_doc_from_xml_element($item) {
-	if (!($item instanceof SimpleXMLElement)) {
+function googleapps_get_file_permissions_from_id($client, $id) {
+	if (empty($id) || !$id) {
 		return FALSE;
 	}
 
-	$id = preg_replace('/https\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
-	$title = $item['title'];
-	$author_info = $item['author'];
-	
-	$collaborators = array();
+	elgg_load_library('gapc:Drive'); // Load drive lib
 
-	// Sort out collaborators
-	foreach ($item->xpath('gd:feedLink') as $acl_feed) {
-		// Yeah this is stupid, but xpath won't cooperate
-		foreach($acl_feed->feed as $feed) {
-			foreach($feed->entry as $feed_entry) {
-				$user = str_replace('Document Permission - ', '', $feed_entry->title);
-				$collaborators[] = $user;
-			}
-		}
-	}
+	$service = new Google_Service_Drive($client);
 
-	// Could be public or everyone
-	if (in_array('default', $collaborators)) {
-		$collaborators = 'public'; // Public document
-	} else if (in_array(elgg_get_plugin_setting('googleapps_domain', 'googleapps'), $collaborators)) {
-		$collaborators = 'domain'; // Shared with domain
-	}
+	$permissions = $service->permissions->listPermissions($id)->getItems();
 
-	$links = $item->link;
-	$src = '';
-	$is_folder = false;
-	$type = '';
-
-	foreach ($item->category as $category) {
-		$attrs = array();
-		foreach ($category->attributes() as $a => $value) {
-			$attrs[$a] = $value[0];
-		}
-		if (!empty ($attrs['scheme']) && $attrs['scheme'] == 'http://schemas.google.com/g/2005#kind') {
-			$type = preg_replace('/\ label\=\"(.*)\"/', '$1', $attrs['label']->asXML());
-			$is_folder = ($type == 'folder');
-		}
-	}
-
-	foreach ($item->link as $link) {
-		$attrs = array();
-		foreach ($link->attributes() as $a => $value) {
-			$attrs[$a] = $value[0];
-		}
-
-		if (!empty ($attrs['rel'])) {
-			if ($attrs['rel'] == 'alternate') {
-				$src = $attrs['href'];	
-			}
-
-			if ($attrs['rel'] == 'http://schemas.google.com/docs/2007#icon') {
-				foreach ($link->attributes() as $la => $lv) {
-					if ($la == 'href') {
-						$icon = "{$lv}"; 
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	if (!empty($src)) {
-		$doc['id'] = $id;
-		$doc['title'] = preg_replace('/\<title\>(.*)\<\/title\>/', '$1', $item->title->asXML());
-		$doc['trunc_title'] = trunc_name($doc['title']);
-		$doc['href'] = preg_replace('/href=\"(.*)\"/', '$1', $src->asXML());
-		$doc['type'] = $type;
-		$doc['updated'] = strtotime($item->updated);
-		$doc['collaborators'] = $collaborators;
-		$doc['icon'] = $icon;
-		$doc['owner_name'] = (string)$item->author->name;
-		$doc['owner_email'] = (string)$item->author->email;
-		return $doc;
-	} else {
-		return FALSE;
-	}
-}
-
-/**
- * Parse google folders from rss response
- *
- * @param string $folders
- * @return array
- */
-function folders_from_rss($folders) {
-
-	$folds = array();
-
-	foreach ($folders->entry as $item) {
-		$id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/id\/(.*)/', '$1', $item->id);
-		$title = preg_replace('/\<title\>(.*)\<\/title\>/', '$1', $item->title->asXML());
-		$parent_id = null;
-
-		foreach ($item->link as $link) {
-			$attrs = array();
-			foreach ($link->attributes() as $a => $value) {
-				$attrs[$a] = $value[0];
-			}
-			if ($attrs['rel'] == 'http://schemas.google.com/docs/2007#parent') {
-				$parent_id = preg_replace('/http\:\/\/docs\.google\.com\/feeds\/default\/private\/full\/(.*)/', '$1', $attrs['href']);
-				break;
-			}
-		}
-
-		$folder = new stdClass;
-		$folder->id = $id;
-		$folder->title = $title;
-		$folder->parent_id = $parent_id;
-		$folds[$folder->id] = $folder;
-	}
-
-	return $folds;
+	return $permissions;
 
 }
 
 /**
- * Get child folders
+ * Create/save a shared google document
  *
- * @param string $parent_id
- * @param string $folders
- * @return array
- */
-function child_folders($parent_id, $folders) {
-
-	$folds = array();
-
-	foreach ($folders as $folder) {
-		if ($parent_id == $folder->parent_id) {
-			$folds[] = $folder;
-		}
-	}
-
-	return $folds;
-
-}
-
-/**
- * Get html elements <option> from folders data
+ * @param Google_Service_Drive_DriveFile $document The google drive document
+ * @param array                          $params   Elgg object params array:
+ * 
+ * 	description => null|string Document description
  *
- * @param string $folders
- * @param string $global_folders
- * @param string $default_folder
- * @param bool $without_n
- * @return string
- */
-function walk_folders($folders, $global_folders, $default_folder = '', $without_n = false) {
-	foreach ($folders as $folder) {
-		if (!$without_n) {
-			echo '
-			';
-		}
-		echo '<option value="' . $folder->id . '"';
-		if ($default_folder == $folder->id) {
-			echo ' selected';
-		}
-		echo '>' . echo_breadcrumbs(get_breadcrumbs($folder->id, $global_folders)) . '</option>';
-
-		$folds = child_folders($folder->id, $global_folders);
-		walk_folders($folds, $global_folders, $default_folder, $without_n);
-	}
-}
-
-/**
- * Get breadcrumbs for folder
+ * 	tags => null|array Document tags
  *
- * @param string $folder_id
- * @param string $folders
- * @param string $path
- * @return string
- */
-function get_breadcrumbs($folder_id, $folders, $path = null) {
-	if (!$path) {
-		$path = array();
-	}
-
-	foreach ($folders as $folder) {
-		if ($folder_id == $folder->id) {
-			$path[] = $folder->title;
-			return get_breadcrumbs($folder->parent_id, $folders, $path);
-			break;
-		}
-	}
-
-	return $path;
-}
-
-/**
- * Shorten long names in breadcrumbs for path
+ * 	access_id => null|INT Document access level
  *
- * @param string $path
- * @return string
- */
-function echo_breadcrumbs($path = null) {
-
-	if (!$path) {
-		return false;
-	}
-	$i = 0;
-	$result = '';
-
-	if (count($path) > 2) {
-		$newpath = array();
-		$newpath[] = $path[0];
-		$newpath[] = '...';
-		$newpath[] = end($path);
-		$path = $newpath;
-	}
-
-	foreach ($path as $folder) {
-		if ($i > 0) {
-			$result = ' > ' . $result;
-		}
-		$result = trunc_name($folder) . $result;
-		$i++;
-	}
-
-	return $result;
-
-}
-
-/**
- * Shorten long name
+ * 	container_guid => null|INT Container guid for the document
  *
- * @param string $string
- * @return string
- */
-function trunc_name($string = '') {
-
-	if (empty($string)) {
-		return false;
-	}
-
-	$i = 0;
-	$result = '';
-
-	$path = explode(' ', $string);
-
-	if (count($path) > 2) {
-		if (count($path) == 3 && strlen($path[1]) < 4) {
-			return $string;
-		}
-		$newpath = array();
-		$newpath[] = $path[0];
-		$newpath[] = '...';
-		$newpath[] = end($path);
-		$path = $newpath;
-
-		$result = implode(' ', $path);
-
-		return $result;
-	}
-
-	return $string;
-}
-
-/**
- * Create the shared google document
+ * 	entity_guid => null|INT Supply this to update an existing entity
  *
- * @param array  $document       Array reprentation of the google document
- * @param string $description    Description to add
- * @param array  $tags           Elgg tag array to add to document
- * @param mixed  $access_id      Access id
- * @param int    $container_guid Container guid for the entity
- * @param int    $entity_guid    Optional entity guid (determines wether or not to create new)
  * @return bool
  */
-function share_document($document, $description, $tags, $access_id, $container_guid, $entity_guid = FALSE) {
-	// Check for entity
-	if ($entity_guid) {
-		$shared_doc = get_entity($entity_guid);
-		if (!elgg_instanceof($shared_doc, 'object', 'shared_doc')) {
-			register_error(elgg_echo('googleapps:error:invaliddoc'));
-			exit;
-		}
-	} else {
-		// No guid, make a new one
-		$shared_doc = new ElggObject();
-		$shared_doc->subtype 		= "shared_doc";
+function googleapps_save_shared_document($document, $params = array()) {
+	// Check for valid drive file
+	if (!($document instanceof Google_Service_Drive_DriveFile)) {
+		register_error(elgg_echo('googleapps:error:invaliddoc'));
+		return FALSE;
 	}
 
-	$shared_doc->title 			= $document['title'];
-	$shared_doc->trunc_title 	= $document['trunc_title'];
-	$shared_doc->description 	= $description;
-	$shared_doc->res_id			= $document['id'];
-	$shared_doc->tags			= string_to_tag_array($tags);
-	$shared_doc->updated		= $document['updated'];
-	$shared_doc->access_id 		= $access_id;
-	$shared_doc->collaborators	= $document['collaborators'];
-	$shared_doc->href			= $document['href'];
-	$shared_doc->container_guid	= $container_guid;
-	$shared_doc->icon           = $document['icon'];
+	// Supply some defaults
+	$defaults = array(
+		'access_id'      => ACCESS_LOGGED_IN,
+		'container_guid' => elgg_get_logged_in_user_guid(),
+		'entity_guid'    => FALSE
+	);
+
+	$params = array_merge($defaults, $params);
+
+	// Check if we were supplied with an entity_guid
+	if ($params['entity_guid']) {
+		// Got one, check if it's a valid entity
+		$shared_doc = get_entity($params['entity_guid']);
+		if (!elgg_instanceof($shared_doc, 'object', 'shared_doc')) {
+			register_error(elgg_echo('googleapps:error:invaliddoc'));
+			return FALSE;
+		}
+	} else {
+		// New object
+		$shared_doc = new ElggObject();
+		$shared_doc->subtype = 'shared_doc';
+	}
+
+	// Set document metadata from drive object
+	$shared_doc->title          = $document->getTitle();
+	$shared_doc->res_id         = $document->getId();
+	$shared_doc->updated        = strtotime($document->getModifiedDate()); // CHECK ME
+	$shared_doc->href           = $document->getAlternateLink();
+	$shared_doc->icon           = $document->getIconLink();
+	
+	$shared_doc->description    = $params['description'];
+	$shared_doc->access_id      = $params['access_id'];
+	$shared_doc->container_guid	= $params['container_guid'];
+	$shared_doc->tags           = string_to_tag_array($params['tags']);
 
 	if (!$shared_doc->save()) {
 		register_error(elgg_echo('googleapps:error:share_doc'));
 		exit;
 	}
 
-	if (!$entity_guid) {
+	if (!$params['entity_guid']) {
 		// Add to river
 		add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
 	}
 	
-	return true;
+	return TRUE;
 }
 
-function get_members_emails($members) {
-	$members_emails = array();
-	foreach ($members as $member) {
-		$members_emails[]=$member['email'];
-	}
+/**
+ * Get the Google access tokens for the admin user (supplied in plugin settings)
+ *
+ * @return string json_encode'd array of admin user's access tokens
+ */
+function googleapps_get_admin_tokens() {
+	$admin_username = elgg_get_plugin_setting('google_admin_username', 'googleapps');
+	$admin_user = get_user_by_username($admin_username);
 
-	return  $members_emails;
+	if (!elgg_instanceof($admin_user, 'user')) {
+		return FALSE;
+	} else {
+		return json_encode(array(
+			'access_token' => $admin_user->google_access_token,
+			'refresh_token' => $admin_user->google_refresh_token
+		));
+	}
 }
 
-function get_members_not_shared($members, $doc) {
-	$collaborators = $doc['collaborators'];
-	$collaborators = array_flip($collaborators);
-
-	$members_not_shared = array();
-
-	foreach ($members as $member) {
-		if (is_null($collaborators[$member])) {
-			$members_not_shared[]=$member;
-		}
-	}
-	return $members_not_shared;
+/**
+ * Return given user's access tokens (default is logged in user)
+ * 
+ * @param ElggUser $user
+ * @return string json_encode'd array of user access tokens
+ */
+function googleapps_get_user_access_tokens($user = FALSE) {
+	if (!elgg_instanceof($user, 'user')) {
+		$user = elgg_get_logged_in_user_entity();
+	} 
+	return json_encode(array(
+		'access_token' => $user->google_access_token,
+		'refresh_token' => $user->google_refresh_token
+	));
 }
 
 /**
@@ -923,7 +517,7 @@ function get_members_not_shared($members, $doc) {
  */
 function googleapps_process_sites() {
 	// Don't do anything if sites are disabled
-	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
+	if (elgg_get_plugin_setting('enable_google_sites', 'googleapps') == 'no') {
 		return FALSE;
 	}
 	
@@ -932,35 +526,46 @@ function googleapps_process_sites() {
 	$log .= "Processing Google Sites\n";
 	$log .= "-----------------------\n";
 	
-	/* Build a 2-legged OAuth Client */		// @TODO should be in a function 
-	$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-	$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
-	$ADMIN_ACCOUNT = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
-	//$client = new OAuthClient($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC);
-	
-	$params = array('max-results' => 500, 'include-all-sites' => 'true'); 
-	
-	$client = OAuthClient::create_2_legged_client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC, null, $ADMIN_ACCOUNT, $params);
-	
+	$client = googleapps_get_client();
+
 	if ($client) {
+		// Get admin user tokens
+		$access_token = googleapps_get_admin_tokens();
 
-		$log .= "Creating 2-legged client for: {$ADMIN_ACCOUNT}\n";
+		if (!$access_token) {
+			$log .= "ABORTING: Invalid admin user or missing access tokens.\n";
+			if (elgg_in_context('googleapps_sites_log')) {
+				echo "<pre>";
+				echo $log;
+				echo "</pre>";
+			}
+			return FALSE;
+		}
 
-		//$params = array('max-results' => 500, 'xoauth_requestor_id' => $ADMIN_ACCOUNT, 'include-all-sites' => 'true'); 
- 
-		$base_feed = "https://sites.google.com/feeds/site/$CONSUMER_KEY/";
+		$client->setAccessToken($access_token);
 
-		$url = $base_feed . '?' . implode_assoc('=', '&', $client->params);
+		$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 
-		$log .= "Request: {$url}\n";
+		$base_feed = "https://sites.google.com/feeds/site/{$domain}";
 
-		$result = $client->execute_without_token($url, '1.4', $client->params);
+		$feed_params = array(
+			'alt' => 'json',
+			'include-all-sites' => 'true',
+			'max-results' => 500,
+		);
 
-		$response_list = $client->populate_sites($result); // Site list
+		$feed_url = $base_feed . '?' . implode_assoc('=', '&', $feed_params);
 
-		if ($response_list && is_array($response_list) && count($response_list) > 0) {
-			$log .= "\nSuccess..\n";
-			
+		$log .= "Request: {$feed_url}\n";
+
+		// Get sites feed
+		$request = new Google_Http_Request($feed_url, 'GET');
+		$response = $client->getAuth()->authenticatedRequest($request);
+		$response = json_decode($response->getResponseBody(), TRUE);
+
+		if ($response && is_array($response) && count($response) > 0) {
+			$log .= "\nSuccess..\n\n";
+
 			// Get exising elgg site entities
 			$site_entities = elgg_get_entities(array(
 				'type' => 'object', 
@@ -970,9 +575,15 @@ function googleapps_process_sites() {
 			
 			// Elgg site guid, for owner/container guid's
 			$site_guid = elgg_get_site_entity()->guid;
+
+			if (!$site_entities) {
+				$site_count = 0;
+			} else {
+				$site_count = count($site_entities);
+			}
 			
-			$log .= "Found " . count($site_entities) . " local site(s)\n";
-			
+			$log .= "Found {$site_count} local site(s)\n";
+
 			// Array to compare local site id's
 			$local_site_ids = array();
 			
@@ -980,8 +591,9 @@ function googleapps_process_sites() {
 			$remote_site_ids = array();
 			
 			// Build an array of remote site id's
-			foreach ($response_list as $site) {
-				$remote_site_ids[] = $site['site_id'];
+			foreach ($response['feed']['entry'] as $site) {
+				$site_id = $site['id']['$t'];
+				$remote_site_ids[] = $site_id;
 			}
 	
 			// Deleted count
@@ -1011,32 +623,87 @@ function googleapps_process_sites() {
 			}
 			
 			// Process all remote sites
-			$log .= "\nFound " . count($response_list) . " remote site(s)\n";
-
+			$log .= "\nFound " . count($response['feed']['entry']) . " remote site(s)\n";
+			
 			$log .= "\nRemote list:\n------------\n";
 			
 			// Array to hold new site
 			$new_sites = array();
 			
 			// Process new sites
-			foreach ($response_list as $site) {
-				$log .= "\n[{$site['title']}]\n";
-				$log .= "ID: {$site['site_id']}\n";
-				$log .= "URL: {$site['url']}\n";
+			foreach ($response['feed']['entry'] as $site) {
+				$site_title = $site['title']['$t'];
+				$site_id = $site['id']['$t'];
+
+				$log .= "\n[{$site_title}]\n";
+				$log .= "ID: {$site_id}\n";
+
+				// Locate site URL and ACL feed url
+				foreach($site['link'] as $link) {
+					if ($link['rel'] == 'alternate') {
+						$site_url = $link['href'];
+					} else if ($link['rel'] == 'http://schemas.google.com/acl/2007#accessControlList') {
+						$acl_url = $link['href'];
+					}
+
+					
+				}
+
+				// Build ACL feed request
+				$acl_feed_params = array(
+					'alt' => 'json'
+				);
+
+				$acl_feed_url = $acl_url . '?' . implode_assoc('=', '&', $acl_feed_params);
+
+				// Get ACL feed
+				$request = new Google_Http_Request($acl_feed_url, 'GET');
+				$response = $client->getAuth()->authenticatedRequest($request);
+				$response = json_decode($response->getResponseBody(), TRUE);
 				
-				if (!in_array($site['site_id'], $local_site_ids)) {
-					$new_sites[$site['title']] = $site['site_id'];
+				// Build an array of owner emails
+				$site_owners = array();
+				foreach ($response['feed']['entry'] as $entry) {
+					if ($entry['gAcl$role']['value'] == 'owner' && $entry['gAcl$scope']['type'] == 'user') {
+						$site_owners[] = $entry['gAcl$scope']['value'];
+					}
+				}
+
+				// Get activity feed (just replace feed location from the acl feed url)
+				$activity_url = preg_replace('!(.*)feeds/acl/site/(.*)!', '$1feeds/activity/$2', $acl_feed_url);
+				
+				// Get activity feed
+				$request = new Google_Http_Request($activity_url, 'GET');
+				$response = $client->getAuth()->authenticatedRequest($request);
+				$response = json_decode($response->getResponseBody(), TRUE);
+				
+				// See if there is any site activity, if so grab the latest timestamp
+				$site_updated = FALSE;
+				foreach ($response['feed']['entry'] as $entry) {
+					$site_updated = strtotime($entry['updated']['$t']);
+					break;
+				}
+				
+				// If there was no site activity, use the main site feed updated timestamp
+				if (!$site_updated) {
+					$site_updated = strtotime($site['updated']['$t']);
+				}
+
+				$log .= "URL: {$site_url}\n";
+										
+				if (!in_array($site_id, $local_site_ids)) {
+					$new_sites[$site_title] = $site_id;
 
 					// Create new site
 					$new_site = new ElggObject();
 					$new_site->owner_guid = $site_guid;
 					$new_site->container_guid = $site_guid;
-					$new_site->site_id = $site['site_id'];
-					$new_site->title = $site['title'];
+					$new_site->site_id = $site_id;
+					$new_site->title = $site_title;
 					$new_site->subtype = "site";
-					$new_site->url = $site['url'];
-					$new_site->modified = $site['modified'];
-					$new_site->remote_owners = $site['owners'];
+					$new_site->url = $site_url;
+					$new_site->modified = $site_updated;
+					$new_site->remote_owners = $site_owners;
 					$new_site->access_id = ACCESS_PRIVATE; // Default access, admin controlled
 					//$new_site->site_access_id = ACCESS_PRIVATE ; // for site
 					$new_site->save();
@@ -1046,7 +713,14 @@ function googleapps_process_sites() {
 				} else {
 					$log .= "Local site exists!\n";
 					// Update local site info
-					googleapps_update_local_site_info($site);
+					$remote_site = array(
+						'modified' => $site_updated,
+						'owners' => $site_owners,
+						'url' => $site_url,
+						'title' => $site_title,
+						'site_id' => $site_id
+					);
+					googleapps_update_local_site_info($remote_site);
 				}
 			}
 			
@@ -1079,7 +753,7 @@ function googleapps_process_sites() {
 	}
 
 	return array(
-		'response_list'=>$response_list,  
+		'response_list'=>$response,  
 		'site_entities'=>$site_entities,
 		'all_site_entities'=>$site_entities // @TODO phase this out
 	);
@@ -1093,12 +767,11 @@ function googleapps_process_sites() {
  */
 function googleapps_process_sites_activity() {
 	// Don't do anything if sites are disabled
-	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') == 'no') {
+	if (elgg_get_plugin_setting('enable_google_sites', 'googleapps') == 'no') {
 		return FALSE;
 	}
 	
 	set_time_limit(0); // Long timeout, just in case
-
 	$log .= "Processing Google Sites Activity\n";
 	$log .= "--------------------------------\n";
 	
@@ -1124,7 +797,7 @@ function googleapps_process_sites_activity() {
 	
 	if ($count >= 1) {
 		$log .= "Found {$count} connected site(s).\n";
-		
+
 		// Grab sites as a batch
 		unset($options['count']);
 		$sites = new ElggBatch('elgg_get_entities', $options);
@@ -1162,23 +835,33 @@ function googleapps_process_sites_activity() {
 			}
 		}
 
-		/* Build a 2-legged OAuth Client */
-		$CONSUMER_KEY = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-		$CONSUMER_SECRET = elgg_get_plugin_setting('login_secret', 'googleapps');
-		$ADMIN_ACCOUNT = elgg_get_plugin_setting('oauth_admin_account', 'googleapps');
 
-		$params = array('max-results' => 500); 
-
-		$client = OAuthClient::create_2_legged_client($CONSUMER_KEY, $CONSUMER_SECRET, SIG_METHOD_HMAC, null, $ADMIN_ACCOUNT, $params);
+		$client = googleapps_get_client();
 		
 		if ($client) {
-			$log .= "\nCreating 2-legged client for: {$ADMIN_ACCOUNT}\n";
+			// Get admin user tokens
+			$access_token = googleapps_get_admin_tokens();
+
+			if (!$access_token) {
+				$log .= "ABORTING: Invalid admin user or missing access tokens.\n";
+				if (elgg_in_context('googleapps_sites_log')) {
+					echo "<pre>";
+					echo $log;
+					echo "</pre>";
+				}
+				return FALSE;
+			}
+
+			$client->setAccessToken($access_token);
+
+			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
 			
 			// Elgg site guid, for owner/container guid's
 			$site_guid = elgg_get_site_entity()->guid;
 			
 			// Loop over our connected sites
 			foreach ($sites_groups as $site_group) {
+
 				$site = $site_group['site'];   // Site entity
 	
 				$group = $site_group['group']; // Group entity
@@ -1186,10 +869,14 @@ function googleapps_process_sites_activity() {
 				// Create feed url
 				$activity_feed = preg_replace('!(.*)feeds/site/(.*)!', '$1feeds/activity/$2', $site->site_id);
 
-				// Add params
-				$url = $activity_feed . '?' . implode_assoc('=', '&', $client->params);
+				$activity_feed_params = array(
+					'alt' => 'json',
+					'max-results' => 500,
+				);
 
-				$log .= "\nProcessing [{$site->title}]...\n\n	Request: {$url}\n\n";
+				$activity_feed_url = $activity_feed . '?' . implode_assoc('=', '&', $activity_feed_params);
+
+				$log .= "\nProcessing [{$site->title}]...\n\n	Request: {$activity_feed_url}\n\n";
 				
 				// Skip sites that have been set back to private
 				if ($site->access_id == ACCESS_PRIVATE) {
@@ -1197,11 +884,10 @@ function googleapps_process_sites_activity() {
 					continue;
 				}
 
-				// Execute request
-				$result = $client->execute_without_token($url, '1.4', $client->params);
-
-				// Objectify that feed
-				$activity_xml = simplexml_load_string($result);
+				// Get activity feed
+				$request = new Google_Http_Request($activity_feed_url, 'GET');
+				$response = $client->getAuth()->authenticatedRequest($request);
+				$response = json_decode($response->getResponseBody(), TRUE);
 
 				$last_activity_time = $site->last_activity_time;
 
@@ -1213,19 +899,20 @@ function googleapps_process_sites_activity() {
 				// Title for activity
 				$title = "Changes on {$site->title} site";
 
-				// Loop over each activity entry
-				foreach ($activity_xml->entry as $item) {
-					$activity_time = strtotime($item->updated);
-					
-					// If the sites activity time is less than the activity entry
-					// we need to post a new object
+				// Loop over activity entries
+				foreach ($response['feed']['entry'] as $entry) {
+					$activity_time = strtotime($entry['updated']['$t']);
+
 					if ($last_activity_time < $activity_time) {
 						// Get activity info
-						$summary = $item->summary->div->asXML();
-						$summary_link = $item->summary->div->a->asXML();
-						$author_email = @$item->author->email[0];
-						$author_name = @$item->author->name[0];
-						
+						$summary = $entry['summary']['$t'];
+
+						// Parse out summary link
+						preg_match_all('~<a\s+.*?</a>~is',$summary,$anchors);
+						$summary_link = $anchors[0][0];
+						$author_email = $entry['author'][0]['email']['$t'];
+						$author_name = $entry['author'][0]['name']['$t'];
+
 						// Store activity timestamps
 						$activity_times[] = $activity_time;
 
@@ -1244,12 +931,12 @@ function googleapps_process_sites_activity() {
 						}
 
 						// Use the api provided category terms to identify action type
-						$category_term = $item->category->attributes()->term;
-						$category_label = $item->category->attributes()->label;
-
+						$category_term = $entry['category'][0]['term'];
+						$category_label = $entry['category'][0]['label'];
+				
 						$log .= "	Found new activity! $author_output $category_label @ $activity_time\n";
-						
-						// Create new site
+					
+						// Create new site activity object
 						$site_activity = new ElggObject();
 						$site_activity->subtype = 'site_activity';
 						
@@ -1270,7 +957,7 @@ function googleapps_process_sites_activity() {
 						$site_activity->site_url = $site->url;
 						$site_activity->author_name = $author_name;
 						$site_activity->summary = $summary;           // Full 'summary' element
-						$site_activity->summary_link = $summary_link; // Just the targeted page that was edited
+						$site_activity->summary_link = $summary_link;
 						
 						// Category term/label
 						$site_activity->category_term = $category_term;
@@ -1291,9 +978,9 @@ function googleapps_process_sites_activity() {
 						} else {
 							$log .= "	Site activity creation failed!!\n\n";
 						}
-					}				
+					}
 				}
-				
+
 				if ($site_new_activity_count) {
 					$log .= "	Created $site_new_activity_count new site_activity object(s)\n";
 					
@@ -1307,10 +994,9 @@ function googleapps_process_sites_activity() {
 			$log .= "Error creating client!\n";
 		}
 	} else {
-		$log .= "No connected sites found. Aborting.\n";
+		$log .= "ABORTING: No connected sites found.\n";
 	}
-	
-	
+
 	if (elgg_in_context('googleapps_sites_log')) {
 		echo "<pre>";
 		echo $log;

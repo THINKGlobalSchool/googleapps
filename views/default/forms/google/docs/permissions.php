@@ -15,7 +15,6 @@ $document_info = elgg_extract('document_info', $vars);
 $container_guid = elgg_extract('container_guid', $vars);
 $options = elgg_extract('options', $vars);
 $entity_guid = elgg_extract('entity_guid', $vars, FALSE);
-$do_create = elgg_extract('do_create', $vars);
 $success_class = elgg_extract('success_class', $vars);
 
 $message = elgg_echo('googleapps:label:access_' . $document_access);
@@ -95,14 +94,11 @@ $tags_input = elgg_view('input/hidden', array(
 	'value' => $document_info['tags'],
 ));
 
-// Check if we're skipping entity creation (just update permissions)
-if ($do_create === 'no') {
-	$create_input = elgg_view('input/hidden', array(
-		'id' => 'googleapps-do-create',
-		'name' => 'do_create',
-		'value' => 'no'
-	));
-}
+$entity_guid_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-do-create',
+	'name' => 'entity_guid',
+	'value' => $entity_guid
+));
 
 // Add optional success class
 if ($success_class) {
@@ -124,7 +120,7 @@ $form_body = <<<HTML
 	$description_input
 	$access_input
 	$tags_input
-	$create_input
+	$entity_guid_input
 	$success_class_input
 HTML;
 

@@ -1,46 +1,36 @@
 <?php
 /**
- * Elgg googlelogin plugin
+ * Elgg Google Apps Plugin
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2012
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
 elgg_register_event_handler('init','system','googleapps_init');
 
 /**
- * Init event handler
- *
- * @return NULL
+ * Init
  */
 function googleapps_init() {
-	global $CONFIG;
-
 	// Libraries
-	elgg_register_library('elgg:googleapps:helpers', elgg_get_plugins_path() . 'googleapps/lib/googleapps.php');
-	elgg_load_library('elgg:googleapps:helpers');
-
-	// Register classes
-	elgg_register_classes(elgg_get_plugins_path() . 'googleapps/lib/classes');
+	elgg_register_library('elgg:googleapps', elgg_get_plugins_path() . 'googleapps/lib/googleapps.php');
+	elgg_load_library('elgg:googleapps');
 
 	// Need to use SSL for google urls
-	$CONFIG->sslroot = str_replace('http://','https://', elgg_get_site_url());
+	elgg_set_config('sslroot', str_replace('http://','https://', elgg_get_site_url()));
 
 	// Constants
-	define('GOOGLEAPPS_ACCESS_MATCH', '-10101');
 	define('GOOGLEAPPS_GROUP_WIKI_RELATIONSHIP', 'wiki_connected_to_group');
 
 	// Register JS
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
-	elgg_register_simplecache_view('js/googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
 
 	// Register doc chooser JS
 	$fp_js = elgg_get_simplecache_url('js', 'googleapps/filepicker');
-	elgg_register_simplecache_view('js/googleapps/filepicker');
 	elgg_register_js('elgg.googlefilepicker', $fp_js);
 
 	// Register google apis for doc picker
@@ -50,7 +40,6 @@ function googleapps_init() {
 
 	// Register CSS for social login
 	$s_css = elgg_get_simplecache_url('css', 'social_login');
-	elgg_register_simplecache_view('css/social_login');
 	elgg_register_css('elgg.social_login', $s_css);
 
 	// Load social login css for non-logged in users
@@ -79,12 +68,6 @@ function googleapps_init() {
 	// Pagesetup event handler
 	elgg_register_event_handler('pagesetup','system','googleapps_pagesetup');
 
-	// Login handler
-	elgg_register_event_handler('login', 'user', 'googleapps_login');
-
-	// Hook for site menu
-	elgg_register_plugin_hook_handler('register', 'menu:topbar', 'googleapps_topbar_menu_setup', 9000);
-	
 	// Remove the edit link from the shared doc entity menu
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'googleapps_shared_doc_entity_menu_setup');
 	
@@ -140,22 +123,23 @@ function googleapps_init() {
 	elgg_register_entity_url_handler('object', 'site', 'googleapps_site_url_handler');
 
 	// add group profile and tool entries
-	if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes') {
+	if (elgg_get_plugin_setting('enable_google_docs', 'googleapps') == 'yes') {
 		elgg_extend_view('groups/tool_latest', 'googleapps/group_shared_documents');
 		add_group_tool_option('shared_doc', elgg_echo('googleapps:label:enableshareddoc'), true);
 	}
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = elgg_get_logged_in_user_entity();
-	if (!empty($user) && $user->google) {		
-		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') != 'no') {
+
+	if (!empty($user) && $user->google_connected) {		
+		if (elgg_get_plugin_setting('enable_google_docs', 'googleapps') != 'no') {
 			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 			elgg_register_menu_item('site', $item);
 		}
 	}
 
 	// Show wiki's if enabled
-	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
+	if (elgg_get_plugin_setting('enable_google_sites', 'googleapps') != 'no') {
 		$item = new ElggMenuItem('wikis', elgg_echo('googleapps:menu:wikis'), 'googleapps/wikis/all');
 		elgg_register_menu_item('site', $item);
 	}
@@ -164,7 +148,7 @@ function googleapps_init() {
 	elgg_register_widget_type('google_docs', elgg_echo('googleapps:label:google_docs'), elgg_echo('googleapps:label:google_docs_description'));
 	
 	// Add wikis edit options, and group wiki view if enabled
-	if (elgg_get_plugin_setting('oauth_sync_sites', 'googleapps') != 'no') {
+	if (elgg_get_plugin_setting('enable_google_sites', 'googleapps') != 'no') {
 		// Extend group options
 		elgg_extend_view('groups/edit', 'forms/google/wikis/group_connect', 900);
 
@@ -180,12 +164,9 @@ function googleapps_init() {
 
 	// Login Related (auth)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/auth";
-	elgg_register_action('google/auth/oauth_update', "$action_base/oauth_update.php", 'public');
 	elgg_register_action('google/auth/login', "$action_base/login.php", 'public');
-	elgg_register_action('google/auth/connect', "$action_base/connect.php", 'public');
-	elgg_register_action('google/auth/disconnect', "$action_base/disconnect.php", 'public');
-	elgg_register_action('google/auth/return', "$action_base/return.php", 'public');
-	elgg_register_action('google/auth/return_with_connect', "$action_base/return_with_connect.php", 'public');
+	elgg_register_action('google/auth/connect', "$action_base/connect.php");
+	elgg_register_action('google/auth/disconnect', "$action_base/disconnect.php");
 	elgg_register_action('google/auth/settings', "$action_base/settings.php");
 
 	// Wiki related (wiki)
@@ -212,17 +193,6 @@ function googleapps_init() {
 function googleapps_pagesetup() {
 
 	$menuitems = array();
-
-	// Settings items
-	/** @TODO delete
-	$menuitems[] = array(
-		'name' => 'wiki_settings',
-		'text' => elgg_echo('googleapps:menu:wiki_settings'),
-		'href' =>  'googleapps/settings/wikiactivity',
-		'contexts' => array('settings'),
-		'priority' => 99999,
-	);
-	*/
 
 	$menuitems[] = array(
 		'name' => 'sync_settings',
@@ -288,43 +258,6 @@ function googleapps_page_handler($page) {
 	$page_type = $page[1];
 	
 	switch ($sub_handler) {
-		case 'test':
-			// TESTING
-			elgg_load_library('gapc:Client');
-			elgg_load_library('gapc:Drive');
-			elgg_load_library('gapc:Spreadsheet');
-
-			$token = 'ya29.1.AADtN_Vn0Zjw7T2iIVI4SzmC97C-lTPDnOINog6i7HSbacNjecLpK5_Gvd8vQAU';
-			$request = new Google\Spreadsheet\Request($token);
-			$serviceRequest = new Google\Spreadsheet\DefaultServiceRequest($request);
-			Google\Spreadsheet\ServiceRequestFactory::setInstance($serviceRequest);
-
-			$spreadsheetService = new Google\Spreadsheet\SpreadsheetService();
-			$spreadsheetFeed = $spreadsheetService->getSpreadsheets();
-
-			$spreadsheet = $spreadsheetFeed->getByTitle('Fitness');
-
-			$worksheetFeed = $spreadsheet->getWorksheets();
-			$worksheet = $worksheetFeed->getByTitle('Fitness');
-			$listFeed = $worksheet->getListFeed();
-
-			$row = array(
-				'sheetid' => uniqid(),
-				'employeename' =>  'Jeff', 
-				'submissiondate' => '3/31/2014', 
-				'monthperiodstart' => 'None', 
-				'monthperiodend' => 'None',
-				'monthlycostofmembership' => 'None',
-				'nameoffacility' => 'None',
-				'proofofvisit' => 'None',
-				'createdby' => 'jtilson@thinkglobalschool.com',
-				'createdat' => '3/31/2014 16:46:49',
-				'modifiedat'=> '3/31/2014 16:47:06',
-				'attachments' => 'None'
-			);
-
-			$listFeed->insert($row);
-			break;
 		// Settings subhandler
 		case 'settings':
 			gatekeeper();
@@ -345,13 +278,6 @@ function googleapps_page_handler($page) {
 				case 'chooser':
 					echo elgg_view('forms/google/docs/chooser');
 					// Need to break out of the page handler for this one (ajax)
-					return true;
-					break;
-				case 'browser':
-					$client = authorized_client(true);
-					$start_key = get_input('start_key', null);
-					$result = googleapps_get_google_docs($client, null, 15, $start_key);
-					echo json_encode($result);
 					return true;
 					break;
 				case 'add':
@@ -420,6 +346,18 @@ function googleapps_page_handler($page) {
 				forward();
 			}
 			break;
+		// Auth related handler
+		case 'auth':
+			switch ($page_type) {
+				case 'callback':
+					$pages = dirname(__FILE__) . '/pages/google/auth';
+					include "$pages/callback.php";
+					break;
+				default; 
+					return FALSE;
+					break;
+			}
+			break;
 		default:
 			return FALSE;
 	}
@@ -428,29 +366,6 @@ function googleapps_page_handler($page) {
 
 	echo elgg_view_page($params['title'], $body);
 	return TRUE;
-}
-
-
-/**
- * googleapps login event handler, triggered on login
- * 
- * @return NULL
- */
-function googleapps_login() {
-	//ignore if this is an api call
-	if (elgg_get_context()=='api') return;
-
-	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
-
-	$user = elgg_get_logged_in_user_entity();
-	if (!empty($user) &&
-	$user->google &&
-	($oauth_sync_email != 'no')) {
-		$client = authorized_client();
-		googleapps_fetch_oauth_data($client, false, 'mail');
-	}
 }
 
 /**
@@ -588,39 +503,6 @@ function googleapps_subtype_heading_handler($hook, $type, $value, $params) {
 	if ($type == 'shared_doc') {
 		return 'Shared Docs';
 	}
-}
-
-/**
- * Topbar menu hook handler
- * - adds the new mail icon to the topbar
- */
-function googleapps_topbar_menu_setup($hook, $type, $value, $params) {		
-	
-	if (elgg_get_plugin_setting('oauth_sync_email', 'googleapps') != 'no') {
-		$user = elgg_get_logged_in_user_entity();
-		if (isset($_SESSION['google_mail_count'])) {
-			$count = $_SESSION['google_mail_count'];
-			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-			
-			$class = "elgg-icon google-email-notifier";
-			$text = "<span class='$class'></span>";
-
-			if ($count != 0) {
-				$text .= "<span class=\"messages-new\">$count</span>";
-			}
-
-			$options = array(
-				'name' => 'google_email',
-				'text' => $text,
-				'href' => "https://mail.google.com/a/$domain",
-				'priority' => 999,
-				'item_class' => 'google-email-container',
-			);
-			$value[] = ElggMenuItem::factory($options);
-		}	
-	}
-	
-	return $value;	
 }
 
 /**
@@ -763,7 +645,7 @@ function googleapps_docs_owner_block_menu($hook, $type, $value, $params) {
 		$item = new ElggMenuItem('googledocs', elgg_echo('shared_doc'), $url);
 		$value[] = $item;
 	} else {
-		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') == 'yes' && $params['entity']->shared_doc_enable != "no") {
+		if (elgg_get_plugin_setting('enable_google_docs', 'googleapps') == 'yes' && $params['entity']->shared_doc_enable != "no") {
 			$url = "googleapps/docs/group/{$params['entity']->guid}/owner";
 			$item = new ElggMenuItem('googledocs', elgg_echo('googleapps:label:groupdocs'), $url);
 			$value[] = $item;
@@ -860,7 +742,6 @@ function googleapps_longtext_menu($hook, $type, $items, $vars) {
 	elgg_load_js('elgg.googlefilepicker');
 	elgg_load_js('google-js-api');
 	elgg_load_js('google-doc-picker-client');
-	elgg_load_css('elgg.jquery.ui'); // Assuming this is registered elsewhere
 
 	return $items;
 }
