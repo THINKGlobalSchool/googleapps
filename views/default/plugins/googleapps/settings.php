@@ -11,6 +11,7 @@
 
 // Get plugin settings
 $googleapps_domain     = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+$googleapps_subdomains = elgg_get_plugin_setting('googleapps_subdomains', 'googleapps');
 
 $enable_google_sites   = elgg_get_plugin_setting('enable_google_sites', 'googleapps');
 $enable_google_docs    = elgg_get_plugin_setting('enable_google_docs', 'googleapps');
@@ -41,6 +42,12 @@ $google_domain_label = elgg_echo('googleapps:admin:domain');
 $google_domain_input = elgg_view('input/text', array(
 	'name' => 'params[googleapps_domain]', 
 	'value' => $googleapps_domain
+));
+
+$google_subdomains_label = elgg_echo('googleapps:admin:subdomains');
+$google_subdomains_input = elgg_view('input/plaintext', array(
+	'name' => 'params[googleapps_subdomains]', 
+	'value' => $googleapps_subdomains
 ));
 
 $admin_account_label = elgg_echo('googleapps:admin:admin_username');
@@ -107,6 +114,10 @@ $auth_body = <<<HTML
 	<div>
 		<label>$google_domain_label</label><br />
 		$google_domain_input
+	</div><br />
+	<div>
+		<label>$google_subdomains_label</label><br />
+		$google_subdomains_input
 	</div><br />
 	<div>
 		<label>$admin_account_label</label><br />

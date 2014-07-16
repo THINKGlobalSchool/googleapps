@@ -36,6 +36,7 @@ return array(
 
 	// Admin Settings
 	'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
+	'googleapps:admin:subdomains' => 'Allowed subdomains, comma seperated',
 	'googleapps:admin:secret' => 'Secret Key (to use with OAuth)',
 	'googleapps:admin:yes' => 'Yes',
 	'googleapps:admin:no' => 'No',

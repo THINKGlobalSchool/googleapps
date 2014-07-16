@@ -85,7 +85,8 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 		$owner = elgg_get_logged_in_user_entity();
 	}
 
-	if ($owner && $owner->canWriteToContainer()) {
+	// Only allow creating google docs if google connected and allowed to write to container
+	if ($owner && $owner->canWriteToContainer() && $owner->google_connected) {
 		$guid = $owner->getGUID();
 		elgg_register_menu_item('title', array(
 			'name' => 'googleapps_docs_add',
@@ -274,6 +275,21 @@ function google_doc_prepare_form_vars($google_doc = NULL) {
 	elgg_clear_sticky_form('google-docs-edit-form');
 
 	return $values;
+}
+
+/**
+ * Retrieve and parse allowed subdomains from plugin settings
+ * 
+ * @return array | bool
+ */
+function googleapps_get_allowed_subdomains() {
+	$subdomain_setting = elgg_get_plugin_setting('googleapps_subdomains', 'googleapps');
+	$subdomains = preg_split('/[\.,\s]/', $subdomain_setting, -1, PREG_SPLIT_NO_EMPTY);
+	if (empty($subdomains)) {
+		return FALSE;
+	} else {
+		return $subdomains;
+	}
 }
 
 

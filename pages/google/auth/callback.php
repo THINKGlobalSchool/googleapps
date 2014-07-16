@@ -96,7 +96,13 @@ foreach ($user->getEmails() as $email) {
 }
 
 // Check for valid email domain
-$allowed = array($googleapps_domain); // @TODO other domains? Hook maybe?
+$allowed = array($googleapps_domain);
+
+// Include subdomains from settings
+foreach (googleapps_get_allowed_subdomains() as $subdomain) {
+	$allowed[] = $subdomain . '.' . $googleapps_domain;
+}
+
 $domain = array_pop(explode('@', $user_email));
 
 if (!in_array($domain, $allowed)) {
