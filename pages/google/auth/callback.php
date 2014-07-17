@@ -18,7 +18,7 @@ $g_state = _elgg_services()->session->get('google_login_state');
 
 // Validate anti-forgery state values
 if (!$g_state || !$state || $g_state != $state) {
-	register_error('googleapps:error:invalidstate');
+	register_error(elgg_echo('googleapps:error:invalidstate'));
 	forward();
 }
 
@@ -239,7 +239,11 @@ if (!_elgg_services()->session->get('google_connect_account')) {
 }
 
 // Forward on
-if (_elgg_services()->session->get('last_forward_from')) {
+if (_elgg_services()->session->get('google_connect_alt_forward')) {
+	$forward_url = _elgg_services()->session->get('google_connect_alt_forward');
+	_elgg_services()->session->set('google_connect_alt_forward', null);
+	forward($forward_url);
+} else if (_elgg_services()->session->get('last_forward_from')) {
 	$forward_url = _elgg_services()->session->get('last_forward_from');
 	_elgg_services()->session->set('last_forward_from', null);
 	forward($forward_url);
