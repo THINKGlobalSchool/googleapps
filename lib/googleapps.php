@@ -1074,7 +1074,7 @@ function googleapps_process_sites() {
 					$new_site->url = $site['url'];
 					$new_site->modified = $site['modified'];
 					$new_site->remote_owners = $site['owners'];
-					$new_site->access_id = ACCESS_PRIVATE; // Default access, admin controlled
+					$new_site->access_id = ACCESS_LOGGED_IN; // Default access, admin controlled
 					//$new_site->site_access_id = ACCESS_PRIVATE ; // for site
 					$new_site->save();
 					
