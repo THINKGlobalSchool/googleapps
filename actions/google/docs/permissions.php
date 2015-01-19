@@ -43,5 +43,4 @@ echo elgg_view('googleapps/success', array(
 	'container_guid' => $container_guid,
 	'success_class' => $success_class
 ));
-
 forward(REFERER);
