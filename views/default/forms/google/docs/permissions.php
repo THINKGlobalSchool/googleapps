@@ -26,7 +26,7 @@ foreach ($options as $option) {
 				'id' => 'googleapps-docs-permissions-update-domain',
 				'text' => elgg_view_icon('share') . elgg_echo('googleapps:submit:domain'),
 				'class' => 'permissions-update-input',
-				'href' => '#',
+				'href' => '',
 				'data-action' => 'domain'
 			));
 			break;
@@ -35,7 +35,7 @@ foreach ($options as $option) {
 				'id' => 'googleapps-docs-permissions-update-public',
 				'text' => elgg_view_icon('share') . elgg_echo('googleapps:submit:public'),
 				'class' => 'permissions-update-input',
-				'href' => '#',
+				'href' => '',
 				'data-action' => 'public'
 			));
 			break;
@@ -44,7 +44,7 @@ foreach ($options as $option) {
 				'id' => 'googleapps-docs-permissions-update-ignore',
 				'text' => elgg_view_icon('delete') . elgg_echo('googleapps:submit:ignore'),
 				'class' => 'permissions-update-input',
-				'href' => '#',
+				'href' => '',
 				'data-action' => 'ignore'
 			));
 			break;

@@ -5,7 +5,7 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 
@@ -116,11 +116,8 @@ function googleapps_init() {
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
 
-	// Setup url handler for google shared docs
-	elgg_register_entity_url_handler('object', 'shared_doc', 'googleapps_shared_doc_url_handler');
-	
-	// Setup url handler for google shared docs
-	elgg_register_entity_url_handler('object', 'site', 'googleapps_site_url_handler');
+	// Register entity url handlers (handles both sites and shared_docs)
+	elgg_register_plugin_hook_handler('entity:url', 'object', 'googleapps_url_handler');
 
 	// add group profile and tool entries
 	if (elgg_get_plugin_setting('enable_google_docs', 'googleapps') == 'yes') {
@@ -154,8 +151,8 @@ function googleapps_init() {
 	}
 
 	// Notifications
-	register_notification_object('object', 'shared_doc', elgg_echo('googleapps:shared_doc:subject'));
-	elgg_register_plugin_hook_handler('notify:entity:message', 'object', 'googleapps_shared_doc_notify_message');
+	elgg_register_notification_event('object', 'shared_doc', array('create'));
+	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:shared_doc', 'googleapps_prepare_notification');
 
 	// Register actions
 
@@ -744,48 +741,56 @@ function googleapps_longtext_menu($hook, $type, $items, $vars) {
 }
 
 /**
- * Set the notification message for google shared docs
- * 
- * @param string $hook    Hook name
- * @param string $type    Hook type
- * @param string $message The current message body
- * @param array  $params  Parameters about the blog posted
+ * Prepare a notification message about a new forum
+ *
+ * @param string                          $hook         Hook name
+ * @param string                          $type         Hook type
+ * @param Elgg_Notifications_Notification $notification The notification to prepare
+ * @param array                           $params       Hook parameters
+ * @return Elgg_Notifications_Notification
+ */
+function googleapps_prepare_notification($hook, $type, $notification, $params) {
+	$entity = $params['event']->getObject();
+	$owner = $params['event']->getActor();
+	$recipient = $params['recipient'];
+	$language = $params['language'];
+	$method = $params['method'];
+
+	// Title for the notification
+	$notification->subject = elgg_echo('googleapps:shared_doc:subject');
+
+    // Message body for the notification
+	$notification->body = elgg_echo('googleapps:shared_doc:body', array(
+			$owner->name,
+			$entity->title,
+			$entity->description,
+			$entity->getURL()
+	), $language);
+
+    // The summary text is used e.g. by the site_notifications plugin
+    $notification->summary = elgg_echo('googleapps:shared_doc:summary', array($entity->title), $language);
+
+    return $notification;
+}
+
+/**
+ * Returns the URL from googleapps related entities
+ *
+ * @param string $hook   'entity:url'
+ * @param string $type   'object'
+ * @param string $url    The current URL
+ * @param array  $params Hook parameters
  * @return string
  */
-function googleapps_shared_doc_notify_message($hook, $type, $message, $params) {
+function googleapps_url_handler($hook, $type, $url, $params) {
 	$entity = $params['entity'];
-	$to_entity = $params['to_entity'];
-	$method = $params['method'];
-	if (elgg_instanceof($entity, 'object', 'shared_doc')) {
-		$descr = $entity->description;
-		$title = $entity->title;
-		$owner = $entity->getOwnerEntity();
-		return elgg_echo('googleapps:shared_doc:body', array(
-			$owner->name,
-			$title,
-			$descr,
-			$entity->getURL()
-		));
+
+	// Check that the entity is a googleapps entity
+	if (elgg_instanceof($entity, 'object', 'site')) {
+		return $entity->url;
+	} else if (elgg_instanceof($entity, 'object', 'shared_doc')) {
+		return $entity->href;
+	} else {
+		return;
 	}
-	return null;
-}
-
-/**
- * Populates the ->getUrl() method for shared google docs
- *
- * @param ElggEntity $entity The entity to return the URL for
- * @return string request url
- */
-function googleapps_shared_doc_url_handler($entity) {
-	return $entity->href;
-}
-
-/**
- * Populates the ->getUrl() method for google sites/wikis
- *
- * @param ElggEntity $entity The entity to return the URL for
- * @return string request url
- */
-function googleapps_site_url_handler($entity) {
-	return $entity->url;
 }

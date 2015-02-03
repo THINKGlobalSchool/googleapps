@@ -166,6 +166,7 @@ return array(
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
+	'googleapps:shared_doc:summary' => 'New Google Shared Doc: %s',
 	'googleapps:shared_doc:body' => "%s shared a google doc titled: %s\n\n%s\n\nTo view the document click here:\n%s
 ",
 
