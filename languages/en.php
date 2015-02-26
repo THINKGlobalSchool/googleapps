@@ -206,4 +206,7 @@ return array(
 	Password: %s
 	
 	You can change your password here: %s",
+
+	// Other plugins (hook related)
+	'todo:label:addgoogledoc' => 'Google Doc'
 );

@@ -5,12 +5,14 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 ?>
 /*<style>*/
-/* Document Icons */
+/* ****************************************
+   DOCUMENT ICONS
+***************************************** */
 .document-icon {
     background: url("<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/mimetypes.gif") no-repeat 0 0;
 	background-position:0 -50px;
@@ -75,14 +77,15 @@
     background-position:0 -190px;
 }
 
-/* Gmail Icon */
 span.google-email-notifier {
 	background:transparent url(<?php echo elgg_get_site_url(); ?>mod/googleapps/graphics/gmail.gif) no-repeat left 2px;
 	cursor:pointer;
 	margin-top: -6px !important;
 }
 
-/* Tooltip for share form */
+/* ****************************************
+   SHARE FORM TOOLTIP
+***************************************** */
 a.googleapps-tooltip {
 	padding-left: 5px;
 	font-size: 11px;
@@ -117,12 +120,13 @@ a.googleapps-tooltip:hover span {
 	width: 200px;		
 }
 
-/* Fix stripe in overlay */
 .ui-widget-overlay { 
 	background: #000000 !important;
 }
 
-/* Permissions Form */
+/* ****************************************
+   DOC PERMISSIONS FORM
+***************************************** */
 .elgg-form-google-docs-permissions {
 
 } 
@@ -136,7 +140,9 @@ a.googleapps-tooltip:hover span {
 	vertical-align: bottom;
 }
 
-/** WIKI FILTER/SORT MENU **/
+/* ****************************************
+   WIKI SORT MENU
+***************************************** */
 
 .elgg-menu-googleapps-wiki-filter {
 
@@ -168,9 +174,9 @@ a.googleapps-tooltip:hover span {
 	color: inherit;
 }
 
-/** END OF SORT MENU **/
-
-/** GOOGLE DOCS SHARE **/
+/* ****************************************
+   GOOGLE DOCS SHARE
+***************************************** */
 
 #googledocsbrowser-previous,
 #googledocsbrowser-next {
@@ -227,9 +233,9 @@ a.googleapps-tooltip:hover span {
 	color: #333;
 }
 
-/** END GOOGLE DOCS SHARE **/
-
-/* LOGIN BUTTON */
+/* ****************************************
+   LOGIN BUTTON
+***************************************** */
 
 hr.google-hr {
     border: 0;
@@ -245,9 +251,9 @@ div.google-login-or {
 	color: #555555;
 }
 
-/***** END LOGIN BUTTON *****/
-
-/*** GOOGLE DOCS PICKER **/
+/* ****************************************
+   GOOGLE DOCS PICKER
+***************************************** */
 #google-docs-selected {
     margin: 10px auto;
     text-align: center;
@@ -314,4 +320,14 @@ div.google-login-or {
     z-index: 9999;
     background-color: #FFF;
 }
+
+/* ****************************************
+   TODO HOOK RELATED
+***************************************** */
+.google-doc-submission-icon {
+	padding-right: 4px;
+	position: relative;
+	top: 2px;
+}
+
 /*</style>*/

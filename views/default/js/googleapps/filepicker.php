@@ -40,6 +40,7 @@ elgg.provide('elgg.googlefilepicker');
 		
 		// Events
 		this.onSelect = options.onSelect;
+		this.onCancel = options.onCancel;
 		this.buttonEl.addEventListener('click', this.open.bind(this));		
 	
 		// Disable the button until the API loads, as it won't work properly until then.
@@ -103,6 +104,11 @@ elgg.provide('elgg.googlefilepicker');
 					});
 					
 				request.execute(this._fileGetCallback.bind(this));
+			} else if (data[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+				// Handle cancel action
+				if (this.onCancel) {
+					this.onCancel();
+				}
 			}
 		},
 		/**

@@ -392,23 +392,48 @@ function googleapps_update_file_permissions($client, $doc_id, $access) {
 	elgg_load_library('gapc:Drive'); // Load drive lib
 
 	$service = new Google_Service_Drive($client);
-	
-	$new_permission = new Google_Service_Drive_Permission();
-	$new_permission->setRole('reader');
+
+	// May insert multiple permissions
+	$permissions = array();
 
 	// Set new permission based on access requested
 	if ($access == "domain") {
+		$permission = new Google_Service_Drive_Permission();
+		$permission->setRole('reader');
+
 		$domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
-		$new_permission->setType('domain');
-		$new_permission->setDomain($domain);
-		$new_permission->setValue($domain);
+		
+		$permission->setType('domain');
+		$permission->setDomain($domain);
+		$permission->setValue($domain);
+
+		$permissions[] = $permission;
 	} else if ($access == 'public') {
-		$new_permission->setType('anyone');
-		$new_permission->setValue('anyone');
+		$permission = new Google_Service_Drive_Permission();
+		$permission->setRole('reader');
+		$permission->setType('anyone');
+		$permission->setValue('anyone');
+
+		$permissions[] = $permission;
+	} else if (is_array($access)) {
+		// Array of ElggUsers 
+		foreach ($access as $user) {
+			$permission = new Google_Service_Drive_Permission();
+			$permission->setRole('reader');
+			$permission->setType('user');
+			$permission->setValue($user->email);
+
+			$permissions[] = $permission;
+		}
 	}
-	
+
 	try {
-		return $service->permissions->insert($doc_id, $new_permission);
+		$success = TRUE;
+		// Handle multiple permissions
+		foreach ($permissions as $permission) {
+			$success &= $service->permissions->insert($doc_id, $permission);	
+		}
+		return $success;
 	} catch (Exception $e) {
 		//var_dump($e);
 		return FALSE;

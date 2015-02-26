@@ -150,6 +150,13 @@ function googleapps_init() {
 		elgg_extend_view('groups/profile/fields', 'googleapps/wiki_group_profile');
 	}
 
+	// If todos plugin is enabled, hook into it's content
+	if (elgg_is_active_plugin('todos')) {
+		elgg_register_plugin_hook_handler('get_submission_content_types', 'todo', 'googleapps_todo_submission_content_type_handler');
+		elgg_register_plugin_hook_handler('handle_submission_content', 'todo', 'googleapps_todo_submission_content_handler');
+		elgg_register_plugin_hook_handler('handle_submission_content_create', 'todo', 'googleapps_todo_submission_content_create_handler');
+	}	
+
 	// Notifications
 	elgg_register_notification_event('object', 'shared_doc', array('create'));
 	elgg_register_plugin_hook_handler('prepare', 'notification:create:object:shared_doc', 'googleapps_prepare_notification');
@@ -792,4 +799,81 @@ function googleapps_url_handler($hook, $type, $url, $params) {
 	} else {
 		return;
 	}
+}
+
+/**
+ * Add a google doc todo submission content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $items
+ * @param array $vars
+ * @return array
+ */
+function googleapps_todo_submission_content_type_handler($hook, $type, $items, $vars) {
+	$items[400] = 'googledoc';
+
+	return $items;
+}
+
+/**
+ * Handle output of google content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $return
+ * @param array $content
+ * @return array
+ */
+function googleapps_todo_submission_content_handler($hook, $type, $return, $content) {
+	$content = json_decode($content);
+
+	// Check if we can json_decode this value, and that it has a type value of 'googledoc'
+	if ($content && $content->type == 'googledoc') {
+		return array(
+			'icon' => elgg_normalize_url('googleapps/docs/add/' . elgg_get_logged_in_user_guid()) . "?document_id={$content->id}&title={$content->title}&icon={$content->icon}&modified={$content->modified}",
+			'icon_content' => elgg_view('output/img', array(
+					'src' => elgg_get_site_url() . 'mod/todos/graphics/copy_content.png'
+			)) . "<span>" . elgg_echo('todo:label:copytoprofile') . "</span>",
+			'url' => $content->url,
+			'title' => $content->title,
+			'target' => false,
+			'text' => elgg_view('output/img', array('class' => 'google-doc-submission-icon', 'src' => $content->icon)) . $content->title
+		);
+	}	
+
+	return false;
+}
+
+/**
+ * Handle output of google content type
+ *
+ * @param string $hook
+ * @param string $type
+ * @param array $return
+ * @param array $params
+ * @return array
+ */
+function googleapps_todo_submission_content_create_handler($hook, $type, $return, $params) {
+	$content = json_decode($params['content']);
+
+	// Check if we can json_decode this value, and that it has a type value of 'googledoc'
+	if ($content && $content->type == 'googledoc') {
+		$todo = get_entity($params['todo_guid']);
+
+		$client = googleapps_get_client();
+		$client->setAccessToken(googleapps_get_user_access_tokens());
+		$document = googleapps_get_file_from_id($client, $content->id);
+
+		// Make sure we have a valid todo
+		if (elgg_instanceof($todo, 'object', 'todo')) {
+			// Update permissions
+			googleapps_update_file_permissions($client, $document->getId(), array($todo->getOwnerEntity()));
+	
+		} else {
+			return false;
+		}
+	}	
+
+	return false;
 }
