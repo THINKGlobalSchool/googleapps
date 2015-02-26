@@ -5,8 +5,8 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
- * @link http://www.thinkglobalschool.com/
+ * @copyright THINK Global School 2010 - 2015
+ * @link http://www.thinkglobalschool.org/
  *
  */
 
@@ -224,7 +224,7 @@ function googleapps_get_page_content_wikis_list($container_guid = NULL) {
 	$params['content'] = $content;
 	$params['sidebar'] = elgg_view('googleapps/featured_site_sidebar');
 
-	$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+	$domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
 	$new_url = 'https://sites.google.com/a/' . $domain . '/sites/system/app/pages/meta/dashboard/create-new-site';
 	
 	// Show create wiki button
@@ -318,13 +318,55 @@ function googleapps_get_client() {
 }
 
 /**
+ * Generate a google service account client
+ */
+function googleapps_get_service_client($scopes = array()) {
+	elgg_load_library('gapc:Client');
+	$plugin = elgg_get_plugin_from_id('googleapps');
+
+	$client = new Google_Client();
+	$client->setApplicationName(elgg_get_plugin_setting('google_domain_label', 'googleapps'));
+
+	if ($plugin->service_token) {
+		$client->setAccessToken($plugin->service_token);
+	}
+
+	// Get auth/key info from plugin settings
+	$key_location = elgg_get_plugin_setting('google_service_client_key', 'googleapps');
+	$key_password = elgg_get_plugin_setting('google_service_client_key_password', 'googleapps');
+	$service_account = elgg_get_plugin_setting('google_service_client_address', 'googleapps');
+	$impersonate = elgg_get_plugin_setting('google_service_client_key_impersonate', 'googleapps');
+
+	$key = file_get_contents($key_location);
+
+	// Get credentials
+	$credentials = new Google_Auth_AssertionCredentials(
+		$service_account,
+		$scopes,
+		$key,
+		$key_password,
+		'http://oauth.net/grant_type/jwt/1.0/bearer',
+		$impersonate
+
+	);
+	$client->setAssertionCredentials($credentials);
+
+	if($client->getAuth()->isAccessTokenExpired()) {
+		$client->getAuth()->refreshTokenWithAssertion($credentials);
+	}
+	$plugin->service_token = $client->getAccessToken();
+
+	return $client;
+}
+
+/**
  * Delete all site entities (debug)
  */
 function googleapps_delete_all_site_entities() {
 	$site_entities = elgg_get_entities(array(
-		'type'=>'object', 
-		'subtype'=>'site',
-		'limit'=>0
+		'type' => 'object', 
+		'subtype' => 'site',
+		'limit' => 0
 	));
 
 	foreach($site_entities as $site_entity) {
@@ -356,7 +398,7 @@ function googleapps_update_file_permissions($client, $doc_id, $access) {
 
 	// Set new permission based on access requested
 	if ($access == "domain") {
-		$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+		$domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
 		$new_permission->setType('domain');
 		$new_permission->setDomain($domain);
 		$new_permission->setValue($domain);
@@ -483,29 +525,15 @@ function googleapps_save_shared_document($document, $params = array()) {
 
 	if (!$params['entity_guid']) {
 		// Add to river
-		add_to_river('river/object/shared_doc/create', 'create', elgg_get_logged_in_user_guid(), $shared_doc->guid);
+		elgg_create_river_item(array(
+			'view' => 'river/object/shared_doc/create',
+			'action_type' => 'create',
+			'subject_guid' => elgg_get_logged_in_user_guid(),
+			'object_guid' => $shared_doc->guid
+		));
 	}
 	
 	return TRUE;
-}
-
-/**
- * Get the Google access tokens for the admin user (supplied in plugin settings)
- *
- * @return string json_encode'd array of admin user's access tokens
- */
-function googleapps_get_admin_tokens() {
-	$admin_username = elgg_get_plugin_setting('google_admin_username', 'googleapps');
-	$admin_user = get_user_by_username($admin_username);
-
-	if (!elgg_instanceof($admin_user, 'user')) {
-		return FALSE;
-	} else {
-		return json_encode(array(
-			'access_token' => $admin_user->google_access_token,
-			'refresh_token' => $admin_user->google_refresh_token
-		));
-	}
 }
 
 /**
@@ -542,25 +570,13 @@ function googleapps_process_sites() {
 	$log .= "Processing Google Sites\n";
 	$log .= "-----------------------\n";
 	
-	$client = googleapps_get_client();
+	// Get service client
+	$client = googleapps_get_service_client(array(
+		'https://sites.google.com/feeds/'
+	));
 
 	if ($client) {
-		// Get admin user tokens
-		$access_token = googleapps_get_admin_tokens();
-
-		if (!$access_token) {
-			$log .= "ABORTING: Invalid admin user or missing access tokens.\n";
-			if (elgg_in_context('googleapps_sites_log')) {
-				echo "<pre>";
-				echo $log;
-				echo "</pre>";
-			}
-			return FALSE;
-		}
-
-		$client->setAccessToken($access_token);
-
-		$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+		$domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
 
 		$base_feed = "https://sites.google.com/feeds/site/{$domain}";
 
@@ -577,6 +593,7 @@ function googleapps_process_sites() {
 		// Get sites feed
 		$request = new Google_Http_Request($feed_url, 'GET');
 		$response = $client->getAuth()->authenticatedRequest($request);
+
 		$response = json_decode($response->getResponseBody(), TRUE);
 
 		if ($response && is_array($response) && count($response) > 0) {
@@ -851,26 +868,13 @@ function googleapps_process_sites_activity() {
 			}
 		}
 
-
-		$client = googleapps_get_client();
+		// Get service client
+		$client = googleapps_get_service_client(array(
+			'https://sites.google.com/feeds/'
+		));
 		
 		if ($client) {
-			// Get admin user tokens
-			$access_token = googleapps_get_admin_tokens();
-
-			if (!$access_token) {
-				$log .= "ABORTING: Invalid admin user or missing access tokens.\n";
-				if (elgg_in_context('googleapps_sites_log')) {
-					echo "<pre>";
-					echo $log;
-					echo "</pre>";
-				}
-				return FALSE;
-			}
-
-			$client->setAccessToken($access_token);
-
-			$domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+			$domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
 			
 			// Elgg site guid, for owner/container guid's
 			$site_guid = elgg_get_site_entity()->guid;
@@ -985,8 +989,16 @@ function googleapps_process_sites_activity() {
 						if ($site_activity->save()) {
 							$log .= "	Created new activity entity: {$site_activity->guid}\n\n";
 							$site_new_activity_count++;
+
+							$river_id = elgg_create_river_item(array(
+								'view' => 'river/object/site_activity/create',
+								'action_type' => 'create',
+								'subject_guid' => $site_activity->owner_guid,
+								'object_guid' => $site_activity->guid,
+								'posted' => $activity_time
+							));
 							
-							if (add_to_river('river/object/site_activity/create', 'create', $site_activity->owner_guid, $site_activity->guid, "", $activity_time)) {
+							if ($river_id) {
 								$log .= "	River entry created!\n\n";
 							} else {
 								$log .= "	River activity creation failed!!\n\n";

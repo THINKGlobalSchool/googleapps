@@ -5,12 +5,12 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 
 // Get allowed domain for validation
-$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+$google_api_domain = elgg_get_plugin_setting('google_api_domain', 'googleapps');
 
 // Get state values
 $state = get_input('state', FALSE);
@@ -96,11 +96,11 @@ foreach ($user->getEmails() as $email) {
 }
 
 // Check for valid email domain
-$allowed = array($googleapps_domain);
+$allowed = array($google_api_domain);
 
 // Include subdomains from settings
 foreach (googleapps_get_allowed_subdomains() as $subdomain) {
-	$allowed[] = $subdomain . '.' . $googleapps_domain;
+	$allowed[] = $subdomain . '.' . $google_api_domain;
 }
 
 $domain = array_pop(explode('@', $user_email));

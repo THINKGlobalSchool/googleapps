@@ -152,7 +152,7 @@ function googleapps_init() {
 
 	// Notifications
 	elgg_register_notification_event('object', 'shared_doc', array('create'));
-	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:shared_doc', 'googleapps_prepare_notification');
+	elgg_register_plugin_hook_handler('prepare', 'notification:create:object:shared_doc', 'googleapps_prepare_notification');
 
 	// Register actions
 
@@ -185,7 +185,6 @@ function googleapps_init() {
  * @return NULL
  */
 function googleapps_pagesetup() {
-
 	$menuitems = array();
 
 	$menuitems[] = array(
@@ -587,7 +586,7 @@ function googleapps_wiki_entity_menu_setup($hook, $type, $value, $params) {
 					'name' => 'wiki_group_disconnect',
 					'text' => elgg_echo('googleapps:label:disconnectwiki'),
 					'href' => $url,
-					'class' => 'elgg-button elgg-button-action',
+					'link_class' => 'elgg-button elgg-button-action',
 					'priority' => 400,
 					'section' => 'info',
 					'is_action' => true

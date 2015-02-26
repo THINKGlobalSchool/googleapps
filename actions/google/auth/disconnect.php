@@ -19,7 +19,7 @@ if (!$user) {
 
 if ($user->google || $user->google_connected) { // Note: $user->google is old metadata
 	// Make sure there's a password
-	if (empty($user->password)) {
+	if (empty($user->password_hash)) {
 		register_error(sprintf(elgg_echo('googleapps:error:googlereturned'), elgg_echo('googleapps:error:passworddisconnect')));
 		forward(REFERER);
 	}

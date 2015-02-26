@@ -42,14 +42,19 @@ return array(
 	'googleapps:admin:no' => 'No',
 	'googleapps:admin:enable_google_sites' => 'Enable Google Sites ',
    	'googleapps:admin:enable_google_docs' => 'Enable Google Docs',
-	'googleapps:admin:admin_username' => 'Google admin username',
 	'googleapps:admin:loginlabel' => 'Log in with Google Text',
 	'googleapps:admin:domainlabel' => 'Domain label (ie: Our Friendly Site)',
-	'googleapps:admin:api_client_id' => 'Google API Client ID',
-	'googleapps:admin:api_client_secret' => 'Google API Client Secret',
-	'googleapps:admin:drive_api_key' => 'Google Drive API Key',
+	'googleapps:admin:api_client_id' => 'Google API Client ID (Web application)',
+	'googleapps:admin:api_client_secret' => 'Google API Client Secret (Web application)',
+	'googleapps:admin:drive_api_key' => 'Google Drive API Key (Key for browser applicatons)',
 	'googleapps:admin:authentication' => 'Authentication/Authorization Settings',
+	'googleapps:admin:service' => 'Service Account Settings',
 	'googleapps:admin:pluginsettings' => 'General Plugin Settings',
+	'googleapps:admin:service_client_id' => 'Service Account Client ID',
+	'googleapps:admin:service_address' => 'Service Account Email Address',
+	'googleapps:admin:service_keylocation' => 'Service Account Key Location',
+	'googleapps:admin:service_keypassword' => 'Service Account Key Password',
+	'googleapps:admin:service_impersonate' => 'Service Admin Account (for admin impersonation)',
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
@@ -163,6 +168,7 @@ return array(
 	'googleapps:label:access_unowned' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Contact the document owner if you wish to update it\'s permissions.',
 	'googleapps:label:insertlink' => 'Insert Google Doc link',
 	'googleapps:label:syncname' => 'Sync your Google account name upon login',
+	'googleapps:label:nosites' => 'No sites have been synced',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',

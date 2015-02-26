@@ -5,24 +5,31 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 
-// Get plugin settings
-$googleapps_domain     = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
-$googleapps_subdomains = elgg_get_plugin_setting('googleapps_subdomains', 'googleapps');
+// API Settings
+$google_api_domain         = elgg_get_plugin_setting('google_api_domain', 'googleapps');
+$google_api_subdomains     = elgg_get_plugin_setting('google_api_subdomains', 'googleapps');
+$google_api_client_id      = elgg_get_plugin_setting('google_api_client_id', 'googleapps');
+$google_api_client_secret  = elgg_get_plugin_setting('google_api_client_secret', 'googleapps');
+$google_drive_api_key      = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
 
+// Service Account Settings
+$google_service_client_id  = elgg_get_plugin_setting('google_service_client_id', 'googleapps');
+$google_service_client_address  = elgg_get_plugin_setting('google_service_client_address', 'googleapps');
+$google_service_client_key = elgg_get_plugin_setting('google_service_client_key', 'googleapps');
+$google_service_client_key_password = elgg_get_plugin_setting('google_service_client_key_password', 'googleapps');
+$google_service_client_impersonate = elgg_get_plugin_setting('google_service_client_key_impersonate', 'googleapps');
+
+
+// Plugin Settings
 $enable_google_sites   = elgg_get_plugin_setting('enable_google_sites', 'googleapps');
 $enable_google_docs    = elgg_get_plugin_setting('enable_google_docs', 'googleapps');
-
-$google_admin_username = elgg_get_plugin_setting('google_admin_username', 'googleapps');
-
 $login_label           = elgg_get_plugin_setting('google_login_label', 'googleapps');
 $domain_label          = elgg_get_plugin_setting('google_domain_label', 'googleapps');
-$google_api_client_id  = elgg_get_plugin_setting('google_api_client_id', 'googleapps');
-$google_api_client_secret  = elgg_get_plugin_setting('google_api_client_secret', 'googleapps');
-$google_drive_api_key  = elgg_get_plugin_setting('google_drive_api_key', 'googleapps');
+
 
 // Set defaults for oauth sync options
 if (!$enable_google_sites) {
@@ -40,20 +47,14 @@ if (!$login_label) {
 // Label/Inputs
 $google_domain_label = elgg_echo('googleapps:admin:domain');
 $google_domain_input = elgg_view('input/text', array(
-	'name' => 'params[googleapps_domain]', 
-	'value' => $googleapps_domain
+	'name' => 'params[google_api_domain]', 
+	'value' => $google_api_domain
 ));
 
 $google_subdomains_label = elgg_echo('googleapps:admin:subdomains');
 $google_subdomains_input = elgg_view('input/plaintext', array(
-	'name' => 'params[googleapps_subdomains]', 
-	'value' => $googleapps_subdomains
-));
-
-$admin_account_label = elgg_echo('googleapps:admin:admin_username');
-$admin_account_input = elgg_view('input/text', array(
-	'name' => 'params[google_admin_username]',
-	'value' => $google_admin_username
+	'name' => 'params[google_api_subdomains]', 
+	'value' => $google_api_subdomains
 ));
 
 $google_api_client_label = elgg_echo('googleapps:admin:api_client_id');
@@ -72,6 +73,37 @@ $google_drive_api_key_label = elgg_echo('googleapps:admin:drive_api_key');
 $google_drive_api_key_input = elgg_view('input/text', array(
 	'name' => 'params[google_drive_api_key]',
 	'value' => $google_drive_api_key
+));
+
+/* Service account */
+$google_service_client_id_label = elgg_echo('googleapps:admin:service_client_id');
+$google_service_client_id_input = elgg_view('input/text', array(
+	'name' => 'params[google_service_client_id]',
+	'value' => $google_service_client_id
+));
+
+$google_service_client_address_label = elgg_echo('googleapps:admin:service_address');
+$google_service_client_address_input = elgg_view('input/text', array(
+	'name' => 'params[google_service_client_address]',
+	'value' => $google_service_client_address
+));
+
+$google_service_client_key_label = elgg_echo('googleapps:admin:service_keylocation');
+$google_service_client_key_input = elgg_view('input/text', array(
+	'name' => 'params[google_service_client_key]',
+	'value' => $google_service_client_key
+));
+
+$google_service_client_key_password_label = elgg_echo('googleapps:admin:service_keypassword');
+$google_service_client_key_password_input = elgg_view('input/text', array(
+	'name' => 'params[google_service_client_key_password]',
+	'value' => $google_service_client_key_password
+));
+
+$google_service_client_impersonate_label = elgg_echo('googleapps:admin:service_impersonate');
+$google_service_client_impersonate_input = elgg_view('input/text', array(
+	'name' => 'params[google_service_client_key_impersonate]',
+	'value' => $google_service_client_impersonate
 ));
 
 // Reusable yes/no options
@@ -120,10 +152,6 @@ $auth_body = <<<HTML
 		$google_subdomains_input
 	</div><br />
 	<div>
-		<label>$admin_account_label</label><br />
-		$admin_account_input
-	</div><br />
-	<div>
 		<label>$google_api_client_label</label><br />
 		$google_api_client_input
 	</div><br />
@@ -140,6 +168,35 @@ HTML;
 $auth_module = elgg_view_module('inline', $auth_title, $auth_body);
 
 echo $auth_module;
+
+// Service Account Module
+$service_title = elgg_echo('googleapps:admin:service');
+$service_body = <<<HTML
+	<div>
+		<label>$google_service_client_id_label</label><br />
+		$google_service_client_id_input
+	</div><br />
+	<div>
+		<label>$google_service_client_address_label</label><br />
+		$google_service_client_address_input
+	</div><br />
+	<div>
+		<label>$google_service_client_key_label</label><br />
+		$google_service_client_key_input
+	</div><br />
+	<div>
+		<label>$google_service_client_key_password_label</label><br />
+		$google_service_client_key_password_input
+	</div><br />
+	<div>
+		<label>$google_service_client_impersonate_label</label><br />
+		$google_service_client_impersonate_input
+	</div><br />
+HTML;
+
+$service_module = elgg_view_module('inline', $service_title, $service_body);
+
+echo $service_module;
 
 // General module
 $general_title = elgg_echo('googleapps:admin:pluginsettings');

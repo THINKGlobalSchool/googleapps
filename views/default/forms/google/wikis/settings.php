@@ -5,8 +5,8 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
- * @link http://www.thinkglobalschool.com/
+ * @copyright THINK Global School 2010 - 2015
+ * @link http://www.thinkglobalschool.org/
  * 
  */
 
@@ -52,4 +52,6 @@ if (!empty($sites)) {
 		<div>$table</div>
 		<div>$submit_input</div>
 HTML;
+} else {
+	echo "<label>" . elgg_echo('googleapps:label:nosites') . "</label>";
 }

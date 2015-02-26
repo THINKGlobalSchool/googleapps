@@ -4,7 +4,7 @@
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 // Sites list tab
@@ -14,7 +14,7 @@ elgg_register_menu_item('googleapps-admin-menu', array(
 	'href' => '#googleapps-admin-listsites',
 	'priority' => 0,
 	'item_class' => 'elgg-state-selected',
-	'class' => 'googleapps-admin-menu-item',
+	'link_class' => 'googleapps-admin-menu-item',
 ));
 
 // Tab to reset sites, not implemented
@@ -32,7 +32,7 @@ elgg_register_menu_item('googleapps-admin-menu', array(
 	'text' => elgg_echo('googleapps:label:cronsites'),
 	'href' => '#googleapps-admin-cronsites',
 	'priority' => 2,
-	'class' => 'googleapps-admin-menu-item',
+	'link_class' => 'googleapps-admin-menu-item',
 ));
 
 
@@ -64,7 +64,12 @@ $list_options = array(
 );
 
 elgg_push_context('sites_debug');
-$list_content = elgg_list_entities($list_options);
+$sites = elgg_list_entities($list_options);
+if ($sites) {
+	$list_content = $sites;
+} else {
+	$list_content =  "<label>" . elgg_echo('googleapps:label:nosites') . "</label>";
+}
 elgg_pop_context('sites_debug');
 
 $content = <<<HTML

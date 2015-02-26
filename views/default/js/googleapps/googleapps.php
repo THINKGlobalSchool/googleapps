@@ -5,8 +5,8 @@
  * @package Googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
- * @link http://www.thinkglobalschool.com/
+ * @copyright THINK Global School 2010 - 2015
+ * @link http://www.thinkglobalschool.org/
  *
  */
 
@@ -326,7 +326,6 @@ elgg.register_hook_handler('init', 'system', elgg.google.init);
  */
 function gapiLoaded() {
 	// Register initPicker hook
-	console.log('Google JS API Callback');
 	elgg.google.apiLoaded = true;
 	elgg.register_hook_handler('init', 'system', elgg.google.initPickers);	
 }
