@@ -380,11 +380,12 @@ function googleapps_delete_all_site_entities() {
  * Change the google drive file permissions based on chosen elgg permissions
  *
  * @param object $client
- * @param string $doc_id Document id
- * @param string $access public | domain
+ * @param string $doc_id     Document id
+ * @param string $access     public | domain
+ * @param array  $optParams  optional params to send along with insert
  * @return bool
  */
-function googleapps_update_file_permissions($client, $doc_id, $access) {
+function googleapps_update_file_permissions($client, $doc_id, $access, $optParams = array()) {
 	if (empty($doc_id) || !$doc_id) {
 		return FALSE;
 	}
@@ -431,7 +432,7 @@ function googleapps_update_file_permissions($client, $doc_id, $access) {
 		$success = TRUE;
 		// Handle multiple permissions
 		foreach ($permissions as $permission) {
-			$success &= $service->permissions->insert($doc_id, $permission);	
+			$success &= $service->permissions->insert($doc_id, $permission, $optParams);	
 		}
 		return $success;
 	} catch (Exception $e) {

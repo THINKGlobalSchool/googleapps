@@ -169,6 +169,7 @@ return array(
 	'googleapps:label:insertlink' => 'Insert Google Doc link',
 	'googleapps:label:syncname' => 'Sync your Google account name upon login',
 	'googleapps:label:nosites' => 'No sites have been synced',
+	'googleapps:label:submissionnotice' => 'Notice: Adding a Google Doc to your submission will automatically share it with the To Do owner',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',

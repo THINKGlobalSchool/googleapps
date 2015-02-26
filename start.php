@@ -868,7 +868,9 @@ function googleapps_todo_submission_content_create_handler($hook, $type, $return
 		// Make sure we have a valid todo
 		if (elgg_instanceof($todo, 'object', 'todo')) {
 			// Update permissions
-			googleapps_update_file_permissions($client, $document->getId(), array($todo->getOwnerEntity()));
+			googleapps_update_file_permissions($client, $document->getId(), array($todo->getOwnerEntity()), array(
+				'sendNotificationEmails' => FALSE
+			));
 	
 		} else {
 			return false;
