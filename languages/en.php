@@ -25,6 +25,8 @@ return array(
 	'admin:google_apps:sites_settings' => 'Sites Settings',
 	'admin:google_apps:sites_debug' => 'Sites Debug',
 	'admin:google_apps' => 'Google Apps',
+	'admin:google_apps:calendars' => 'Calendars',
+	'item:object:google_cal' => 'Google Calendars',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -92,6 +94,9 @@ return array(
 	'googleapps:error:notconnected' => 'No Google connected account found',
 	'googleapps:error:existing_account' => 'It appears that email address is already registered and is not connected to Google. If you are the email owner, please log in to Spot and connect manually.',
 	'googleapps:error:disconnect' => 'There was an error disconnecting your Google account',
+	'googleapps:error:savecalendar' => 'There was an error saving your calendar',
+	'googleapps:error:calendar_not_found' => 'Invalid calendar.',
+	'googleapps:error:missing_fields' => 'You must fill in the title and feed URL',
 
 	// Success messages
 	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from Google.', 
@@ -105,6 +110,7 @@ return array(
 	'googleapps:success:groupwikiconnected' => 'Successfully connected wiki to group',
 	'googleapps:success:groupwikidisconnected' => 'Successfully disconnected wiki from group',
 	'googleapps:success:share_doc_save' => 'Successfully edited Google Doc',
+	'googleapps:success:savecalendar' => 'Calendar saved successfully',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
@@ -170,6 +176,15 @@ return array(
 	'googleapps:label:syncname' => 'Sync your Google account name upon login',
 	'googleapps:label:nosites' => 'No sites have been synced',
 	'googleapps:label:submissionnotice' => '* Adding a Google Doc to your submission will automatically share it with the To Do owner',
+	'googleapps:label:calendars' => 'Calendars',
+	'googleapps:label:admin_title' => 'Calendar Administration',
+	'googleapps:label:add_button' => 'Add Calendar',
+	'googleapps:label:add_cal_title' => 'Add New Calendar',
+	'googleapps:label:edit_cal_title' => 'Edit Calendar',
+	'googleapps:label:calendar_id' => 'Calendar ID',
+	'googleapps:label:text_color_label' => 'Text Color (eg. FFFFFF - white)',
+	'googleapps:label:background_color_label' => 'Background Color (eg. 000000 - black)',
+	'googleapps:label:no_calendars' => 'No Calendars',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',

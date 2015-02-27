@@ -329,5 +329,4 @@ div.google-login-or {
 	position: relative;
 	top: 2px;
 }
-
 /*</style>*/

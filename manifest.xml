@@ -21,5 +21,10 @@
 		<name>google-api-php-client</name>
 		<version>1.10</version>
 	</requires>
+	<requires>
+		<type>plugin</type>
+		<name>tgsutilities</name>
+		<version>1.10</version>
+	</requires>
 	<activate_on_install>true</activate_on_install>
 </plugin_manifest>

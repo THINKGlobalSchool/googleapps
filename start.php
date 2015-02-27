@@ -38,6 +38,14 @@ function googleapps_init() {
 	elgg_register_js('google-js-api', "https://www.google.com/jsapi?key={$drive_api_key}", 'footer');
 	elgg_register_js('google-doc-picker-client', "https://apis.google.com/js/client.js?onload=gapiLoaded", 'footer');
 
+	// Register calendar JS
+	$c_url = elgg_get_simplecache_url('js', 'googleapps/calendars');
+	elgg_register_js('elgg.google.calendars', $c_url);
+
+	// Register gcal fullcalendar extension
+	$g_js = elgg_get_simplecache_url('js', 'gcal/gcal');
+	elgg_register_js('elgg.google.gcal', $g_js, 'head', 1000);
+
 	// Register CSS for social login
 	$s_css = elgg_get_simplecache_url('css', 'social_login');
 	elgg_register_css('elgg.social_login', $s_css);
@@ -60,6 +68,10 @@ function googleapps_init() {
 
 	// Extend system CSS with our own styles
 	elgg_extend_view('css/elgg','css/googleapps/css');
+
+	// Calendars ajax CSS
+	$c_url = 'ajax/view/css/googleapps/calendars';
+	elgg_register_css('elgg.google.calendars', $c_url, 999);
 
 	// Register subtypes
 	elgg_register_entity_type('object','site_activity', 'Site activity');
@@ -116,6 +128,9 @@ function googleapps_init() {
 	// Setup main page handler
 	elgg_register_page_handler('googleapps','googleapps_page_handler');
 
+	// Calendar page handler
+	elgg_register_page_handler('calendar', 'googleapps_calendar_page_handler');
+
 	// Register entity url handlers (handles both sites and shared_docs)
 	elgg_register_plugin_hook_handler('entity:url', 'object', 'googleapps_url_handler');
 
@@ -131,6 +146,16 @@ function googleapps_init() {
 	// Add docs menu item
 	$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 	elgg_register_menu_item('site', $item);
+
+
+	// Add calendar menu item
+	if (elgg_is_logged_in()) {
+		elgg_register_menu_item('site', array(
+			'name' => 'calendar',
+			'href' => 'calendar/',
+			'text' => elgg_echo('googleapps:label:calendars')
+		));
+	}
 
 	// Show wiki's if enabled
 	if (elgg_get_plugin_setting('enable_google_sites', 'googleapps') != 'no') {
@@ -161,6 +186,9 @@ function googleapps_init() {
 	elgg_register_notification_event('object', 'shared_doc', array('create'));
 	elgg_register_plugin_hook_handler('prepare', 'notification:create:object:shared_doc', 'googleapps_prepare_notification');
 
+	// Whitelist ajax views
+	elgg_register_ajax_view('css/googleapps/calendars');
+
 	// Register actions
 
 	// Login Related (auth)
@@ -184,6 +212,11 @@ function googleapps_init() {
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
 	elgg_register_action('google/docs/insert', "$action_base/insert.php");
 	elgg_register_action('google/docs/edit', "$action_base/edit.php");
+
+	// Calendars
+	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/calendars";
+	elgg_register_action('google/calendars/save', "$action_base/save.php");
+	elgg_register_action('google/calendars/delete', "$action_base/delete.php");
 }
 
 /**	
@@ -207,10 +240,11 @@ function googleapps_pagesetup() {
 		elgg_register_menu_item('page', ElggMenuItem::factory($menuitem));
 	}
 
-	// Admin wiki debug
+	// Admin Items
 	if (elgg_in_context('admin')) {
 		elgg_register_admin_menu_item('administer', 'sites_debug', 'google_apps');
 		elgg_register_admin_menu_item('administer', 'sites_settings', 'google_apps');
+		elgg_register_admin_menu_item('administer', 'calendars', 'google_apps');
 	}
 }
 
@@ -365,6 +399,74 @@ function googleapps_page_handler($page) {
 	$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);
 
 	echo elgg_view_page($params['title'], $body);
+	return TRUE;
+}
+
+/**
+ * Googleapps Calendar Page Handler
+ *
+ * @param array $page
+ * @return true|false Depending on success
+ */
+function googleapps_calendar_page_handler($page) {
+	gatekeeper();
+	if ($page[0] == 'load') {
+		$id = get_input('id', FALSE);
+		$start_date = get_input('start_date', FALSE);
+		$end_date = get_input('end_date', FALSE);
+		$class_name = get_input('class_name', FALSE);
+
+		if (!$id) {
+			return FALSE;
+		} else {
+			echo json_encode(googleapps_get_calendar_events($id, $class_name, $start_date, $end_date));
+		}
+	} else {
+		$calendars = elgg_get_entities(array(
+			'type' => 'object',
+			'subtype' => 'google_cal'
+		));
+
+		$title = elgg_echo('googleapps:label:calendars');
+
+		// register page menu items for each calendar
+		foreach ($calendars as $calendar) {
+			$guid = $calendar->getGUID();
+			$input = elgg_view('input/checkbox', array(
+				'id' => 'google-calendar-' . $guid,
+				'class' => 'float-right elgg-google-calendar-toggler',
+				'checked' => 'checked'
+			));
+			$text = "<label>$calendar->title</label>$input";
+			
+			elgg_register_menu_item('google-calendar-filter', array(
+				'name' => 'google-calendar-' . $guid,
+				'text' => $text,
+				'href' => false,
+				'item_class' => 'pas mrs google-calendar-feed google-calendar-feed-' . $guid
+			));
+		}
+
+		$content .= elgg_view_menu('google-calendar-filter', array(
+			'class' => 'elgg-menu-hz'
+		));
+
+		$content = "<div class='elgg-head clearfix'><h2 class='elgg-heading-main'>{$title}</h2></div>";
+
+		$content .= elgg_view_menu('google-calendar-filter', array(
+			'class' => 'elgg-menu-hz'
+		));
+
+		$content .= elgg_view('googleapps/calendars', array('calendars' => $calendars));
+
+		$body = elgg_view_layout('one_column', array(
+			'filter' => '',
+			'content' => $content,
+			'title' => '',
+		));
+
+		echo elgg_view_page($title, $body);
+	}
 	return TRUE;
 }
 

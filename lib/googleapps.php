@@ -278,6 +278,45 @@ function google_doc_prepare_form_vars($google_doc = NULL) {
 }
 
 /**
+ * Prepare form vars for google calendars
+ *
+ * @param mixed $entity 
+ * @return arary
+ */
+function google_calendars_prepare_form_vars($calendar = null) {
+	// input names => defaults
+	$values = array(
+		'title' => '',
+		'google_cal_feed' => '',
+		'text_color' => '',
+		'background_color' => '',
+		'access_id' => ACCESS_DEFAULT,
+		'guid' => ''
+	);
+
+	if (elgg_is_sticky_form('google-calendar-save')) {
+		foreach (array_keys($values) as $field) {
+			$values[$field] = elgg_get_sticky_value('google-calendar-save', $field);
+		}
+	}
+
+	elgg_clear_sticky_form('google-calendar-save');
+
+	if (!$calendar) {
+		return $values;
+	}
+
+	foreach (array_keys($values) as $field) {
+		if (isset($calendar->$field)) {
+			$values[$field] = $calendar->$field;
+		}
+	}
+
+	$values['entity'] = $calendar;
+	return $values;
+}
+
+/**
  * Retrieve and parse allowed subdomains from plugin settings
  * 
  * @return array | bool
@@ -311,7 +350,14 @@ function googleapps_get_client() {
 	$client->setClientId($client_id);
 	$client->setClientSecret($client_secret);
 	$client->setRedirectUri($redirect_uri);
-	$client->setScopes(array('email', 'profile', 'https://sites.google.com/feeds/', 'https://www.googleapis.com/auth/drive'));
+	$client->setScopes(array(
+		'email', 
+		'profile', 
+		'https://sites.google.com/feeds/', 
+		'https://www.googleapis.com/auth/drive',
+		'https://www.googleapis.com/auth/calendar.readonly',
+		'https://www.googleapis.com/auth/calendar'
+	));
 	$client->setAccessType('offline');
 	$client->setApplicationName(elgg_get_plugin_setting('google_domain_label', 'googleapps'));
 	return $client;
@@ -1141,6 +1187,89 @@ function googleapps_update_local_site_info($remote_site) {
 	}
 
 	return FALSE;
+}
+
+/**
+ * Get events from calendar api
+ *
+ * @param string $calendar_id Calendar ID
+ * @param string $class_name  Class name for display in fullcalendar
+ * @param string $start_date  Event upper limit
+ * @param string $end_date    Event lower limit
+ * @return array
+ */
+function googleapps_get_calendar_events($calendar_id, $class_name = FALSE, $start_date = FALSE, $end_date = FALSE) {
+	if (!$calendar_id) {
+		return FALSE;
+	}
+
+	// Get google client and load calendar API
+	elgg_load_library('gapc:Client');
+	elgg_load_library('gapc:Calendar');
+
+	$client = googleapps_get_service_client(array(
+		'https://www.googleapis.com/auth/calendar',
+		'https://www.googleapis.com/auth/calendar.readonly'
+	));
+
+	$service = new Google_Service_Calendar($client);
+
+	$optParams = array(
+		'showDeleted' => 0,
+		'maxResults' => '2500',
+		'singleEvents' => 1
+	);
+
+	// Attempt to create DateTime objects with given date strings
+	$start_date = $start_date ? new DateTime($start_date) : FALSE;
+	$end_date =  $end_date ? new DateTime($end_date) : FALSE;
+
+	// If we've got dates, format then ISO-8602 (2014-12-07T00:00:00Z)
+	if ($start_date) {
+		$optParams['timeMin'] = $start_date->format('c');
+	}
+
+	if ($end_date) {
+		$optParams['timeMax'] = $end_date->format('c');
+	}
+
+	$events = $service->events->listEvents($calendar_id, $optParams);
+
+	$event_array = array();
+
+	foreach ($events->getItems() as $item) {
+		// Determine if this is an all day event		
+		$allDay = FALSE;
+		if (!$item->getStart()->getDateTime()) {
+			$allDay = true;
+		}
+
+		// Figure out start date
+		$start_string = $item->getStart()->getDateTime() ? $item->getStart()->getDateTime() : $item->getStart()->getDate();
+
+		// Figure out end date
+		$end_string = $item->getEnd()->getDateTime() ? $item->getEnd()->getDateTime() : $item->getEnd()->getDate();
+
+		// Format dates
+		$start = new DateTime($start_string);
+		$end = new DateTime($end_string);
+
+		// Add event to event array
+		$event_array[] = array(
+			'id' => $item->getId(),
+			'title' => $item->getSummary(),
+			'url' => $item->getHtmlLink(),
+			'start' => $start->format('c'),
+			'end' => $end->format('c'),
+			'allDay' => $allDay,
+			'location' => $item->getLocation(),
+			'description' => $item->getDescription(),
+			'className' => $class_name,
+			'editable' => false,
+		);
+	}
+
+	return $event_array;
 }
 
 /**
