@@ -53,7 +53,6 @@ elgg.google.calendars.buildCalendar = function(calendars) {
 elgg.google.calendars.buildSources = function(calendars) {
 	var sources = [];
 	var i = 0;
-	console.log(calendars);
 	$.each(calendars, function(k, v) {
 		if (v.display) {
 			sources[i] = $.fullCalendar.spotgcalFeed(v.url, {className: 'google-calendar-feed-' + k});
