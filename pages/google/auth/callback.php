@@ -72,7 +72,7 @@ if ($client->getAccessToken()) {
 $service = new Google_Service_Plus($client);
 
 // Extract userid from token payload
-$userid = $token_data['payload']['id'];
+$userid = $token_data['payload']['sub'];
 
 // Get access tokens (access and refresh)
 $access_tokens = json_decode($client->getAccessToken());
