@@ -373,10 +373,6 @@ function googleapps_get_service_client($scopes = array()) {
 	$client = new Google_Client();
 	$client->setApplicationName(elgg_get_plugin_setting('google_domain_label', 'googleapps'));
 
-	if ($plugin->service_token) {
-		$client->setAccessToken($plugin->service_token);
-	}
-
 	// Get auth/key info from plugin settings
 	$key_location = elgg_get_plugin_setting('google_service_client_key', 'googleapps');
 	$key_password = elgg_get_plugin_setting('google_service_client_key_password', 'googleapps');
@@ -400,7 +396,6 @@ function googleapps_get_service_client($scopes = array()) {
 	if($client->getAuth()->isAccessTokenExpired()) {
 		$client->getAuth()->refreshTokenWithAssertion($credentials);
 	}
-	$plugin->service_token = $client->getAccessToken();
 
 	return $client;
 }
