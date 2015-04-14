@@ -176,7 +176,7 @@ if (!$entities) {
 		$ia = elgg_get_ignore_access();
 		elgg_set_ignore_access(true);
 
-		if (!$user->google && !$user->google_connected) {
+		if (!$user->google && !$user->google_connected && $user->googleapps_controlled_profile != 'yes') {
 			elgg_set_ignore_access($ia);
 
 			// Revoke tokens
