@@ -5,7 +5,7 @@
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 
@@ -22,9 +22,6 @@ function googleapps_init() {
 	// Libraries
 	elgg_register_library('elgg:googleapps:helpers', elgg_get_plugins_path() . 'googleapps/lib/googleapps.php');
 	elgg_load_library('elgg:googleapps:helpers');
-
-	// Register classes
-	elgg_register_classes(elgg_get_plugins_path() . 'googleapps/lib/classes');
 
 	// Need to use SSL for google urls
 	$CONFIG->sslroot = str_replace('http://','https://', elgg_get_site_url());
@@ -152,7 +149,7 @@ function googleapps_init() {
 
 	// Add menu items if user is synced and if sites/docs are enabled
 	$user = elgg_get_logged_in_user_entity();
-	if (!empty($user) && $user->google) {		
+	if (!empty($user) && ($user->google_connected || $user->google)) {		
 		if (elgg_get_plugin_setting('oauth_sync_docs', 'googleapps') != 'no') {
 			$item = new ElggMenuItem('docs', elgg_echo('googleapps:label:google_docs'), 'googleapps/docs/all');
 			elgg_register_menu_item('site', $item);
@@ -185,12 +182,9 @@ function googleapps_init() {
 
 	// Login Related (auth)
 	$action_base = elgg_get_plugins_path() . "googleapps/actions/google/auth";
-	elgg_register_action('google/auth/oauth_update', "$action_base/oauth_update.php", 'public');
 	elgg_register_action('google/auth/login', "$action_base/login.php", 'public');
 	elgg_register_action('google/auth/connect', "$action_base/connect.php", 'public');
 	elgg_register_action('google/auth/disconnect', "$action_base/disconnect.php", 'public');
-	elgg_register_action('google/auth/return', "$action_base/return.php", 'public');
-	elgg_register_action('google/auth/return_with_connect', "$action_base/return_with_connect.php", 'public');
 	elgg_register_action('google/auth/settings', "$action_base/settings.php");
 
 	// Wiki related (wiki)
@@ -206,7 +200,6 @@ function googleapps_init() {
 	elgg_register_action('google/docs/permissions', "$action_base/permissions.php");
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
 	elgg_register_action('google/docs/insert', "$action_base/insert.php");
-	elgg_register_action('google/docs/edit', "$action_base/edit.php");
 }
 
 /**	
@@ -217,17 +210,6 @@ function googleapps_init() {
 function googleapps_pagesetup() {
 
 	$menuitems = array();
-
-	// Settings items
-	/** @TODO delete
-	$menuitems[] = array(
-		'name' => 'wiki_settings',
-		'text' => elgg_echo('googleapps:menu:wiki_settings'),
-		'href' =>  'googleapps/settings/wikiactivity',
-		'contexts' => array('settings'),
-		'priority' => 99999,
-	);
-	*/
 
 	$menuitems[] = array(
 		'name' => 'sync_settings',
@@ -310,18 +292,6 @@ function googleapps_page_handler($page) {
 			gatekeeper();
 			elgg_push_context('docs');
 			switch ($page_type) {
-				case 'chooser':
-					echo elgg_view('forms/google/docs/chooser');
-					// Need to break out of the page handler for this one (ajax)
-					return true;
-					break;
-				case 'browser':
-					$client = authorized_client(true);
-					$start_key = get_input('start_key', null);
-					$result = googleapps_get_google_docs($client, null, 15, $start_key);
-					echo json_encode($result);
-					return true;
-					break;
 				case 'add':
 					if ($page[2]) {
 						elgg_set_page_owner_guid($page[2]);
@@ -388,6 +358,18 @@ function googleapps_page_handler($page) {
 				forward();
 			}
 			break;
+		// Auth related handler
+		case 'auth':
+			switch ($page_type) {
+				case 'callback':
+					$pages = dirname(__FILE__) . '/pages/google/auth';
+					include "$pages/callback.php";
+					break;
+				default; 
+					return FALSE;
+					break;
+			}
+			break;
 		default:
 			return FALSE;
 	}
@@ -407,18 +389,6 @@ function googleapps_page_handler($page) {
 function googleapps_login() {
 	//ignore if this is an api call
 	if (elgg_get_context()=='api') return;
-
-	$oauth_sync_email = elgg_get_plugin_setting('oauth_sync_email', 'googleapps');
-	$oauth_sync_sites = elgg_get_plugin_setting('oauth_sync_sites', 'googleapps');
-	$oauth_sync_docs = elgg_get_plugin_setting('oauth_sync_docs', 'googleapps');
-
-	$user = elgg_get_logged_in_user_entity();
-	if (!empty($user) &&
-	$user->google &&
-	($oauth_sync_email != 'no')) {
-		$client = authorized_client();
-		googleapps_fetch_oauth_data($client, false, 'mail');
-	}
 }
 
 /**
@@ -893,10 +863,17 @@ function googleapps_todo_submission_content_create_handler($hook, $type, $return
 	if ($content && $content->type == 'googledoc') {
 		$todo = get_entity($params['todo_guid']);
 
+		$client = googleapps_get_client();
+		$client->setAccessToken(googleapps_get_user_access_tokens());
+		$document = googleapps_get_file_from_id($client, $content->id);
+
 		// Make sure we have a valid todo
 		if (elgg_instanceof($todo, 'object', 'todo')) {
-			// Update permissions!
-			googleapps_document_add_user_permissions(authorized_client(TRUE), $content->id, array($todo->getOwnerEntity()), false);
+			// Update permissions
+			googleapps_update_file_permissions($client, $document->getId(), array($todo->getOwnerEntity()), array(
+				'sendNotificationEmails' => FALSE
+			));
+	
 		} else {
 			return false;
 		}
@@ -904,7 +881,6 @@ function googleapps_todo_submission_content_create_handler($hook, $type, $return
 
 	return false;
 }
-
 
 /**
  * Set the notification message for google shared docs

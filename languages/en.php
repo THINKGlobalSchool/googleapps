@@ -25,6 +25,8 @@ $english = array(
 	'admin:google_apps:sites_settings' => 'Sites Settings',
 	'admin:google_apps:sites_debug' => 'Sites Debug',
 	'admin:google_apps' => 'Google Apps',
+	'admin:google_apps:calendars' => 'Calendars',
+	'item:object:google_cal' => 'Google Calendars',
 
 	// Menu/Submenu's
 	'googleapps:menu:wiki_settings' => 'Wiki Activity Settings',
@@ -36,20 +38,25 @@ $english = array(
 
 	// Admin Settings
 	'googleapps:admin:domain' => 'Google Apps (hosted) Domain Name (ie: thinkglobalschool.com)',
+	'googleapps:admin:subdomains' => 'Allowed subdomains, comma seperated',
 	'googleapps:admin:secret' => 'Secret Key (to use with OAuth)',
 	'googleapps:admin:yes' => 'Yes',
 	'googleapps:admin:no' => 'No',
-	'googleapps:admin:sync_email' => 'Enable Google Mail',
-	'googleapps:admin:sync_sites' => 'Enable Google Sites ',
-   	'googleapps:admin:sync_docs' => 'Enable Google Docs',
-	'googleapps:admin:oauth_update_interval' => 'Time interval of unread email update (in minutes)',
-	'googleapps:admin:2_legged_account' => 'Admin account for 2 legged OAuth',
+	'googleapps:admin:enable_google_sites' => 'Enable Google Sites ',
+   	'googleapps:admin:enable_google_docs' => 'Enable Google Docs',
 	'googleapps:admin:loginlabel' => 'Log in with Google Text',
 	'googleapps:admin:domainlabel' => 'Domain label (ie: Our Friendly Site)',
-	'googleapps:admin:drive_client' => 'Google Drive Client ID',
-	'googleapps:admin:drive_key' => 'Google Drive API Key',
+	'googleapps:admin:api_client_id' => 'Google API Client ID (Web application)',
+	'googleapps:admin:api_client_secret' => 'Google API Client Secret (Web application)',
+	'googleapps:admin:drive_api_key' => 'Google Drive API Key (Key for browser applicatons)',
 	'googleapps:admin:authentication' => 'Authentication/Authorization Settings',
+	'googleapps:admin:service' => 'Service Account Settings',
 	'googleapps:admin:pluginsettings' => 'General Plugin Settings',
+	'googleapps:admin:service_client_id' => 'Service Account Client ID',
+	'googleapps:admin:service_address' => 'Service Account Email Address',
+	'googleapps:admin:service_keylocation' => 'Service Account Key Location',
+	'googleapps:admin:service_keypassword' => 'Service Account Key Password',
+	'googleapps:admin:service_impersonate' => 'Service Admin Account (for admin impersonation)',
 
 	// User settings
 	'googleapps:usersettings:login_description' => 'Connect your Spot user account with your Google Apps account.',
@@ -80,9 +87,21 @@ $english = array(
 	'googleapps:error:invaliddoc' => 'Invalid Google Doc',
 	'googleapps:error:wikiconnectionfailed' => 'Could not connect wiki to group',
 	'googleapps:error:wikidisconnectionfailed' => 'Could not disconnect wiki from group',
+	'googleapps:error:invalidstate' => 'Invalid Login State',
+	'googleapps:error:loginerror' => 'Error: %s',
+	'googleapps:error:missinglogin' => 'Missing login authentication date',
+	'googleapps:error:accesstokens' => 'There was an error retrieving access tokens',
+	'googleapps:error:notconnected' => 'No Google connected account found',
+	'googleapps:error:existing_account' => 'It appears that email address is already registered and is not connected to Google. If you are the email owner, please log in to Spot and connect manually.',
+	'googleapps:error:disconnect' => 'There was an error disconnecting your Google account',
+	'googleapps:error:savecalendar' => 'There was an error saving your calendar',
+	'googleapps:error:calendar_not_found' => 'Invalid calendar.',
+	'googleapps:error:missing_fields' => 'You must fill in the title and feed URL',
 
 	// Success messages
-	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from googleapps.', 
+	'googleapps:success:disconnect' => 'Your profile has been successfully disconnected from Google.', 
+	'googleapps:success:connect' => 'Google connected account created! Welcome to Spot %s!',
+	'googleapps:success:manual_connect' => 'Google account connected!',
 	'googleapps:success:sites_reset' => 'Google Sites have been successfully reset',
 	'googleapps:success:delete' => 'Google Shared Document successfully deleted',
 	'googleapps:success' => 'Success!',
@@ -91,6 +110,7 @@ $english = array(
 	'googleapps:success:groupwikiconnected' => 'Successfully connected wiki to group',
 	'googleapps:success:groupwikidisconnected' => 'Successfully disconnected wiki from group',
 	'googleapps:success:share_doc_save' => 'Successfully edited Google Doc',
+	'googleapps:success:savecalendar' => 'Calendar saved successfully',
 
 	// General labels
 	'googleapps:label:user_docs' => '%s\'s Shared Google Docs',
@@ -114,7 +134,7 @@ $english = array(
 	'googleapps:label:table_updated' => 'Last Updated',
 	'googleapps:label:tooltipname' => 'What is this?',
 	'googleapps:label:viewdocument' => 'View Document',
-	'googleapps:label:connect' => 'Connect with Google Account',
+	'googleapps:label:connect' => 'Connect Google Account',
 	'googleapps:label:disconnect' => 'Disconnect Google Account',
 	'googleapps:label:documentsdisplay' => 'Documents to display',
 	'googleapps:label:allfolders' => 'All Folders',
@@ -153,10 +173,22 @@ $english = array(
 	'googleapps:label:access_domain' => 'This document is shared only with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
 	'googleapps:label:access_unowned' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Contact the document owner if you wish to update it\'s permissions.',
 	'googleapps:label:insertlink' => 'Insert Google Doc link',
+	'googleapps:label:syncname' => 'Sync your Google account name upon login',
+	'googleapps:label:nosites' => 'No sites have been synced',
 	'googleapps:label:submissionnotice' => '* Adding a Google Doc to your submission will automatically share it with the To Do owner',
+	'googleapps:label:calendars' => 'Calendars',
+	'googleapps:label:admin_title' => 'Calendar Administration',
+	'googleapps:label:add_button' => 'Add Calendar',
+	'googleapps:label:add_cal_title' => 'Add New Calendar',
+	'googleapps:label:edit_cal_title' => 'Edit Calendar',
+	'googleapps:label:calendar_id' => 'Calendar ID',
+	'googleapps:label:text_color_label' => 'Text Color (eg. FFFFFF - white)',
+	'googleapps:label:background_color_label' => 'Background Color (eg. 000000 - black)',
+	'googleapps:label:no_calendars' => 'No Calendars',
 
 	// Notifications
 	'googleapps:shared_doc:subject' => 'New Google Shared Doc',
+	'googleapps:shared_doc:summary' => 'New Google Shared Doc: %s',
 	'googleapps:shared_doc:body' => "%s shared a google doc titled: %s\n\n%s\n\nTo view the document click here:\n%s
 ",
 
@@ -191,8 +223,8 @@ $english = array(
 	
 	You can change your password here: %s",
 
-	// Todo submission content type
-	'todo:label:addgoogledoc' => 'Add Google Doc',
+	// Other plugins (hook related)
+	'todo:label:addgoogledoc' => 'Google Doc'
 );
 
 add_translation('en',$english);

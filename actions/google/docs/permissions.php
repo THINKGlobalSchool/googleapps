@@ -15,7 +15,6 @@ $document_id = get_input('doc_id');
 $container_guid = get_input('container_guid');
 $action = get_input('permissions_action');
 $entity_guid = get_input('entity_guid', FALSE);
-$do_create = get_input('do_create', 'yes');
 $success_class = get_input('success_class');
 
 // Make sure user can write to the container (group)
@@ -25,22 +24,27 @@ if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
 }
 
 // Get google doc
-$client = authorized_client(TRUE);
-$document = googleapps_get_doc_from_id($client, $document_id);
+$client = googleapps_get_client();
+$client->setAccessToken(googleapps_get_user_access_tokens());
+$document = googleapps_get_file_from_id($client, $document_id);
 
 // Update permissions if action is either public or domain
 if ($action == 'public' || $action == 'domain') {
-	googleapps_update_document_share_scope($client, $document['id'], $action);
+	googleapps_update_file_permissions($client, $document->getId(), $action);
 }
 
-// Check if we're going to create a new entity 
-if ($do_create === 'yes') {
-	// Share the doc
-	share_document($document, $description, $tags, $access_id, $container_guid, $entity_guid);
-}
+// Share document
+googleapps_save_shared_document($document, array(
+	'description' => $description,
+	'access_id' => $access_id,
+	'tags' => $tags,
+	'container_guid' =>  $container_guid,
+	'entity_guid' => $entity_guid
+));
 
 echo elgg_view('googleapps/success', array(
 	'container_guid' => $container_guid,
 	'success_class' => $success_class
 ));
+
 forward(REFERER);

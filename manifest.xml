@@ -9,11 +9,16 @@
 	<blurb>Google Integration and Google Apps</blurb>
 	<description>Provides Google authorization and authentication, as well as Google Docs and Sites integration</description>
 	<website>http://www.thinkglobalschool.org</website>
-	<copyright>THINK Global School 2010 - 2014</copyright>
+	<copyright>THINK Global School 2010 - 2015</copyright>
 	<license>GNU Public License version 2</license>
 	<requires>
 		<type>elgg_release</type>
 		<version>1.8</version>
+	</requires>
+	<requires>
+		<type>plugin</type>
+		<name>google-api-php-client</name>
+		<version>1.10</version>
 	</requires>
 	<activate_on_install>true</activate_on_install>
 </plugin_manifest>

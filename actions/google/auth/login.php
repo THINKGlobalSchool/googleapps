@@ -1,35 +1,21 @@
 <?php
 /**
- * Googleapps login action
+ * Google login
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright FlatSourcing 2010
+ * @author Jeff Tilson
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
-$home_url = elgg_get_site_url();
+$state = md5(rand());
 
-$google = new GoogleOpenID();
-$google->use_oauth();
-$google->set_home_url($home_url);
-$google->set_return_url(elgg_add_action_tokens_to_url($home_url . 'action/google/auth/return', FALSE));
+$_SESSION['google_login_state'] = $state;
 
-$googleapps_domain = elgg_get_plugin_setting('googleapps_domain', 'googleapps');
+$client = googleapps_get_client();
+$client->setState($state);
 
+$authUrl = $client->createAuthUrl();
 
-if ($googleapps_domain) {
-	$google->set_start_url('https://www.google.com/accounts/o8/site-xrds?ns=2&hd=' . $googleapps_domain);
-} else {
-	$google->set_start_url("https://www.google.com/accounts/o8/id");
-}
-
-try {
-	$url = $google->get_authorization_url();
-	forward($url);
-} catch(Exception $e) {
-	register_error(sprintf(elgg_echo("googleapps:error:wrongdomain"), $username));
-	forward();
-}
-
-exit;
+forward($authUrl);
