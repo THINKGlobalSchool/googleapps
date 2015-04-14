@@ -190,7 +190,6 @@ if (!$entities) {
 	} else {
 		// Update google connection status
 		_elgg_services()->session->set('last_forward_from', elgg_normalize_url('googleapps/settings/account'));
-		$user->google_connected = TRUE;
 	}
 
 	// Check if user is banned
@@ -200,6 +199,9 @@ if (!$entities) {
 	}
 	$login_message = elgg_echo('loginok');
 }
+
+// Make sure the user is flagged as connected
+$user->google_connected = TRUE;
 
 // Start the login process
 $persistant = TRUE;
