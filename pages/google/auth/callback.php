@@ -176,7 +176,7 @@ if (!$entities) {
 		$ia = elgg_get_ignore_access();
 		elgg_set_ignore_access(true);
 
-		if (!$user->google && !$user->google_connected && $user->googleapps_controlled_profile != 'yes') {
+		if (!$user->google && !$user->google_connected) {
 			elgg_set_ignore_access($ia);
 
 			// Revoke tokens
@@ -188,9 +188,8 @@ if (!$entities) {
 
 		elgg_set_ignore_access($ia);
 	} else {
-		// Update google connection status
+		// Set last forward to account settings
 		$_SESSION['last_forward_from'] = elgg_normalize_url('googleapps/settings/account');
-		$user->google_connected = TRUE;
 	}
 
 	// Check if user is banned
@@ -200,6 +199,9 @@ if (!$entities) {
 	}
 	$login_message = elgg_echo('loginok');
 }
+
+// Make sure the user is flagged as connected
+$user->google_connected = TRUE;
 
 // Start the login process
 $persistant = TRUE;
