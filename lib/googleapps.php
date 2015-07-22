@@ -86,7 +86,7 @@ function googleapps_get_page_content_docs_list($container_guid = NULL) {
 	}
 
 	// Only allow creating google docs if google connected and allowed to write to container
-	if ($owner && $owner->canWriteToContainer() && $owner->google_connected) {
+	if ($owner && $owner->canWriteToContainer() && elgg_get_logged_in_user_entity()->google_connected) {
 		$guid = $owner->getGUID();
 		elgg_register_menu_item('title', array(
 			'name' => 'googleapps_docs_add',
