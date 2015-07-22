@@ -188,7 +188,7 @@ if (!$entities) {
 
 		elgg_set_ignore_access($ia);
 	} else {
-		// Update google connection status
+		// Set last forward to account settings
 		_elgg_services()->session->set('last_forward_from', elgg_normalize_url('googleapps/settings/account'));
 	}
 
