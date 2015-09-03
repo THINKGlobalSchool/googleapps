@@ -298,8 +298,7 @@ elgg.google.wikiOrderByChange = function(event) {
  * @return void
  */
 elgg.google.insert = function(textAreaId, content) {
-	$('#' + textAreaId).val($('#' + textAreaId).val() + ' ' + content + ' ');
-	<?php echo elgg_view('embed/custom_insert_js'); ?>
+	CKEDITOR.instances[textAreaId].insertHtml(content);
 }
 
 
