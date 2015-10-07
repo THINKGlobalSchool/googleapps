@@ -822,7 +822,7 @@ function googleapps_public_pages_handler($hook, $type, $value, $params) {
 }
 
 /**
- * Add 'insert google doc' item to longtext menu
+ * Load in google file picker related js for longtext
  *
  * @param string $hook
  * @param string $type
@@ -831,20 +831,9 @@ function googleapps_public_pages_handler($hook, $type, $value, $params) {
  * @return array
  */
 function googleapps_longtext_menu($hook, $type, $items, $vars) {
-	if (elgg_get_logged_in_user_entity()->google_connected) {
-		$items[] = ElggMenuItem::factory(array(
-			'name' => 'google_doc',
-			'href' => "#",
-			'text' => elgg_echo('googleapps:label:insertlink'),
-			'link_class' => "elgg-longtext-control google-doc-picker google-doc-picker-insert google-doc-picker-insert-{$vars['id']}",
-			'priority' => 1,
-			'title' => elgg_view_title(elgg_echo('googleapps:label:insertlink')),
-		));
-
-		elgg_load_js('elgg.googlefilepicker');
-		elgg_load_js('google-js-api');
-		elgg_load_js('google-doc-picker-client');
-	}
+	elgg_load_js('elgg.googlefilepicker');
+	elgg_load_js('google-js-api');
+	elgg_load_js('google-doc-picker-client');
 	return $items;
 }
 

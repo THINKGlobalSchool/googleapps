@@ -103,63 +103,6 @@ elgg.google.initPickers = function() {
 								.removeClass('elgg-button-action')
 								.html(elgg.echo('googleapps:label:change'));
 						}
-					// Insert link handler
-					} else if ($(this.buttonEl).hasClass('google-doc-picker-insert')) {
-						var classes = $(this.buttonEl).attr('class');
-						var insertClass = classes.split(/[, ]+/).pop();
-						var textAreaId = insertClass.substr(insertClass.indexOf('google-doc-picker-insert-') + "google-doc-picker-insert-".length);
-
-						elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
-							data: {
-								'doc_link': file.alternateLink,
-								'doc_id': file.id
-							},
-							success: function(json) {
-								// Check for errors
-								if (json.status == -1) {
-									return false;
-								}
-
-								var $link = $(document.createElement('a'));
-								$link.attr('href', file.alternateLink);
-								$link.html(file.title);
-
-								$(document).undelegate('.googleapps-docs-insert-success', 'click');
-								$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
-									$(this).parents('.ui-dialog').remove();
-									console.log($link.get(0).outerHTML);
-									elgg.google.insert(textAreaId, $link.get(0).outerHTML);
-									event.preventDefault();
-								});
-
-								// Check insert status
-								if (json.output.insert_status !== 1) {
-									var title = elgg.echo('googleapps:label:permissions_warning_title');
-
-									// Need to update permissions
-									var dlg = $("<div></div>").html(json.output.form).dialog({
-										width: 450,
-										height: 'auto',
-										modal: true,
-										title: title,
-										draggable: false,
-										resizable: false,
-										closeOnEscape: false,
-										open: function(event, ui) {
-										
-										}
-									});
-									
-									dlg.find('form').submit(function () {
-										dlg.parents('.ui-dialog').remove();
-									});
-								} else {
-									// Good to go! Insert..
-									elgg.google.insert(textAreaId, $link.get(0).outerHTML);
-								}
-							}
-						});
-
 					// Share new doc handler
 					} else {
 						if ($('#google-overlay-shade').length == 0) {
@@ -348,6 +291,94 @@ elgg.google.initTodoSubmissionPicker = function (hook, type, params, options) {
 	return true;
 }
 
+elgg.google.addDriveButton = function(hook, type, params, value) {
+	if (params.length) {
+		params.each(function(idx) {
+			var editor = $(this).ckeditorGet();
+
+			editor.addCommand("insertDrive", { // create named command
+			    exec: function(editor) {
+			       
+			    	var editor_id = editor.name;
+
+					var picker = new FilePicker({
+						apiKey: elgg.google.DRIVE_API_KEY,
+						clientId: elgg.google.DRIVE_API_CLIENT,
+						buttonEl: null,
+						onSelect: function(file) {
+							
+							elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
+								data: {
+									'doc_link': file.alternateLink,
+									'doc_id': file.id
+								},
+								success: function(json) {
+									// Check for errors
+									if (json.status == -1) {
+										return false;
+									}
+
+									var $link = $(document.createElement('a'));
+									$link.attr('href', file.alternateLink);
+									$link.html(file.title);
+
+									$(document).undelegate('.googleapps-docs-insert-success', 'click');
+									$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
+										$(this).parents('.ui-dialog').remove();
+										console.log($link.get(0).outerHTML);
+										elgg.google.insert(editor_id, $link.get(0).outerHTML);
+										event.preventDefault();
+									});
+
+									// Check insert status
+									if (json.output.insert_status !== 1) {
+										var title = elgg.echo('googleapps:label:permissions_warning_title');
+
+										// Need to update permissions
+										var dlg = $("<div></div>").html(json.output.form).dialog({
+											width: 450,
+											height: 'auto',
+											modal: true,
+											title: title,
+											draggable: false,
+											resizable: false,
+											closeOnEscape: false,
+											open: function(event, ui) {
+											
+											}
+										});
+										
+										dlg.find('form').submit(function () {
+											dlg.parents('.ui-dialog').remove();
+										});
+									} else {
+										// Good to go! Insert..
+										elgg.google.insert(editor_id, $link.get(0).outerHTML);
+									}
+								}
+							});
+						}
+					});
+
+					// Auto open the picker (not bound to an element)
+					picker.open();
+			    }
+			});
+
+			// Add Google Drive button
+			editor.ui.addButton('DriveButton', { // add new button and bind our command
+			    label: elgg.echo("googleapps:label:insertcontent"),
+			    command: 'insertDrive',
+			    toolbar: 'insert',
+			    icon: elgg.get_site_url() + 'mod/googleapps/graphics/drive_icon.png'
+			});
+
+		});
+	}
+}
+
+
+elgg.register_hook_handler('init', 'ckeditor', elgg.google.addDriveButton);
 elgg.register_hook_handler('init', 'system', elgg.google.init);
 
 /**
@@ -356,6 +387,7 @@ elgg.register_hook_handler('init', 'system', elgg.google.init);
 function gapiLoaded() {
 	// Register initPicker hook
 	elgg.google.apiLoaded = true;
+
 
 	// Trigger a hook here for plugins to do something when the google api is loaded
 	elgg.trigger_hook('apiloaded', 'google');

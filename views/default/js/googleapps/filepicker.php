@@ -41,11 +41,15 @@ elgg.provide('elgg.googlefilepicker');
 		// Events
 		this.onSelect = options.onSelect;
 		this.onCancel = options.onCancel;
-		this.buttonEl.addEventListener('click', this.open.bind(this));		
+
+		// Check for button element
+		if (this.buttonEl) {
+			this.buttonEl.addEventListener('click', this.open.bind(this));		
 	
-		// Disable the button until the API loads, as it won't work properly until then.
-		this.buttonEl.disabled = true;
- 
+			// Disable the button until the API loads, as it won't work properly until then.
+			this.buttonEl.disabled = true;
+		}
+
 		// Load the drive API
 		gapi.client.setApiKey(this.apiKey);
 		gapi.client.load('drive', 'v2', options.onDriveApiLoaded.bind(this));
@@ -126,7 +130,9 @@ elgg.provide('elgg.googlefilepicker');
 		 * @private
 		 */
 		_pickerApiLoaded: function() {
-			this.buttonEl.disabled = false;
+			if (this.buttonEl) {
+				this.buttonEl.disabled = false;
+			}
 		},
 		
 		/**
