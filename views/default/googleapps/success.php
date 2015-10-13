@@ -4,7 +4,7 @@
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2014
  * @link http://www.thinkglobalschool.org
  */
 
@@ -18,13 +18,10 @@ if (elgg_instanceof($owner, 'group')) {
 	$forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
 }
 
+$shared_label = elgg_echo('googleapps:label:documentshared');
+
 echo <<<HTML
-	<p><label>Document shared</label></p>
-	<a href='$forward_url' class="$success_class"><span class='elgg-button elgg-button-action'>Ok</span></a>
-	<style>
-		button.ui-corner-all {
-			display: none;
-		}
-	</style>
+	<p><label>$shared_label</label></p>
+	<a href='$forward_url' class="$success_class"><button class='elgg-button-submit pas mrs mtm'>Ok</button></a>
 HTML;
 ?>

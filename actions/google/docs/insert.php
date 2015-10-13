@@ -8,7 +8,6 @@
  * @link http://www.thinkglobalschool.org
  */
 
-$document_link = get_input('doc_link');
 $document_id = get_input('doc_id');
 
 // Get google doc and permissions

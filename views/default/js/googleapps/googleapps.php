@@ -36,7 +36,6 @@ elgg.google.init = function() {
 	// Google Docs Form Stuff
 	$('.permissions-update-input').live('click', function(event) {
 		var $form = $(this).closest('form');
-
 		$form.find('#googleapps-docs-permissions-action').val($(this).data('action'));
 		$form.trigger('submit');
 		event.preventDefault();
@@ -147,18 +146,11 @@ elgg.google.initPickers = function() {
 /**
  * Google Doc Submit handler
  */
-elgg.google.docsSubmit = function(event) {			
+elgg.google.docsSubmit = function(event) {
 	var data = {};
 	
 	$($(this).serializeArray()).each(function (i, e) {
 		data[e.name] = e.value;
-		// TinyMCE does some voodoo magic.. need to account for that
-		if (e.name == 'description' && typeof(tinyMCE) !== 'undefined') {
-			var description = tinyMCE.get('description');
-			if (description) {
-				data[e.name] = description.getContent();
-			}
-		}
 	});
 
 	// Switch title based on action
@@ -172,13 +164,18 @@ elgg.google.docsSubmit = function(event) {
 		var title = elgg.echo('googleapps:success');
 	}
 
+	// Show spinner
+	$(this).closest('.ui-dialog-content').html($(document.createElement('div')).addClass('elgg-ajax-loader mal'));
+
 	elgg.action(this.action, {
 		data: data,
-		success: function(json) {			
+		success: function(json) {
 			// Return false on error. The action should spit out some useful information
 			if (json.status == -1) {
 				return false;
 			}
+
+			$('body').find('.ui-dialog').remove();
 
 			// Show dialog
 			var dlg = $("<div></div>").html(json.output).dialog({
@@ -194,10 +191,6 @@ elgg.google.docsSubmit = function(event) {
 						$(".ui-dialog-titlebar-close").remove();
 					}
 				}
-			});
-			
-			dlg.find('form').submit(function () {
-				dlg.parents('.ui-dialog').remove();
 			});
 		}
 	});
@@ -243,7 +236,6 @@ elgg.google.wikiOrderByChange = function(event) {
 elgg.google.insert = function(textAreaId, content) {
 	CKEDITOR.instances[textAreaId].insertHtml(content);
 }
-
 
 /**
  * Helper date format function
@@ -305,56 +297,49 @@ elgg.google.addDriveButton = function(hook, type, params, value) {
 						apiKey: elgg.google.DRIVE_API_KEY,
 						clientId: elgg.google.DRIVE_API_CLIENT,
 						buttonEl: null,
-						onSelect: function(file) {
+						onSelect: function(file, documentInfo) {
 							
-							elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
-								data: {
-									'doc_link': file.alternateLink,
-									'doc_id': file.id
-								},
-								success: function(json) {
-									// Check for errors
-									if (json.status == -1) {
-										return false;
-									}
+							// Check if we want to embed the item itself (actual document) or just a link
+							var documentType = documentInfo.type;
 
-									var $link = $(document.createElement('a'));
-									$link.attr('href', file.alternateLink);
-									$link.html(file.title);
+							if (documentType == 'folder') {
+								var embedStringType = elgg.echo('googleapps:label:driveembedfolder');
+							} else {
+								var embedStringType = elgg.echo('googleapps:label:driveembedfile');
+							}
 
-									$(document).undelegate('.googleapps-docs-insert-success', 'click');
-									$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
-										$(this).parents('.ui-dialog').remove();
-										console.log($link.get(0).outerHTML);
-										elgg.google.insert(editor_id, $link.get(0).outerHTML);
-										event.preventDefault();
-									});
+							var $dialog = $(document.createElement('div'))
+								.attr({
+									'title': elgg.echo('googleapps:label:driveembedtype'),
+									'id': 'google-drive-embed-type-dialog'
+								});
+							
+							$dialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembeddesc'))).append('<br />');
 
-									// Check insert status
-									if (json.output.insert_status !== 1) {
-										var title = elgg.echo('googleapps:label:permissions_warning_title');
+							$dialog.append(
+								$(document.createElement('button'))
+									.addClass('elgg-button-submit pas mrs mtm google-drive-embed-insert')
+									.append(elgg.echo('googleapps:label:driveembedlink'))
+									.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.insertDriveContent)
+							);
 
-										// Need to update permissions
-										var dlg = $("<div></div>").html(json.output.form).dialog({
-											width: 450,
-											height: 'auto',
-											modal: true,
-											title: title,
-											draggable: false,
-											resizable: false,
-											closeOnEscape: false,
-											open: function(event, ui) {
-											
-											}
-										});
-										
-										dlg.find('form').submit(function () {
-											dlg.parents('.ui-dialog').remove();
-										});
-									} else {
-										// Good to go! Insert..
-										elgg.google.insert(editor_id, $link.get(0).outerHTML);
-									}
+							$dialog.append(
+								$(document.createElement('button'))
+									.addClass('elgg-button-submit pas mrs mtm google-drive-embed-actual')
+									.append(elgg.echo('googleapps:label:driveembedactual', [embedStringType]))
+									.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.embedDriveContent)
+							);
+							
+
+							$('body').append($dialog);
+
+							$("#google-drive-embed-type-dialog").dialog({
+								modal: true,
+								draggable: false,
+								resizable: false,
+								closeOnEscape: false,
+								open: function(event, ui) {	
+									$(".ui-dialog-titlebar-close").remove();
 								}
 							});
 						}
@@ -375,6 +360,251 @@ elgg.google.addDriveButton = function(hook, type, params, value) {
 
 		});
 	}
+}
+
+/** 
+ * Generate insert content for docs/folders
+ */ 
+elgg.google.insertDriveContent = function(event) {
+	// Update dialog content
+	var $dialog = $('#google-drive-embed-type-dialog');
+	$dialog.html($(document.createElement('div')).addClass('elgg-ajax-loader mal'));
+
+	// Get event data
+	var file = event.data.file;
+	var documentInfo = event.data.documentInfo;
+	var editor_id = event.data.editorId;
+
+	elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
+		data: {
+			'doc_id': file.id
+		},
+		success: function(json) {
+
+			// Nuke the dialog
+			$dialog.dialog('destroy').remove();
+
+			// Check for errors
+			if (json.status == -1) {
+				return false;
+			}
+
+			var $link = $(document.createElement('a'));
+			$link.attr('href', file.alternateLink);
+			$link.html(file.title);
+
+			$(document).undelegate('.googleapps-docs-insert-success', 'click');
+			$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
+				$(this).parents('.ui-dialog').remove();
+				elgg.google.insert(editor_id, $link.get(0).outerHTML);
+				event.preventDefault();
+			});
+
+			// Check insert status
+			if (json.output.insert_status !== 1) {
+				var title = elgg.echo('googleapps:label:permissions_warning_title');
+
+				// Need to update permissions
+				var dlg = $("<div></div>").html(json.output.form).dialog({
+					width: 450,
+					height: 'auto',
+					modal: true,
+					title: title,
+					draggable: false,
+					resizable: false,
+					closeOnEscape: false
+				});
+			} else {
+				// Good to go! Insert..
+				elgg.google.insert(editor_id, $link.get(0).outerHTML);
+			}
+		}
+	});
+}
+
+/** 
+ * Generate embed content for docs/folders
+ */ 
+elgg.google.embedDriveContent = function(event) {
+
+	// Update dialog content
+	var $dialog = $('#google-drive-embed-type-dialog');
+	$dialog.html($(document.createElement('div')).addClass('elgg-ajax-loader mal'));
+
+	// Get event data
+	var file = event.data.file;
+	var documentInfo = event.data.documentInfo;
+	var editor_id = event.data.editorId;
+
+	// Going to allow adjusting dimensions
+	var $optionsDialog = $(document.createElement('div'))
+		.attr({
+			'title': elgg.echo('googleapps:label:driveembedoptions'),
+			'id': 'google-drive-embed-options-dialog'
+		});
+
+	// Check for a document or a folder
+	if (documentInfo.type == 'folder') {
+		// Got a folder, add inputs for selecting grid/list views
+		$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedfolderstyle'))).append("<br />");
+		
+
+		// List
+		$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedfolderlist')));
+		$optionsDialog.append(
+			$(document.createElement('input')).attr({
+				'type': 'radio',
+				'name': 'googleFolderStyle',
+				'id': 'google-drive-embed-folder-list',
+				'value': 'list',
+				'checked': 'checked',
+				'class': 'mls mrs'
+			})
+		);
+
+		// Grid
+		$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedfoldergrid')));
+		$optionsDialog.append(
+			$(document.createElement('input')).attr({
+				'type': 'radio',
+				'name': 'googleFolderStyle',
+				'value': 'grid',
+				'id': 'google-drive-embed-folder-grid',
+				'class': 'mls mrs'
+			})
+		);
+
+		$optionsDialog.append("<br />");
+	}
+
+	var defaultWidth = 800;
+	var defaultHeight = 600;
+
+	// Width input
+	$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedwidth')))
+	$optionsDialog.append(
+		$(document.createElement('input')).attr({
+			'id': 'google-drive-embed-width',
+			'value': defaultWidth,
+			'maxLength': 4,
+			'class': 'mls mrs'
+		})
+	);
+
+	// Height input
+	$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedheight')))
+	$optionsDialog.append(
+		$(document.createElement('input')).attr({
+			'id': 'google-drive-embed-height',
+			'value': defaultHeight,
+			'maxLength': 4,
+			'class': 'mls mrs'
+		})
+	).append("<br />");
+
+	// Add finish button
+	$optionsDialog.append(
+		$(document.createElement('button'))
+			.addClass('elgg-button-submit pas mrs mtm google-drive-embed-finish')
+			.append(elgg.echo('googleapps:label:driveembedfinish'))
+			.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, function(event) {
+				// Get width and height, and style if applicable
+				var height = $('#google-drive-embed-height').val();
+				var width = $('#google-drive-embed-width').val();
+				var style = $('input[name=googleFolderStyle]:checked').val();
+
+				// Show spinner
+				$optionsDialog.html($(document.createElement('div')).addClass('elgg-ajax-loader mal'));
+
+				// Fire the insert action to check permissions
+				elgg.action(elgg.get_site_url() + 'action/google/docs/insert', {
+					data: {
+						'doc_id': file.id
+					},
+					success: function(json) {
+						// Nuke the dialog
+						$optionsDialog.dialog('destroy').remove();
+
+						// Check for errors
+						if (json.status == -1) {
+							return false;
+						}
+
+						var $link = $(document.createElement('a'));
+						$link.attr('href', file.alternateLink);
+						$link.html(file.title);
+
+						$(document).undelegate('.googleapps-docs-insert-success', 'click');
+						$(document).delegate('.googleapps-docs-insert-success', 'click', function(event) {
+							$(this).parents('.ui-dialog').remove();
+
+							// Generate and insert embed code
+							elgg.google.getAndInsertEmbedCode(file.id, documentInfo.type, height, width, style, editor_id);
+			
+							event.preventDefault();
+						});
+
+						// Check insert status
+						if (json.output.insert_status !== 1) {
+							var title = elgg.echo('googleapps:label:permissions_warning_title');
+
+							// Need to update permissions
+							var dlg = $("<div></div>").html(json.output.form).dialog({
+								width: 450,
+								height: 'auto',
+								modal: true,
+								title: title,
+								draggable: false,
+								resizable: false,
+								closeOnEscape: false
+							});
+						} else {
+							// Good to go! Insert..
+							elgg.google.getAndInsertEmbedCode(file.id, documentInfo.type, height, width, style, editor_id);
+						}
+					}
+				});
+			})
+	);
+
+	// Remove old dialog
+	$dialog.dialog('destroy').remove();
+
+	// Append/show options dialog
+	$('body').append($optionsDialog);
+	$("#google-drive-embed-options-dialog").dialog({
+		modal: true,
+		draggable: false,
+		resizable: false,
+		closeOnEscape: false,
+		open: function(event, ui) {	
+			$(".ui-dialog-titlebar-close").remove();
+		}
+	});
+}
+
+// Generate and insert doc/folder embed code
+elgg.google.getAndInsertEmbedCode = function(id, type, height, width, style, editor_id) {
+	elgg.action(elgg.get_site_url() + 'action/google/docs/embed', {
+		data: {
+			'doc_id': id,
+			'doc_type': type,
+			'doc_embed_height': height, 
+			'doc_embed_width': width,
+			'doc_embed_folder_style': style
+		},
+		success: function(json) {
+
+			// Check for errors
+			if (json.status == -1) {
+				return false;
+			}
+				
+			elgg.google.insert(editor_id, json.output);
+
+			return true;
+		}
+	});
 }
 
 

@@ -42,6 +42,9 @@ elgg.provide('elgg.googlefilepicker');
 		this.onSelect = options.onSelect;
 		this.onCancel = options.onCancel;
 
+		// Other vars
+		this.selectedDocument = null;
+
 		// Check for button element
 		if (this.buttonEl) {
 			this.buttonEl.addEventListener('click', this.open.bind(this));		
@@ -78,14 +81,21 @@ elgg.provide('elgg.googlefilepicker');
 		 */
 		_showPicker: function() {
 			var accessToken = gapi.auth.getToken().access_token;
+
+			// initial view for the first ViewGroup
+			var docView = new google.picker.DocsView(google.picker.ViewId.DOCS);
+			docView.setIncludeFolders(true);
+			docView.setSelectFolderEnabled(true);
+
 			this.picker = new google.picker.PickerBuilder().
 				addViewGroup(
-					new google.picker.ViewGroup(google.picker.ViewId.DOCS).
+					new google.picker.ViewGroup(docView).
 					addView(google.picker.ViewId.DOCUMENTS).
 					addView(google.picker.ViewId.SPREADSHEETS).
 					addView(google.picker.ViewId.DOCS_IMAGES_AND_VIDEOS).
 					addView(google.picker.ViewId.PRESENTATIONS).
-					addView(google.picker.ViewId.PDFS)).
+					addView(google.picker.ViewId.PDFS).
+					addView(google.picker.ViewId.FOLDERS)).
 				addViewGroup(new google.picker.ViewGroup(new google.picker.DocsUploadView())).
 				setAppId(this.clientId).
 				setOAuthToken(accessToken).
@@ -106,6 +116,9 @@ elgg.provide('elgg.googlefilepicker');
 					request = gapi.client.drive.files.get({
 						fileId: id
 					});
+
+				// Store the picker document for use in the callback
+				this.selectedDocument = file;
 					
 				request.execute(this._fileGetCallback.bind(this));
 			} else if (data[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
@@ -119,9 +132,10 @@ elgg.provide('elgg.googlefilepicker');
 		 * Called when file details have been retrieved from Google Drive.
 		 * @private
 		 */
-		_fileGetCallback: function(file) {
+		_fileGetCallback: function(respFile) {
 			if (this.onSelect) {
-				this.onSelect(file);
+				// Send the api response, along with the picker document
+				this.onSelect(respFile, this.selectedDocument);
 			}
 		},
 		

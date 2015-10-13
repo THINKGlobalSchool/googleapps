@@ -321,6 +321,17 @@ div.google-login-or {
     background-color: #FFF;
 }
 
+#google-drive-embed-width, #google-drive-embed-height {
+	width: 50px;
+}
+
+#google-drive-embed-folder-list, #google-drive-embed-folder-grid {
+	margin-top: 10px;
+	margin-left: 5px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
 /* ****************************************
    TODO HOOK RELATED
 ***************************************** */

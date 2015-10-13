@@ -211,6 +211,7 @@ function googleapps_init() {
 	elgg_register_action('google/docs/permissions', "$action_base/permissions.php");
 	elgg_register_action('google/docs/delete', "$action_base/delete.php");
 	elgg_register_action('google/docs/insert', "$action_base/insert.php");
+	elgg_register_action('google/docs/embed', "$action_base/embed.php");
 	elgg_register_action('google/docs/edit', "$action_base/edit.php");
 
 	// Calendars
