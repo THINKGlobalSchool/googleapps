@@ -298,50 +298,60 @@ elgg.google.addDriveButton = function(hook, type, params, value) {
 						clientId: elgg.google.DRIVE_API_CLIENT,
 						buttonEl: null,
 						onSelect: function(file, documentInfo) {
-							
-							// Check if we want to embed the item itself (actual document) or just a link
-							var documentType = documentInfo.type;
+							// We can only offer embeds if this is a google doc (slide, sheet, etc) or a folder
+							if (documentInfo.type == 'folder' || documentInfo.type == 'document') {
+								// Check if we want to embed the item itself (actual document) or just a link
+								var documentType = documentInfo.type;
 
-							if (documentType == 'folder') {
-								var embedStringType = elgg.echo('googleapps:label:driveembedfolder');
-							} else {
-								var embedStringType = elgg.echo('googleapps:label:driveembedfile');
-							}
-
-							var $dialog = $(document.createElement('div'))
-								.attr({
-									'title': elgg.echo('googleapps:label:driveembedtype'),
-									'id': 'google-drive-embed-type-dialog'
-								});
-							
-							$dialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembeddesc'))).append('<br />');
-
-							$dialog.append(
-								$(document.createElement('button'))
-									.addClass('elgg-button-submit pas mrs mtm google-drive-embed-insert')
-									.append(elgg.echo('googleapps:label:driveembedlink'))
-									.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.insertDriveContent)
-							);
-
-							$dialog.append(
-								$(document.createElement('button'))
-									.addClass('elgg-button-submit pas mrs mtm google-drive-embed-actual')
-									.append(elgg.echo('googleapps:label:driveembedactual', [embedStringType]))
-									.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.embedDriveContent)
-							);
-							
-
-							$('body').append($dialog);
-
-							$("#google-drive-embed-type-dialog").dialog({
-								modal: true,
-								draggable: false,
-								resizable: false,
-								closeOnEscape: false,
-								open: function(event, ui) {	
-									$(".ui-dialog-titlebar-close").remove();
+								if (documentType == 'folder') {
+									var embedStringType = elgg.echo('googleapps:label:driveembedfolder');
+								} else {
+									var embedStringType = elgg.echo('googleapps:label:driveembedfile');
 								}
-							});
+
+								var $dialog = $(document.createElement('div'))
+									.attr({
+										'title': elgg.echo('googleapps:label:driveembedtype'),
+										'id': 'google-drive-embed-type-dialog'
+									});
+								
+								$dialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembeddesc'))).append('<br />');
+
+								$dialog.append(
+									$(document.createElement('button'))
+										.addClass('elgg-button-submit pas mrs mtm google-drive-embed-insert')
+										.append(elgg.echo('googleapps:label:driveembedlink'))
+										.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.insertDriveContent)
+								);
+
+								$dialog.append(
+									$(document.createElement('button'))
+										.addClass('elgg-button-submit pas mrs mtm google-drive-embed-actual')
+										.append(elgg.echo('googleapps:label:driveembedactual', [embedStringType]))
+										.bind('click', {'file': file, 'documentInfo': documentInfo, 'editorId': editor_id}, elgg.google.embedDriveContent)
+								);
+								
+
+								$('body').append($dialog);
+
+								$("#google-drive-embed-type-dialog").dialog({
+									modal: true,
+									draggable: false,
+									resizable: false,
+									closeOnEscape: false,
+									open: function(event, ui) {	
+										$(".ui-dialog-titlebar-close").remove();
+									}
+								});
+							} else {
+								// Got some other type of file (ie: uploaded pdf, video, mp3, word doc, etc)
+								var fakeEvent = {};
+								fakeEvent.data = {};
+								fakeEvent.data.file = file;
+								fakeEvent.data.documentInfo = documentInfo;
+								fakeEvent.data.editorId = editor_id;
+								elgg.google.insertDriveContent(fakeEvent);
+							}
 						}
 					});
 
