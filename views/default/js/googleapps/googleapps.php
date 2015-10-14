@@ -549,7 +549,7 @@ elgg.google.embedDriveContent = function(event) {
 							$(this).parents('.ui-dialog').remove();
 
 							// Generate and insert embed code
-							elgg.google.getAndInsertEmbedCode(file.id, documentInfo.type, height, width, style, editor_id);
+							elgg.google.getAndInsertEmbedCode(file, documentInfo.type, height, width, style, editor_id);
 			
 							event.preventDefault();
 						});
@@ -570,7 +570,7 @@ elgg.google.embedDriveContent = function(event) {
 							});
 						} else {
 							// Good to go! Insert..
-							elgg.google.getAndInsertEmbedCode(file.id, documentInfo.type, height, width, style, editor_id);
+							elgg.google.getAndInsertEmbedCode(file, documentInfo.type, height, width, style, editor_id);
 						}
 					}
 				});
@@ -594,10 +594,11 @@ elgg.google.embedDriveContent = function(event) {
 }
 
 // Generate and insert doc/folder embed code
-elgg.google.getAndInsertEmbedCode = function(id, type, height, width, style, editor_id) {
+elgg.google.getAndInsertEmbedCode = function(file, type, height, width, style, editor_id) {
 	elgg.action(elgg.get_site_url() + 'action/google/docs/embed', {
 		data: {
-			'doc_id': id,
+			'doc_id': file.id,
+			'doc_embed_link': file.embedLink ? file.embedLink : null,
 			'doc_type': type,
 			'doc_embed_height': height, 
 			'doc_embed_width': width,

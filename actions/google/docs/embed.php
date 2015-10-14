@@ -10,6 +10,7 @@
 
 // Get inputs
 $document_id = get_input('doc_id');
+$document_embed_link = get_input('doc_embed_link');
 $document_type = get_input('doc_type');
 $document_embed_height = get_input('doc_embed_height', FALSE);
 $document_embed_width = get_input('doc_embed_width', FALSE);
@@ -24,7 +25,7 @@ if ($document_type == 'folder') {
 	));
 } else {
 	echo elgg_view('googleapps/embedfile', array(
-		'id' => $document_id,
+		'embed_link' => $document_embed_link,
 		'height' => $document_embed_height,
 		'width' => $document_embed_width
 	));

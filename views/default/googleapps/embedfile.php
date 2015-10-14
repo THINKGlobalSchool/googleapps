@@ -9,7 +9,7 @@
  */
 
 $attrs = array(
-	'src' => "https://docs.google.com/document/d/{$vars['id']}/preview",
+	'src' => $vars['embed_link'],
 	'height' => $vars['height'],
 	'width' => $vars['width'],
 	'frameborder' => "0"
