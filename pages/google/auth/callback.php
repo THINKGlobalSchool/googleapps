@@ -180,7 +180,7 @@ if (!$entities) {
 			elgg_set_ignore_access($ia);
 
 			// Revoke tokens
-			$client->revokeToken($access_tokens->refresh_token);
+			$client->revokeToken();
 
 			register_error(elgg_echo('googleapps:error:existing_account'));
 			forward();

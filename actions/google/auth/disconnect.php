@@ -29,7 +29,7 @@ if ($user->google || $user->google_connected) { // Note: $user->google is old me
 	$client->setAccessToken(json_encode(array('access_token' => $user->google_access_token)));
 	
 	// Try revoking
-	if ($client->revokeToken($user->google_refresh_token)) {
+	if ($client->revokeToken()) {
 		// Metadata options
 		$options = array(
 			'guid' => $user->guid,
