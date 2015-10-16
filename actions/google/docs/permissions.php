@@ -24,9 +24,14 @@ if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
 }
 
 // Get google doc
-$client = googleapps_get_client();
-$client->setAccessToken(googleapps_get_user_access_tokens());
-$document = googleapps_get_file_from_id($client, $document_id);
+try {
+	$client = googleapps_get_client();
+	$client->setAccessToken(googleapps_get_user_access_tokens());
+	$document = googleapps_get_file_from_id($client, $document_id);
+} catch (Exception $e) {
+	register_error($e->getMessage());
+	forward(REFERER);
+}
 
 // Update permissions if action is either public or domain
 if ($action == 'public' || $action == 'domain') {

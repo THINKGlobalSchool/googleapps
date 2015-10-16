@@ -618,7 +618,6 @@ elgg.google.getAndInsertEmbedCode = function(file, type, height, width, style, e
 	});
 }
 
-
 elgg.register_hook_handler('init', 'ckeditor', elgg.google.addDriveButton);
 elgg.register_hook_handler('init', 'system', elgg.google.init);
 

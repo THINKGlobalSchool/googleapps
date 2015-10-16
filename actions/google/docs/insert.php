@@ -4,17 +4,22 @@
  *
  * @package googleapps
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
- * @copyright THINK Global School 2010 - 2014
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.org
  */
 
 $document_id = get_input('doc_id');
 
 // Get google doc and permissions
-$client = googleapps_get_client();
-$client->setAccessToken(googleapps_get_user_access_tokens());
-$permissions = googleapps_get_file_permissions_from_id($client, $document_id);
-$document = googleapps_get_file_from_id($client, $document_id);
+try {
+	$client = googleapps_get_client();
+	$client->setAccessToken(googleapps_get_user_access_tokens());
+	$permissions = googleapps_get_file_permissions_from_id($client, $document_id);
+	$document = googleapps_get_file_from_id($client, $document_id);
+} catch (Exception $e) {
+	register_error($e->getMessage());
+	forward(REFERER);
+}
 
 $document_info = array();
 $document_info['doc_id'] = $document_id;
