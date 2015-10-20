@@ -364,7 +364,7 @@ elgg.google.addDriveButton = function(hook, type, params, value) {
 			editor.ui.addButton('DriveButton', { // add new button and bind our command
 			    label: elgg.echo("googleapps:label:insertcontent"),
 			    command: 'insertDrive',
-			    toolbar: 'insert',
+			    toolbar: 'custom2',
 			    icon: elgg.get_site_url() + 'mod/googleapps/graphics/drive_icon.png'
 			});
 

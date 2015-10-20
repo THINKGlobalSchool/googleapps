@@ -173,7 +173,7 @@ return array(
 	'googleapps:label:access_domain' => 'This document is shared only with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Choose one of the following options:',
 	'googleapps:label:access_unowned' => 'This document is not shared publicly or shared with ' . $domain_label . '. This may result in access denied errors for viewers of this post. Contact the document owner if you wish to update it\'s permissions.',
 	'googleapps:label:insertlink' => 'Insert Google Doc link',
-	'googleapps:label:insertcontent' => 'Insert Google Drive content',
+	'googleapps:label:insertcontent' => 'Google Drive',
 	'googleapps:label:syncname' => 'Sync your Google account name upon login',
 	'googleapps:label:nosites' => 'No sites have been synced',
 	'googleapps:label:submissionnotice' => '* Adding a Google Doc to your submission will automatically share it with the To Do owner',

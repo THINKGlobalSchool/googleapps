@@ -340,4 +340,12 @@ div.google-login-or {
 	position: relative;
 	top: 2px;
 }
+
+/* ****************************************
+   CKEditor Button
+***************************************** */
+.cke_button_label.cke_button__drivebutton_label {
+	display: inline;
+}
+
 /*</style>*/
