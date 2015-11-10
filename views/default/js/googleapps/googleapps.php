@@ -487,8 +487,8 @@ elgg.google.embedDriveContent = function(event) {
 		$optionsDialog.append("<br />");
 	}
 
-	var defaultWidth = 800;
-	var defaultHeight = 600;
+	var defaultWidth = 650;
+	var defaultHeight = 400;
 
 	// Width input
 	$optionsDialog.append($((document).createElement('label')).append(elgg.echo('googleapps:label:driveembedwidth')))
