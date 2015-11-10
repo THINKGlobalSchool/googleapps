@@ -17,6 +17,10 @@ $action = get_input('permissions_action');
 $entity_guid = get_input('entity_guid', FALSE);
 $success_class = get_input('success_class');
 
+if (!$container_guid) {
+	$container_guid = elgg_get_logged_in_user_guid();
+}
+
 // Make sure user can write to the container (group)
 if (!can_write_to_container(elgg_get_logged_in_user_guid(), $container_guid)) {
 	register_error(elgg_echo('googleapps:error:nopermission'));
