@@ -29,6 +29,9 @@ function googleapps_init() {
 	$googleapps_js = elgg_get_simplecache_url('js', 'googleapps/googleapps');
 	elgg_register_js('elgg.google', $googleapps_js);
 
+	$googleapps_c_js = elgg_get_simplecache_url('js', 'googleapps/conditional');
+	elgg_register_js('elgg.google-conditional', $googleapps_c_js);
+
 	// Register doc chooser JS
 	$fp_js = elgg_get_simplecache_url('js', 'googleapps/filepicker');
 	elgg_register_js('elgg.googlefilepicker', $fp_js);
@@ -58,6 +61,11 @@ function googleapps_init() {
 	// Load JS lib, only if logged in and not in admin context
 	if (elgg_is_logged_in() && !elgg_in_context('admin')) {
 		elgg_load_js('elgg.google');
+
+		// Load google connected conditional JS
+		if (elgg_get_logged_in_user_entity()->google_connected) {
+			elgg_load_js('elgg.google-conditional');
+		}
 	}
 	
 	// Extend admin JS
