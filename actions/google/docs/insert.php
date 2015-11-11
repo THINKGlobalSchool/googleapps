@@ -42,7 +42,8 @@ if ($is_public) {
 	$form_vars = array(
 		'document_info' => $document_info,
 		'do_create' => 'no',
-		'success_class' => 'googleapps-docs-insert-success'
+		'success_class' => 'googleapps-docs-insert-success',
+		'context' => 'insert'
 	);
 
 	// If this document is shared to the domain, warn and give the option to share publicly

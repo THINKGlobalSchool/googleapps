@@ -16,6 +16,7 @@ $container_guid = elgg_extract('container_guid', $vars);
 $options = elgg_extract('options', $vars);
 $entity_guid = elgg_extract('entity_guid', $vars, FALSE);
 $success_class = elgg_extract('success_class', $vars);
+$context = elgg_extract('context', $vars, 'share');
 
 $message = elgg_echo('googleapps:label:access_' . $document_access);
 
@@ -94,6 +95,12 @@ $tags_input = elgg_view('input/hidden', array(
 	'value' => $document_info['tags'],
 ));
 
+$context_input = elgg_view('input/hidden', array(
+	'id' => 'googleapps-docs-context',
+	'name' => 'context',
+	'value' => $context,
+));
+
 $entity_guid_input = elgg_view('input/hidden', array(
 	'id' => 'googleapps-do-create',
 	'name' => 'entity_guid',
@@ -122,6 +129,7 @@ $form_body = <<<HTML
 	$tags_input
 	$entity_guid_input
 	$success_class_input
+	$context_input
 HTML;
 
 echo $form_body;

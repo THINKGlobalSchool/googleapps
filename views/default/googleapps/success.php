@@ -12,10 +12,15 @@ $owner = get_entity($vars['container_guid']);
 
 $success_class = elgg_extract('success_class', $vars);
 
-if (elgg_instanceof($owner, 'group')) {
-	$forward_url = elgg_get_site_url() . "googleapps/docs/group/{$owner->guid}/owner";
-} else {
-	$forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
+$context = elgg_extract('context', $vars, 'share');
+
+// Don't set forward url unless in share context (embed success handling is handled in JS)
+if ($context == 'share') {
+	if (elgg_instanceof($owner, 'group')) {
+		$forward_url = elgg_get_site_url() . "googleapps/docs/group/{$owner->guid}/owner";
+	} else {
+		$forward_url = elgg_get_site_url() . 'googleapps/docs/' . $owner->username;
+	}
 }
 
 $shared_label = elgg_echo('googleapps:label:documentshared');
