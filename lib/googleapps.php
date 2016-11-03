@@ -462,6 +462,7 @@ function googleapps_update_file_permissions($client, $doc_id, $access, $optParam
 		foreach ($access as $user) {
 			$permission = new Google_Service_Drive_Permission();
 			$permission->setRole('reader');
+			$permission->setAdditionalRoles(["commenter"]);
 			$permission->setType('user');
 			$permission->setValue($user->email);
 
